@@ -1,7 +1,12 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage, router } from '@inertiajs/vue3';
+import Dropdown from '@/Components/Dropdown.vue';
+import DropdownLink from '@/Components/DropdownLink.vue';
+import { computed } from 'vue';
 
 defineEmits(['toggle-sidebar']);
+
+const user = computed(() => usePage().props.auth?.user);
 </script>
 
 <template>
@@ -17,7 +22,7 @@ defineEmits(['toggle-sidebar']);
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <h1 class="text-xl font-bold text-primary-600">JodTod</h1>
+                <Link :href="route('dashboard')" class="text-xl font-bold text-primary-600">JodTod</Link>
             </div>
 
             <!-- Right: Notifications + Profile -->
@@ -29,10 +34,24 @@ defineEmits(['toggle-sidebar']);
                     </svg>
                 </button>
 
-                <!-- Profile Avatar -->
-                <button class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-medium">
-                    U
-                </button>
+                <!-- Profile Dropdown -->
+                <Dropdown v-if="user" align="right" width="48">
+                    <template #trigger>
+                        <button class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-medium">
+                                {{ user.name?.charAt(0)?.toUpperCase() }}
+                            </div>
+                            <span class="hidden sm:block text-sm font-medium text-gray-700">{{ user.name }}</span>
+                            <svg class="hidden sm:block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </template>
+                    <template #content>
+                        <DropdownLink :href="route('profile.edit')">Profile</DropdownLink>
+                        <DropdownLink :href="route('logout')" method="post" as="button">Logout</DropdownLink>
+                    </template>
+                </Dropdown>
             </div>
         </div>
     </header>

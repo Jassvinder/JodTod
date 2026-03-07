@@ -1,4 +1,5 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -6,7 +7,9 @@
         <div class="w-full max-w-md">
             <!-- Logo -->
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-primary-600">JodTod</h1>
+                <Link href="/">
+                    <h1 class="text-3xl font-bold text-primary-600">JodTod</h1>
+                </Link>
                 <p class="text-gray-500 mt-1">Kharcha split karo, dosti mazboot rakho</p>
             </div>
 

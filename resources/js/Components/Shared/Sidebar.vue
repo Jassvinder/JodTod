@@ -1,5 +1,6 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 defineProps({
     open: Boolean,
@@ -7,12 +8,30 @@ defineProps({
 
 defineEmits(['close']);
 
+const currentUrl = computed(() => usePage().url);
+
 const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: 'home' },
-    { name: 'Expenses', href: '/expenses', icon: 'wallet' },
-    { name: 'Groups', href: '/groups', icon: 'users' },
-    { name: 'Profile', href: '/profile', icon: 'user' },
+    { name: 'Dashboard', route: 'dashboard', icon: 'home' },
+    { name: 'Expenses', route: 'expenses', icon: 'wallet', href: '/expenses' },
+    { name: 'Groups', route: 'groups', icon: 'users', href: '/groups' },
+    { name: 'Profile', route: 'profile.edit', icon: 'user' },
 ];
+
+function getHref(item) {
+    try {
+        return route(item.route);
+    } catch {
+        return item.href || '#';
+    }
+}
+
+function isActive(item) {
+    try {
+        return route().current(item.route);
+    } catch {
+        return currentUrl.value.startsWith(item.href || '###');
+    }
+}
 </script>
 
 <template>
@@ -32,7 +51,7 @@ const navigation = [
     >
         <!-- Logo -->
         <div class="flex items-center h-16 px-6 border-b border-gray-200">
-            <h1 class="text-xl font-bold text-primary-600">JodTod</h1>
+            <Link :href="route('dashboard')" class="text-xl font-bold text-primary-600">JodTod</Link>
         </div>
 
         <!-- Navigation -->
@@ -40,8 +59,13 @@ const navigation = [
             <Link
                 v-for="item in navigation"
                 :key="item.name"
-                :href="item.href"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                :href="getHref(item)"
+                :class="[
+                    'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                    isActive(item)
+                        ? 'bg-primary-50 text-primary-700 font-medium'
+                        : 'text-gray-700 hover:bg-gray-100'
+                ]"
                 @click="$emit('close')"
             >
                 <!-- Home Icon -->

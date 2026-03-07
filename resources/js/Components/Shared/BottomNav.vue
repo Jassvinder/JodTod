@@ -1,12 +1,31 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const currentUrl = computed(() => usePage().url);
 
 const navigation = [
-    { name: 'Home', href: '/dashboard', icon: 'home' },
-    { name: 'Expenses', href: '/expenses', icon: 'wallet' },
-    { name: 'Groups', href: '/groups', icon: 'users' },
-    { name: 'Profile', href: '/profile', icon: 'user' },
+    { name: 'Home', route: 'dashboard', icon: 'home' },
+    { name: 'Expenses', route: 'expenses', icon: 'wallet', href: '/expenses' },
+    { name: 'Groups', route: 'groups', icon: 'users', href: '/groups' },
+    { name: 'Profile', route: 'profile.edit', icon: 'user' },
 ];
+
+function getHref(item) {
+    try {
+        return route(item.route);
+    } catch {
+        return item.href || '#';
+    }
+}
+
+function isActive(item) {
+    try {
+        return route().current(item.route);
+    } catch {
+        return currentUrl.value.startsWith(item.href || '###');
+    }
+}
 </script>
 
 <template>
@@ -15,8 +34,11 @@ const navigation = [
             <Link
                 v-for="item in navigation"
                 :key="item.name"
-                :href="item.href"
-                class="flex flex-col items-center justify-center gap-1 px-3 py-2 text-gray-500 hover:text-primary-600 transition-colors"
+                :href="getHref(item)"
+                :class="[
+                    'flex flex-col items-center justify-center gap-1 px-3 py-2 transition-colors',
+                    isActive(item) ? 'text-primary-600' : 'text-gray-500 hover:text-primary-600'
+                ]"
             >
                 <!-- Home Icon -->
                 <svg v-if="item.icon === 'home'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
