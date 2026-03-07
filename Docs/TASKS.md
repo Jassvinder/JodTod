@@ -8,15 +8,6 @@
 - [ ] Configure PWA manifest & service worker (basic)
 
 
-### Phase 3: Personal Expenses
-- [ ] Create expenses migration & model
-- [ ] Create categories migration & seeder
-- [ ] Build "Add Expense" form (Vue component)
-- [ ] Build "Expense List" with filters & pagination
-- [ ] Implement "Edit Expense" functionality
-- [ ] Implement "Delete Expense" with confirmation
-- [ ] Build expense summary/charts (Chart.js)
-
 ### Phase 4: Group Management
 - [ ] Create groups migration & model
 - [ ] Create group_members migration & model
@@ -56,7 +47,20 @@
 - [ ] Quick add expense button
 - [ ] Pending settlements indicator
 
-### Phase 8: SEO & Landing Pages (Blade)
+### Phase 8: Admin Dashboard & Role System
+- [ ] Add `role` column to users table (migration)
+- [ ] Update User model (role field, isAdmin helper)
+- [ ] Create admin middleware
+- [ ] Role-based redirect after login
+- [ ] Create AdminLayout (Vue - separate sidebar)
+- [ ] Build admin dashboard overview (stats cards)
+- [ ] Build user management (list, view, change role, ban/unban, delete)
+- [ ] Build category management (CRUD)
+- [ ] Build blog management (CRUD with SEO fields)
+- [ ] Build admin reports page (trends, breakdowns)
+- [ ] Create UserSeeder (1 admin + 4 users)
+
+### Phase 9: SEO & Landing Pages (Blade)
 - [ ] Build landing page (hero, features, CTA)
 - [ ] Build features page
 - [ ] Build about, contact, privacy, terms pages
@@ -66,14 +70,14 @@
 - [ ] Add meta tags, OG tags, structured data
 - [ ] Add schema markup
 
-### Phase 9: Notifications
+### Phase 10: Notifications
 - [ ] Setup Laravel Notifications
 - [ ] In-app notification system (bell icon, count)
 - [ ] Email notification templates
 - [ ] Notification preferences (toggle on/off)
 - [ ] Notification triggers for all events
 
-### Phase 10: PWA & Polish
+### Phase 11: PWA & Polish
 - [ ] Complete PWA setup (icons, manifest, service worker)
 - [ ] Offline caching strategy
 - [ ] Background sync for offline data
@@ -86,7 +90,7 @@
 
 ## IN PROGRESS
 
-### Phase 3: Personal Expenses (NEXT UP)
+### Phase 4: Group Management (NEXT UP)
 
 ---
 
@@ -103,6 +107,15 @@
 - [x] Create reusable Blade components (header, footer, public layout)
 - [x] Create reusable Vue components (AppLayout, GuestLayout, Header, Sidebar, BottomNav)
 - [x] Dashboard page placeholder
+
+### Phase 3: Personal Expenses
+- [x] Create expenses migration & model
+- [x] Create categories migration & seeder
+- [x] Build "Add Expense" form (Vue component)
+- [x] Build "Expense List" with filters & pagination
+- [x] Implement "Edit Expense" functionality
+- [x] Implement "Delete Expense" with confirmation
+- [x] Build expense summary/charts (Chart.js)
 
 ### Phase 2: Authentication
 - [x] Create users migration & model (with avatar, google_id, currency, language, notifications)

@@ -11,6 +11,7 @@
 | email | VARCHAR(255) | NOT NULL, UNIQUE | |
 | email_verified_at | TIMESTAMP | NULLABLE | |
 | password | VARCHAR(255) | NULLABLE (Google login) | |
+| role | ENUM('admin', 'user') | DEFAULT 'user' | App-level role (admin or regular user) |
 | avatar | VARCHAR(255) | NULLABLE | Profile photo path |
 | google_id | VARCHAR(255) | NULLABLE, UNIQUE | For Google OAuth |
 | currency | VARCHAR(10) | DEFAULT 'INR' | Preferred currency |

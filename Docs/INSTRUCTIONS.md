@@ -115,11 +115,17 @@
 - Expense amount stored in `expenses` table
 - Each member's share stored in `expense_splits` table
 - Recalculate balances on every add/edit/delete
+- **Admin can add expense on behalf of any member:**
+  - Admin sees a "Created by" dropdown (in addition to "Paid by")
+  - `user_id` (who created) = admin, but `paid_by` = selected member
+  - Regular members can only add expenses as themselves
+  - This is useful when a member is offline or forgot to add their expense
 
 ### Validation Rules:
 - Description: required, max 255
 - Amount: required, numeric, min 0.01
 - Paid by: required, must be group member
+- Created by: auto-set to logged-in user (admin can override for "paid_by")
 - Split type: required, one of (equal, custom, percentage)
 - Custom split total must equal expense amount
 - Percentage split total must equal 100
@@ -235,7 +241,40 @@
 
 ---
 
-## Feature 10: Responsive Design
+## Feature 10: Admin Dashboard & Role System
+
+### What to build:
+- Role column on users table (enum: 'admin', 'user', default 'user')
+- Admin middleware to protect `/admin/*` routes
+- Role-based redirect after login (admin -> /admin, user -> /dashboard)
+- Admin dashboard with site-wide statistics
+- User management (list, view, change role, ban/unban, delete)
+- Category management (CRUD)
+- Blog management (CRUD with SEO fields)
+- Reports (expense trends, category breakdown, settlement stats)
+
+### Implementation Notes:
+- Simple `role` column on `users` table — no separate roles/permissions table
+- Admin routes: `/admin/*` (Inertia + Vue with separate AdminLayout)
+- Admin middleware: check `auth()->user()->role === 'admin'`
+- Admin cannot delete themselves
+- Admin layout: separate sidebar with admin-specific navigation
+- User interface (`/dashboard`, `/expenses`, `/groups`) is completely separate from admin (`/admin/*`)
+- Blog CRUD in admin panel, public blog listing/detail in Blade (SEO)
+- Admin can see all users' data but cannot modify their expenses directly
+
+### Validation Rules:
+- Role: required, one of ('admin', 'user')
+- User ban: cannot ban self, cannot ban other admins
+- Category delete: only if no expenses use that category
+
+### Seeder:
+- 1 admin user (admin@jodtod.com / password)
+- 4 regular users for testing
+
+---
+
+## Feature 11: Responsive Design
 
 ### Breakpoints (Tailwind defaults):
 - Mobile: < 640px (sm)

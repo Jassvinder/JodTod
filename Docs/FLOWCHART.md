@@ -16,12 +16,16 @@
     +---> [Login / Register]
               |
               v
-        [Dashboard / Home Screen] (Inertia + Vue)
+        [Check User Role]
               |
-              +---> [Personal Expenses]
-              +---> [Groups]
-              +---> [Profile / Settings]
-              +---> [Notifications]
+              +---> [role = 'admin'] --> [Admin Dashboard] (/admin)
+              |
+              +---> [role = 'user'] --> [User Dashboard] (/dashboard)
+                        |
+                        +---> [Personal Expenses]
+                        +---> [Groups]
+                        +---> [Profile / Settings]
+                        +---> [Notifications]
 ```
 
 ---
@@ -34,13 +38,13 @@
     +---> [Email + Password Login]
     |         |
     |         v
-    |     [Validate] --> [Success] --> [Dashboard]
+    |     [Validate] --> [Success] --> [Check Role] --> [Admin? /admin : /dashboard]
     |                --> [Fail] --> [Error Message]
     |
     +---> [Google OAuth Login]
     |         |
     |         v
-    |     [Google Consent] --> [Callback] --> [Create/Find User] --> [Dashboard]
+    |     [Google Consent] --> [Callback] --> [Create/Find User] --> [Check Role] --> [Redirect]
     |
     +---> [Register]
               |
@@ -160,17 +164,18 @@
     |         - Paid By: [Select Member] (default: me)
     |         - Date (default: today)
     |         - Category
+    |         - Admin only: can add expense on behalf of any member
     |         - Split Type:
     |             |
     |             +---> [Equal Split]
-    |             |         All members ka equal share
+    |             |         Equal share among selected members
     |             |
     |             +---> [Custom Split]
-    |             |         Har member ka amount manually enter karo
+    |             |         Enter specific amount per member
     |             |         Validation: total = expense amount
     |             |
     |             +---> [Percentage Split]
-    |                       Har member ka % enter karo
+    |                       Enter % per member
     |                       Validation: total = 100%
     |         |
     |         v
@@ -241,7 +246,53 @@
 
 ---
 
-## 8. PWA Flow
+## 8. Admin Dashboard Flow
+
+```
+[Admin Login] --> [/admin] (Admin Dashboard)
+    |
+    +---> [Overview / Stats]
+    |         - Total users count
+    |         - Total groups count
+    |         - Total expenses (all users)
+    |         - New users this month
+    |         - Active groups this month
+    |
+    +---> [User Management] (/admin/users)
+    |         - List all users (search, filter by role, paginated)
+    |         - View user details (expenses, groups, activity)
+    |         - Change user role (admin/user)
+    |         - Ban / Unban user
+    |         - Delete user (soft delete, confirm dialog)
+    |
+    +---> [Category Management] (/admin/categories)
+    |         - List categories
+    |         - Add new category
+    |         - Edit category (name, icon)
+    |         - Delete category (only if no expenses linked)
+    |
+    +---> [Blog Management] (/admin/blog)
+    |         - List all blog posts (draft/published)
+    |         - Create new post (title, slug, content, excerpt, image, SEO fields)
+    |         - Edit post
+    |         - Publish / Unpublish post
+    |         - Delete post
+    |
+    +---> [Reports] (/admin/reports)
+    |         - Expense trends (daily/weekly/monthly)
+    |         - Category-wise breakdown (all users)
+    |         - Top groups by activity
+    |         - Settlement stats
+    |
+    +---> [Settings] (/admin/settings)
+              - Site name / tagline (future)
+              - Default currency
+              - Maintenance mode toggle
+```
+
+---
+
+## 9. PWA Flow
 
 ```
 [First Visit]
