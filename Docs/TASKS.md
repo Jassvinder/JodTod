@@ -5,13 +5,7 @@
 ## PENDING
 
 ### Phase 1: Project Setup
-- [ ] Initialize Laravel project
-- [ ] Configure MySQL database connection
-- [ ] Install & configure Inertia.js + Vue.js
-- [ ] Install & configure Tailwind CSS
-- [ ] Setup folder structure (Blade views, Vue components)
 - [ ] Configure PWA manifest & service worker (basic)
-- [ ] Setup Git repository
 
 ### Phase 2: Authentication
 - [ ] Create users migration & model
@@ -103,8 +97,20 @@
 
 (Nothing currently in progress)
 
+### Phase 2: Authentication (NEXT UP)
+
 ---
 
 ## COMPLETED
 
-(Nothing completed yet)
+### Phase 1: Project Setup
+- [x] Initialize Laravel project
+- [x] Configure MySQL database connection
+- [x] Install & configure Inertia.js + Vue.js
+- [x] Install & configure Tailwind CSS
+- [x] Setup folder structure (Blade views, Vue components)
+- [x] Setup Git repository
+- [x] Build landing page (hero, features, CTA) - basic version
+- [x] Create reusable Blade components (header, footer, public layout)
+- [x] Create reusable Vue components (AppLayout, GuestLayout, Header, Sidebar, BottomNav)
+- [x] Dashboard page placeholder

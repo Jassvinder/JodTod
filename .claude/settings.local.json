@@ -4,7 +4,8 @@
       "Bash(cp:*)",
       "Bash(composer require:*)",
       "Bash(npm install:*)",
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
