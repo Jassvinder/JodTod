@@ -1,0 +1,317 @@
+<script setup>
+import AppLayout from '@/Layouts/AppLayout.vue';
+import CategoryPieChart from '@/Components/Expenses/CategoryPieChart.vue';
+import DailyBarChart from '@/Components/Expenses/DailyBarChart.vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
+
+const props = defineProps({
+    expenses: Object,
+    categories: Array,
+    summary: Object,
+    filters: Object,
+});
+
+const search = ref(props.filters.search || '');
+const category = ref(props.filters.category || '');
+const period = ref(props.filters.period || '');
+const sort = ref(props.filters.sort || 'expense_date');
+const direction = ref(props.filters.direction || 'desc');
+
+const showDeleteModal = ref(false);
+const expenseToDelete = ref(null);
+
+let searchTimeout = null;
+
+function applyFilters() {
+    router.get(route('expenses.index'), {
+        search: search.value || undefined,
+        category: category.value || undefined,
+        period: period.value || undefined,
+        sort: sort.value !== 'expense_date' ? sort.value : undefined,
+        direction: direction.value !== 'desc' ? direction.value : undefined,
+    }, {
+        preserveState: true,
+        replace: true,
+    });
+}
+
+watch([category, period, sort, direction], applyFilters);
+
+watch(search, () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(applyFilters, 400);
+});
+
+function clearFilters() {
+    search.value = '';
+    category.value = '';
+    period.value = '';
+    sort.value = 'expense_date';
+    direction.value = 'desc';
+    router.get(route('expenses.index'), {}, { preserveState: true, replace: true });
+}
+
+function toggleSort(field) {
+    if (sort.value === field) {
+        direction.value = direction.value === 'desc' ? 'asc' : 'desc';
+    } else {
+        sort.value = field;
+        direction.value = 'desc';
+    }
+}
+
+function confirmDelete(expense) {
+    expenseToDelete.value = expense;
+    showDeleteModal.value = true;
+}
+
+function deleteExpense() {
+    if (!expenseToDelete.value) return;
+    router.delete(route('expenses.destroy', expenseToDelete.value.id), {
+        onFinish: () => {
+            showDeleteModal.value = false;
+            expenseToDelete.value = null;
+        },
+    });
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    }).format(amount);
+}
+
+function formatDate(date) {
+    return new Date(date).toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    });
+}
+
+const hasActiveFilters = () => search.value || category.value || period.value;
+</script>
+
+<template>
+    <Head title="Expenses" />
+
+    <AppLayout>
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Expenses</h2>
+                    <p class="mt-1 text-gray-500">Track your personal expenses</p>
+                </div>
+                <Link
+                    :href="route('expenses.create')"
+                    class="inline-flex items-center px-4 py-2.5 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors"
+                >
+                    <svg class="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Expense
+                </Link>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white rounded-xl border border-gray-200 p-5">
+                    <p class="text-sm text-gray-500">This Month</p>
+                    <p class="mt-1 text-2xl font-bold text-gray-900">{{ formatCurrency(summary.monthly_total) }}</p>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-200 p-5">
+                    <p class="text-sm text-gray-500">Last Month</p>
+                    <p class="mt-1 text-2xl font-bold text-gray-900">{{ formatCurrency(summary.last_month_total) }}</p>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-200 p-5">
+                    <p class="text-sm text-gray-500">Difference</p>
+                    <p
+                        class="mt-1 text-2xl font-bold"
+                        :class="summary.monthly_total > summary.last_month_total ? 'text-accent-600' : 'text-success-600'"
+                    >
+                        {{ summary.monthly_total > summary.last_month_total ? '+' : '' }}{{ formatCurrency(summary.monthly_total - summary.last_month_total) }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div v-if="summary.category_breakdown.length || summary.daily_trend.length" class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Category Pie Chart -->
+                <div v-if="summary.category_breakdown.length" class="bg-white rounded-xl border border-gray-200 p-5">
+                    <h3 class="text-sm font-medium text-gray-500 mb-3">This Month by Category</h3>
+                    <CategoryPieChart :data="summary.category_breakdown" />
+                </div>
+
+                <!-- Daily Trend Bar Chart -->
+                <div v-if="summary.daily_trend.length" class="bg-white rounded-xl border border-gray-200 p-5">
+                    <h3 class="text-sm font-medium text-gray-500 mb-3">Daily Spending Trend</h3>
+                    <DailyBarChart :data="summary.daily_trend" />
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="mt-6 bg-white rounded-xl border border-gray-200 p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Search -->
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input
+                            v-model="search"
+                            type="text"
+                            placeholder="Search description..."
+                            class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        />
+                    </div>
+
+                    <!-- Category filter -->
+                    <select
+                        v-model="category"
+                        class="w-full py-2.5 px-3 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                        <option value="">All Categories</option>
+                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                            {{ cat.name }}
+                        </option>
+                    </select>
+
+                    <!-- Period filter -->
+                    <select
+                        v-model="period"
+                        class="w-full py-2.5 px-3 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                        <option value="">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+
+                    <!-- Clear filters -->
+                    <button
+                        v-if="hasActiveFilters()"
+                        @click="clearFilters"
+                        class="py-2.5 px-3 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                    >
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Expenses List -->
+            <div class="mt-4 bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <!-- Table Header (desktop) -->
+                <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-5 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <button @click="toggleSort('expense_date')" class="col-span-2 flex items-center gap-1 hover:text-gray-700">
+                        Date
+                        <span v-if="sort === 'expense_date'" class="text-primary-600">{{ direction === 'asc' ? '↑' : '↓' }}</span>
+                    </button>
+                    <div class="col-span-3">Description</div>
+                    <button @click="toggleSort('category_id')" class="col-span-2 flex items-center gap-1 hover:text-gray-700">
+                        Category
+                        <span v-if="sort === 'category_id'" class="text-primary-600">{{ direction === 'asc' ? '↑' : '↓' }}</span>
+                    </button>
+                    <button @click="toggleSort('amount')" class="col-span-2 flex items-center gap-1 justify-end hover:text-gray-700">
+                        Amount
+                        <span v-if="sort === 'amount'" class="text-primary-600">{{ direction === 'asc' ? '↑' : '↓' }}</span>
+                    </button>
+                    <div class="col-span-3 text-right">Actions</div>
+                </div>
+
+                <!-- Expense rows -->
+                <div v-if="expenses.data.length === 0" class="px-5 py-12 text-center text-gray-400">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <p>No expenses found</p>
+                    <Link :href="route('expenses.create')" class="inline-block mt-2 text-primary-600 hover:text-primary-700 font-medium text-sm">Add your first expense</Link>
+                </div>
+
+                <div
+                    v-for="expense in expenses.data"
+                    :key="expense.id"
+                    class="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors items-center"
+                >
+                    <!-- Mobile: stacked layout -->
+                    <div class="sm:col-span-2 text-sm text-gray-500">{{ formatDate(expense.expense_date) }}</div>
+                    <div class="sm:col-span-3 text-sm font-medium text-gray-900">{{ expense.description || '-' }}</div>
+                    <div class="sm:col-span-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                            {{ expense.category?.name }}
+                        </span>
+                    </div>
+                    <div class="sm:col-span-2 text-sm font-semibold text-gray-900 sm:text-right">{{ formatCurrency(expense.amount) }}</div>
+                    <div class="sm:col-span-3 flex items-center gap-2 sm:justify-end">
+                        <Link
+                            :href="route('expenses.edit', expense.id)"
+                            class="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium text-primary-600 hover:bg-primary-50 transition-colors"
+                        >
+                            Edit
+                        </Link>
+                        <button
+                            @click="confirmDelete(expense)"
+                            class="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium text-accent-600 hover:bg-accent-50 transition-colors"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="expenses.data.length && expenses.last_page > 1" class="px-5 py-3 border-t border-gray-200 flex items-center justify-between">
+                    <p class="text-sm text-gray-500">
+                        Showing {{ expenses.from }} to {{ expenses.to }} of {{ expenses.total }} expenses
+                    </p>
+                    <div class="flex gap-1">
+                        <Link
+                            v-for="link in expenses.links"
+                            :key="link.label"
+                            :href="link.url || '#'"
+                            :class="[
+                                'px-3 py-1.5 rounded-md text-sm',
+                                link.active ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-100',
+                                !link.url ? 'opacity-50 pointer-events-none' : '',
+                            ]"
+                            v-html="link.label"
+                            preserve-state
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <Teleport to="body">
+            <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center">
+                <div class="fixed inset-0 bg-black/50" @click="showDeleteModal = false"></div>
+                <div class="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Delete Expense</h3>
+                    <p class="mt-2 text-sm text-gray-600">
+                        Are you sure you want to delete this expense of
+                        <strong>{{ expenseToDelete ? formatCurrency(expenseToDelete.amount) : '' }}</strong>?
+                        This action cannot be undone.
+                    </p>
+                    <div class="mt-5 flex gap-3 justify-end">
+                        <button
+                            @click="showDeleteModal = false"
+                            class="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            @click="deleteExpense"
+                            class="px-4 py-2 rounded-lg bg-accent-600 text-white text-sm font-semibold hover:bg-accent-700"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
+    </AppLayout>
+</template>

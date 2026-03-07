@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -28,6 +29,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
         'google_id',
     ];
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
 
     protected function casts(): array
     {

@@ -12,7 +12,7 @@ const currentUrl = computed(() => usePage().url);
 
 const navigation = [
     { name: 'Dashboard', route: 'dashboard', icon: 'home' },
-    { name: 'Expenses', route: 'expenses', icon: 'wallet', href: '/expenses' },
+    { name: 'Expenses', route: 'expenses.index', icon: 'wallet', routePrefix: 'expenses' },
     { name: 'Groups', route: 'groups', icon: 'users', href: '/groups' },
     { name: 'Profile', route: 'profile.edit', icon: 'user' },
 ];
@@ -27,9 +27,12 @@ function getHref(item) {
 
 function isActive(item) {
     try {
+        if (item.routePrefix) {
+            return route().current(item.routePrefix + '.*');
+        }
         return route().current(item.route);
     } catch {
-        return currentUrl.value.startsWith(item.href || '###');
+        return false;
     }
 }
 </script>
