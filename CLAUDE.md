@@ -1,7 +1,15 @@
 # JodTod - Project Instructions for Claude
 
+## Language Rules (STRICT)
+- **Chat with user:** Hinglish (Hindi + English mix)
+- **Code, comments, variable names:** English ONLY
+- **UI content, labels, buttons:** English ONLY
+- **Documentation files (Docs/):** English ONLY
+- **Git commit messages:** English ONLY
+- NO Hindi/Hinglish anywhere in the codebase. All project content must be in English.
+
 ## Project Overview
-JodTod is an expense tracker & splitter app. Users can track personal expenses and split group expenses with settlement calculation ("kaun kisko kitna dega").
+JodTod is an expense tracker & splitter app. Users can track personal expenses and split group expenses with settlement calculation.
 
 ## Tech Stack
 - **Backend:** Laravel (PHP)

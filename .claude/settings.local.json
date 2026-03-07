@@ -6,7 +6,8 @@
       "Bash(npm install:*)",
       "Bash(php artisan:*)",
       "Bash(npm run:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(curl:*)"
     ]
   }
 }

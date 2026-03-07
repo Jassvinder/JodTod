@@ -23,10 +23,10 @@
                 {{ $hero['subtitle'] }}
             </p>
             <div class="mt-8 flex flex-col sm:flex-row gap-4">
-                <a href="/register" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-primary-700 font-semibold hover:bg-primary-50 transition-colors">
+                <a href="{{ url('/register') }}" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-primary-700 font-semibold hover:bg-primary-50 transition-colors">
                     {{ $hero['cta_primary'] }}
                 </a>
-                <a href="/features" class="inline-flex items-center justify-center px-6 py-3 rounded-lg border-2 border-white/30 text-white font-semibold hover:bg-white/10 transition-colors">
+                <a href="{{ url('/features') }}" class="inline-flex items-center justify-center px-6 py-3 rounded-lg border-2 border-white/30 text-white font-semibold hover:bg-white/10 transition-colors">
                     {{ $hero['cta_secondary'] }}
                 </a>
             </div>
@@ -38,8 +38,8 @@
 <section class="py-16 sm:py-24 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto">
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900">Sab kuch ek jagah</h2>
-            <p class="mt-4 text-lg text-gray-600">Personal expenses track karo ya group me split karo - {{ config('site.app.name') }} sab sambhalta hai</p>
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900">Everything in one place</h2>
+            <p class="mt-4 text-lg text-gray-600">Track personal expenses or split with groups — {{ config('site.app.name') }} handles it all</p>
         </div>
 
         <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -72,8 +72,8 @@
 <section class="py-16 sm:py-24 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto">
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900">Kaise kaam karta hai?</h2>
-            <p class="mt-4 text-lg text-gray-600">Bas 3 simple steps</p>
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900">How it works</h2>
+            <p class="mt-4 text-lg text-gray-600">Just 3 simple steps</p>
         </div>
 
         <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -93,7 +93,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl sm:text-4xl font-bold">{{ $cta['title'] }}</h2>
         <p class="mt-4 text-lg text-primary-100">{{ $cta['subtitle'] }}</p>
-        <a href="/register" class="mt-8 inline-flex items-center justify-center px-8 py-3 rounded-lg bg-white text-primary-700 font-semibold hover:bg-primary-50 transition-colors">
+        <a href="{{ url('/register') }}" class="mt-8 inline-flex items-center justify-center px-8 py-3 rounded-lg bg-white text-primary-700 font-semibold hover:bg-primary-50 transition-colors">
             {{ $cta['button'] }}
         </a>
     </div>

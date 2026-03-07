@@ -10,7 +10,7 @@ import { Link } from '@inertiajs/vue3';
                 <Link href="/">
                     <h1 class="text-3xl font-bold text-primary-600">JodTod</h1>
                 </Link>
-                <p class="text-gray-500 mt-1">Kharcha split karo, dosti mazboot rakho</p>
+                <p class="text-gray-500 mt-1">Split expenses, strengthen friendships</p>
             </div>
 
             <!-- Card -->

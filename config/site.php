@@ -22,8 +22,8 @@ return [
     */
     'app' => [
         'name' => 'JodTod',
-        'tagline' => 'Kharcha split karo, dosti mazboot rakho',
-        'description' => 'Dosto, roommates aur family ke saath kharcha split karo asaani se. Personal expense tracking, group expense splitting, instant settlement.',
+        'tagline' => 'Split expenses, strengthen friendships',
+        'description' => 'Split expenses with friends, roommates and family easily. Personal expense tracking, group expense splitting, instant settlement.',
         'url' => env('APP_URL', 'http://localhost'),
         'currency' => '₹',
         'currency_code' => 'INR',
@@ -36,29 +36,29 @@ return [
     */
     'landing' => [
         'hero' => [
-            'title_line1' => 'Kharcha split karo,',
-            'title_line2' => 'dosti mazboot rakho',
-            'subtitle' => 'Group trip ho ya roommate ka kharcha - JodTod se track karo, split karo, aur settle karo. Kaun kisko kitna dega, sab clear!',
-            'cta_primary' => 'Free me shuru karein',
-            'cta_secondary' => 'Features dekhein',
+            'title_line1' => 'Split expenses,',
+            'title_line2' => 'strengthen friendships',
+            'subtitle' => 'Whether it\'s a group trip or roommate bills — track, split, and settle with JodTod. Who owes whom, all crystal clear!',
+            'cta_primary' => 'Get started for free',
+            'cta_secondary' => 'See features',
         ],
 
         'features' => [
             [
                 'title' => 'Personal Expense Tracking',
-                'description' => 'Rozana ka kharcha track karo. Category-wise dekhein kitna kahan gaya.',
+                'description' => 'Track your daily expenses. See category-wise breakdown of where your money goes.',
                 'icon' => 'wallet',
                 'color' => 'primary',
             ],
             [
                 'title' => 'Group Expense Splitting',
-                'description' => 'Friends, roommates ya family ke saath kharcha share karo. Equal, custom ya percentage split.',
+                'description' => 'Share expenses with friends, roommates or family. Equal, custom or percentage split.',
                 'icon' => 'users',
                 'color' => 'success',
             ],
             [
                 'title' => 'Smart Settlement',
-                'description' => 'Kaun kisko kitna dega - sab automatic calculate. Minimum transactions me settle karo.',
+                'description' => 'Who owes whom — all calculated automatically. Settle in minimum transactions.',
                 'icon' => 'calculator',
                 'color' => 'accent',
             ],
@@ -67,25 +67,25 @@ return [
         'how_it_works' => [
             [
                 'step' => 1,
-                'title' => 'Group Banao',
-                'description' => 'Trip, flat, office lunch - kisi bhi cheez ke liye group create karo aur dosto ko add karo.',
+                'title' => 'Create a Group',
+                'description' => 'Trip, flat, office lunch — create a group for anything and add your friends.',
             ],
             [
                 'step' => 2,
-                'title' => 'Kharcha Add Karo',
-                'description' => 'Jisne bhi pay kiya wo expense add kare. Split type choose karo - equal, custom ya percentage.',
+                'title' => 'Add Expenses',
+                'description' => 'Whoever paid adds the expense. Choose split type — equal, custom or percentage.',
             ],
             [
                 'step' => 3,
-                'title' => 'Settle Up Karo',
-                'description' => 'JodTod automatically batayega kaun kisko kitna dega. Minimum transactions, maximum clarity!',
+                'title' => 'Settle Up',
+                'description' => 'JodTod automatically shows who owes whom. Minimum transactions, maximum clarity!',
             ],
         ],
 
         'cta' => [
-            'title' => 'Paise ka jhagda band, JodTod shuru!',
-            'subtitle' => 'Free me register karein aur abhi se expenses track karna shuru karein.',
-            'button' => 'Abhi shuru karein - Free hai!',
+            'title' => 'No more money fights, start with JodTod!',
+            'subtitle' => 'Register for free and start tracking your expenses today.',
+            'button' => 'Get started — It\'s free!',
         ],
     ],
 
@@ -115,7 +115,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'footer' => [
-        'description' => 'Kharcha split karo, dosti mazboot rakho.',
+        'description' => 'Split expenses, strengthen friendships.',
         'quick_links' => [
             ['label' => 'Features', 'url' => '/features'],
             ['label' => 'Blog', 'url' => '/blog'],
@@ -137,8 +137,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'seo' => [
-        'default_title' => 'JodTod - Expense Tracker & Splitter | Kharcha Split Karo Asaani Se',
-        'default_description' => 'JodTod - Dosto, roommates aur family ke saath kharcha split karo asaani se. Personal expense tracking, group expense splitting, instant settlement.',
+        'default_title' => 'JodTod - Expense Tracker & Splitter | Split Expenses Easily',
+        'default_description' => 'JodTod - Split expenses with friends, roommates and family easily. Personal expense tracking, group expense splitting, instant settlement.',
         'og_image' => '/images/og-image.png',
     ],
 
@@ -148,14 +148,14 @@ return [
     |--------------------------------------------------------------------------
     */
     'categories' => [
-        ['name' => 'Food', 'hindi' => 'Khana-Peena', 'icon' => 'utensils'],
-        ['name' => 'Travel', 'hindi' => 'Safar', 'icon' => 'car'],
-        ['name' => 'Shopping', 'hindi' => 'Khareedari', 'icon' => 'shopping-bag'],
-        ['name' => 'Bills', 'hindi' => 'Bills', 'icon' => 'file-text'],
-        ['name' => 'Entertainment', 'hindi' => 'Manoranjan', 'icon' => 'film'],
-        ['name' => 'Medical', 'hindi' => 'Dawai-Doctor', 'icon' => 'heart-pulse'],
-        ['name' => 'Education', 'hindi' => 'Padhai', 'icon' => 'book-open'],
-        ['name' => 'Rent', 'hindi' => 'Kiraya', 'icon' => 'home'],
-        ['name' => 'Other', 'hindi' => 'Anya', 'icon' => 'more-horizontal'],
+        ['name' => 'Food', 'icon' => 'utensils'],
+        ['name' => 'Travel', 'icon' => 'car'],
+        ['name' => 'Shopping', 'icon' => 'shopping-bag'],
+        ['name' => 'Bills', 'icon' => 'file-text'],
+        ['name' => 'Entertainment', 'icon' => 'film'],
+        ['name' => 'Medical', 'icon' => 'heart-pulse'],
+        ['name' => 'Education', 'icon' => 'book-open'],
+        ['name' => 'Rent', 'icon' => 'home'],
+        ['name' => 'Other', 'icon' => 'more-horizontal'],
     ],
 ];

@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'JodTod - Expense Tracker & Splitter')</title>
-    <meta name="description" content="@yield('meta_description', 'JodTod - Dosto ke saath kharcha split karo asaani se. Track personal & group expenses, settle up instantly.')">
+    <meta name="description" content="@yield('meta_description', config('site.seo.default_description'))">
 
     @hasSection('meta_tags')
         @yield('meta_tags')
@@ -14,7 +14,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="@yield('title', 'JodTod - Expense Tracker & Splitter')">
-    <meta property="og:description" content="@yield('meta_description', 'JodTod - Dosto ke saath kharcha split karo asaani se.')">
+    <meta property="og:description" content="@yield('meta_description', config('site.seo.default_description'))">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
 

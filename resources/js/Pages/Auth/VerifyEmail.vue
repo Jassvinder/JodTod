@@ -18,14 +18,14 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
     <GuestLayout>
         <Head title="Email Verify Karein" />
 
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Email verify karein</h2>
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Verify your email</h2>
 
         <p class="mb-4 text-sm text-gray-600">
-            Sign up ke liye shukriya! Shuru karne se pehle, apna email verify kar lo - humne ek link bheja hai tumhare email pe.
+            Thanks for signing up! Before getting started, please verify your email address by clicking the link we just sent you.
         </p>
 
         <div v-if="verificationLinkSent" class="mb-4 text-sm font-medium text-success-600">
-            Ek naya verification link bhej diya gaya hai tumhare email pe.
+            A new verification link has been sent to your email address.
         </div>
 
         <form @submit.prevent="submit">
@@ -34,7 +34,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                 class="w-full py-3 px-4 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
                 :disabled="form.processing"
             >
-                Verification Email Dobara Bhejo
+                Resend Verification Email
             </button>
 
             <div class="mt-4 text-center">

@@ -7,15 +7,6 @@
 ### Phase 1: Project Setup
 - [ ] Configure PWA manifest & service worker (basic)
 
-### Phase 2: Authentication
-- [ ] Create users migration & model
-- [ ] Setup Laravel Breeze / Fortify
-- [ ] Build registration page
-- [ ] Build login page
-- [ ] Implement forgot password / reset password
-- [ ] Email verification setup
-- [ ] Google OAuth login (Socialite)
-- [ ] Auth middleware & route protection
 
 ### Phase 3: Personal Expenses
 - [ ] Create expenses migration & model
@@ -95,9 +86,7 @@
 
 ## IN PROGRESS
 
-(Nothing currently in progress)
-
-### Phase 2: Authentication (NEXT UP)
+### Phase 3: Personal Expenses (NEXT UP)
 
 ---
 
@@ -114,3 +103,14 @@
 - [x] Create reusable Blade components (header, footer, public layout)
 - [x] Create reusable Vue components (AppLayout, GuestLayout, Header, Sidebar, BottomNav)
 - [x] Dashboard page placeholder
+
+### Phase 2: Authentication
+- [x] Create users migration & model (with avatar, google_id, currency, language, notifications)
+- [x] Setup Laravel Breeze (Vue/Inertia stack)
+- [x] Build registration page (themed, Google OAuth button)
+- [x] Build login page (themed, Google OAuth button)
+- [x] Implement forgot password / reset password (themed)
+- [x] Email verification setup (MustVerifyEmail enabled)
+- [x] Google OAuth login (Socialite + GoogleController)
+- [x] Auth middleware & route protection
+- [x] Profile page (update info, change password, delete account)

@@ -18,10 +18,10 @@ const submit = () => {
     <GuestLayout>
         <Head title="Forgot Password" />
 
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Password bhool gaye?</h2>
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Forgot your password?</h2>
 
         <p class="mb-4 text-sm text-gray-600">
-            Koi baat nahi! Apna email daalo, hum reset link bhej denge.
+            No worries! Enter your email and we'll send you a reset link.
         </p>
 
         <div v-if="status" class="mb-4 text-sm font-medium text-success-600">
@@ -48,11 +48,11 @@ const submit = () => {
                 class="mt-6 w-full py-3 px-4 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
                 :disabled="form.processing"
             >
-                Reset Link Bhejo
+                Send Reset Link
             </button>
 
             <p class="mt-4 text-center text-sm text-gray-600">
-                <Link :href="route('login')" class="text-primary-600 font-medium hover:text-primary-700">Login pe wapas jaayein</Link>
+                <Link :href="route('login')" class="text-primary-600 font-medium hover:text-primary-700">Back to login</Link>
             </p>
         </form>
     </GuestLayout>

@@ -28,7 +28,7 @@ const submit = () => {
     <GuestLayout>
         <Head title="Reset Password" />
 
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Naya password set karein</h2>
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Set new password</h2>
 
         <form @submit.prevent="submit">
             <div>
@@ -54,7 +54,7 @@ const submit = () => {
                 class="mt-6 w-full py-3 px-4 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
                 :disabled="form.processing"
             >
-                Password Reset Karein
+                Reset Password
             </button>
         </form>
     </GuestLayout>

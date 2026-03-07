@@ -12,7 +12,7 @@
                 <h4 class="text-sm font-semibold text-white uppercase tracking-wide">Quick Links</h4>
                 <ul class="mt-3 space-y-2">
                     @foreach(config('site.footer.quick_links') as $link)
-                    <li><a href="{{ $link['url'] }}" class="text-sm hover:text-white transition-colors">{{ $link['label'] }}</a></li>
+                    <li><a href="{{ url($link['url']) }}" class="text-sm hover:text-white transition-colors">{{ $link['label'] }}</a></li>
                     @endforeach
                 </ul>
             </div>
@@ -22,7 +22,7 @@
                 <h4 class="text-sm font-semibold text-white uppercase tracking-wide">Legal</h4>
                 <ul class="mt-3 space-y-2">
                     @foreach(config('site.footer.legal_links') as $link)
-                    <li><a href="{{ $link['url'] }}" class="text-sm hover:text-white transition-colors">{{ $link['label'] }}</a></li>
+                    <li><a href="{{ url($link['url']) }}" class="text-sm hover:text-white transition-colors">{{ $link['label'] }}</a></li>
                     @endforeach
                 </ul>
             </div>
@@ -32,7 +32,7 @@
                 <h4 class="text-sm font-semibold text-white uppercase tracking-wide">More</h4>
                 <ul class="mt-3 space-y-2">
                     @foreach(config('site.footer.other_links') as $link)
-                    <li><a href="{{ $link['url'] }}" class="text-sm hover:text-white transition-colors">{{ $link['label'] }}</a></li>
+                    <li><a href="{{ url($link['url']) }}" class="text-sm hover:text-white transition-colors">{{ $link['label'] }}</a></li>
                     @endforeach
                 </ul>
             </div>

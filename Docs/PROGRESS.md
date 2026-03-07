@@ -2,16 +2,17 @@
 
 ---
 
-## Current Status: PHASE 1 COMPLETE - MOVING TO PHASE 2
+## Current Status: PHASE 2 COMPLETE - MOVING TO PHASE 3
 
 ### What's Done:
 - Planning complete (flowchart, schema, API, settlement logic, SEO strategy)
 - Phase 1: Project setup complete (Laravel + Inertia + Vue + Tailwind + MySQL)
 - Reusable component architecture setup (Blade + Vue)
+- Phase 2: Authentication complete (login, register, Google OAuth, email verify, profile)
 - Landing page, Dashboard placeholder, Git repo initialized
 
 ### What's Next:
-- Phase 2: Authentication (users migration, login, register, Google OAuth)
+- Phase 3: Personal Expenses (categories, CRUD, filters, charts)
 
 ---
 
@@ -43,3 +44,20 @@
 - Routes configured: / (Blade), /dashboard (Inertia)
 - Git repo initialized with initial commit
 - Build tested successfully (npm run build)
+
+### 2026-03-07 - Phase 2: Authentication (COMPLETED)
+- Installed Laravel Breeze (Vue/Inertia stack) + Laravel Socialite
+- Updated users migration: avatar, google_id, currency, language, notification_email, notification_push
+- User model: MustVerifyEmail enabled
+- Themed all auth pages (Indigo+Rose design):
+  - Login: email/password + Google OAuth + "Remember me" + forgot password link
+  - Register: name/email/password + Google OAuth
+  - Forgot Password, Reset Password, Verify Email
+- Google OAuth: GoogleController (redirect + callback), auto-creates/links users
+- AppLayout: sidebar with active route highlighting (Ziggy), header with user dropdown + logout
+- BottomNav: mobile navigation with active state
+- Profile page: update info, change password, delete account (uses AppLayout)
+- Removed Breeze defaults (Welcome.vue, AuthenticatedLayout.vue)
+- Fixed Tailwind v4 compatibility (removed v3 postcss/tailwind configs)
+- Fixed MySQL string length issue (Schema::defaultStringLength 191)
+- .env: Google OAuth env vars added (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
