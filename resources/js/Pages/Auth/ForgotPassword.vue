@@ -18,9 +18,9 @@ const submit = () => {
     <GuestLayout>
         <Head title="Forgot Password" />
 
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Forgot your password?</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Forgot your password?</h2>
 
-        <p class="mb-4 text-sm text-gray-600">
+        <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
             No worries! Enter your email and we'll send you a reset link.
         </p>
 
@@ -34,7 +34,7 @@ const submit = () => {
                 <TextInput
                     id="email"
                     type="email"
-                    class="mt-1 block w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                    class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500"
                     v-model="form.email"
                     required
                     autofocus
@@ -51,7 +51,7 @@ const submit = () => {
                 Send Reset Link
             </button>
 
-            <p class="mt-4 text-center text-sm text-gray-600">
+            <p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
                 <Link :href="route('login')" class="text-primary-600 font-medium hover:text-primary-700">Back to login</Link>
             </p>
         </form>

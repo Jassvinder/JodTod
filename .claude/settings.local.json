@@ -7,7 +7,15 @@
       "Bash(php artisan:*)",
       "Bash(npm run:*)",
       "Bash(rm:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(xargs grep:*)",
+      "Bash(npm list:*)",
+      "Bash(cd D:/phpserver/www/JodTod && php composer.phar require intervention/image 2>&1 | tail -10)",
+      "Bash(php -l app/Http/Controllers/DashboardController.php)",
+      "Bash(php -l routes/web.php)",
+      "Bash(cd D:/phpserver/www/JodTod && npx vite build 2>&1 | tail -5)",
+      "Bash(cd D:/phpserver/www/JodTod && npx vite build 2>&1 | tail -8)",
+      "Bash(cd D:/phpserver/www/JodTod && npx vite build 2>&1)"
     ]
   }
 }

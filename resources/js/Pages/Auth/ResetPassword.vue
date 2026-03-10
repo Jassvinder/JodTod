@@ -28,24 +28,24 @@ const submit = () => {
     <GuestLayout>
         <Head title="Reset Password" />
 
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Set new password</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Set new password</h2>
 
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
-                <TextInput id="email" type="email" class="mt-1 block w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500" v-model="form.email" required autofocus autocomplete="username" />
+                <TextInput id="email" type="email" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500" v-model="form.email" required autofocus autocomplete="username" />
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="password" value="New Password" />
-                <TextInput id="password" type="password" class="mt-1 block w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500" v-model="form.password" required autocomplete="new-password" />
+                <TextInput id="password" type="password" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500" v-model="form.password" required autocomplete="new-password" />
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="password_confirmation" value="Confirm Password" />
-                <TextInput id="password_confirmation" type="password" class="mt-1 block w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500" v-model="form.password_confirmation" required autocomplete="new-password" />
+                <TextInput id="password_confirmation" type="password" class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500" v-model="form.password_confirmation" required autocomplete="new-password" />
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
 

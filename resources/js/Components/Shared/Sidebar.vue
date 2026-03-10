@@ -10,10 +10,13 @@ defineEmits(['close']);
 
 const currentUrl = computed(() => usePage().url);
 
+const unreadCount = computed(() => usePage().props.unread_notifications_count || 0);
+
 const navigation = [
     { name: 'Dashboard', route: 'dashboard', icon: 'home' },
     { name: 'Expenses', route: 'expenses.index', icon: 'wallet', routePrefix: 'expenses' },
-    { name: 'Groups', route: 'groups', icon: 'users', href: '/groups' },
+    { name: 'Groups', route: 'groups.index', icon: 'users', routePrefix: 'groups' },
+    { name: 'Notifications', route: 'notifications.index', icon: 'bell', routePrefix: 'notifications' },
     { name: 'Profile', route: 'profile.edit', icon: 'user' },
 ];
 
@@ -48,13 +51,13 @@ function isActive(item) {
     <!-- Sidebar -->
     <aside
         :class="[
-            'fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-200',
+            'fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-200',
             open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         ]"
     >
         <!-- Logo -->
-        <div class="flex items-center h-16 px-6 border-b border-gray-200">
-            <Link :href="route('dashboard')" class="text-xl font-bold text-primary-600">JodTod</Link>
+        <div class="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-700">
+            <Link :href="route('dashboard')" class="text-xl font-bold text-primary-600 dark:text-primary-400">JodTod</Link>
         </div>
 
         <!-- Navigation -->
@@ -66,8 +69,8 @@ function isActive(item) {
                 :class="[
                     'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
                     isActive(item)
-                        ? 'bg-primary-50 text-primary-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                 ]"
                 @click="$emit('close')"
             >
@@ -83,11 +86,22 @@ function isActive(item) {
                 <svg v-else-if="item.icon === 'users'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
+                <!-- Bell Icon -->
+                <svg v-else-if="item.icon === 'bell'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
                 <!-- User Icon -->
                 <svg v-else-if="item.icon === 'user'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span>{{ item.name }}</span>
+                <span class="flex-1">{{ item.name }}</span>
+                <!-- Notification badge in sidebar -->
+                <span
+                    v-if="item.icon === 'bell' && unreadCount > 0"
+                    class="ml-auto inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-accent-500 rounded-full"
+                >
+                    {{ unreadCount > 99 ? '99+' : unreadCount }}
+                </span>
             </Link>
         </nav>
     </aside>

@@ -25,3 +25,17 @@ createInertiaApp({
         color: '#6366f1',
     },
 });
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+                // Check for updates periodically
+                setInterval(() => registration.update(), 60 * 60 * 1000); // every hour
+            })
+            .catch(() => {
+                // SW registration failed - app still works without it
+            });
+    });
+}

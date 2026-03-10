@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Expense extends Model
@@ -44,6 +45,21 @@ class Expense extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    public function splits(): HasMany
+    {
+        return $this->hasMany(ExpenseSplit::class);
+    }
+
+    public function scopeForGroup($query, $groupId)
+    {
+        return $query->where('group_id', $groupId);
     }
 
     public function scopePersonal($query)

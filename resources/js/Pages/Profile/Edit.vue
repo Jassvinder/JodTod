@@ -16,20 +16,20 @@ defineProps({
 
     <AppLayout>
         <div class="max-w-3xl mx-auto space-y-6">
-            <h2 class="text-2xl font-bold text-gray-900">Profile Settings</h2>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Profile Settings</h2>
 
-            <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                 <UpdateProfileInformationForm
                     :must-verify-email="mustVerifyEmail"
                     :status="status"
                 />
             </div>
 
-            <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                 <UpdatePasswordForm />
             </div>
 
-            <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                 <DeleteUserForm />
             </div>
         </div>

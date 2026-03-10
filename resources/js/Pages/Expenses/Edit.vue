@@ -25,10 +25,10 @@ function submit() {
 
     <AppLayout>
         <div class="max-w-lg mx-auto">
-            <h2 class="text-2xl font-bold text-gray-900">Edit Expense</h2>
-            <p class="mt-1 text-gray-500">Update expense details</p>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Edit Expense</h2>
+            <p class="mt-1 text-gray-500 dark:text-gray-400">Update expense details</p>
 
-            <div class="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+            <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                 <ExpenseForm
                     :form="form"
                     :categories="categories"

@@ -1,5 +1,7 @@
 # JodTod - Feature-wise Implementation Instructions
 
+> **Note:** If any task or feature mentions a screenshot with a filename (e.g., `1.png`), check the `Docs/screenshots/` folder for the referenced image.
+
 ---
 
 ## Feature 1: Authentication System

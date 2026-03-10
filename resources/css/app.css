@@ -6,6 +6,8 @@
 @source '../**/*.js';
 @source '../**/*.vue';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
@@ -45,4 +47,64 @@
     --color-success-700: #047857;
     --color-success-800: #065f46;
     --color-success-900: #064e3b;
+}
+
+/* Base form element styles (replaces @tailwindcss/forms plugin for Tailwind v4) */
+@layer base {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="search"],
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="month"],
+    input[type="week"],
+    input[type="time"],
+    select,
+    textarea {
+        @apply border border-gray-300 bg-white px-3 py-2.5 text-base text-gray-900 rounded-lg shadow-sm outline-none transition-colors;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="number"]:focus,
+    input[type="tel"]:focus,
+    input[type="url"]:focus,
+    input[type="search"]:focus,
+    input[type="date"]:focus,
+    input[type="datetime-local"]:focus,
+    input[type="month"]:focus,
+    input[type="week"]:focus,
+    input[type="time"]:focus,
+    select:focus,
+    textarea:focus {
+        @apply border-primary-500 ring-1 ring-primary-500;
+    }
+
+    /* Dark mode form styles */
+    .dark input[type="text"],
+    .dark input[type="email"],
+    .dark input[type="password"],
+    .dark input[type="number"],
+    .dark input[type="tel"],
+    .dark input[type="url"],
+    .dark input[type="search"],
+    .dark input[type="date"],
+    .dark input[type="datetime-local"],
+    .dark input[type="month"],
+    .dark input[type="week"],
+    .dark input[type="time"],
+    .dark select,
+    .dark textarea {
+        @apply border-gray-600 bg-gray-800 text-gray-100;
+    }
+
+    /* Dark mode checkbox */
+    .dark input[type="checkbox"] {
+        @apply border-gray-600 bg-gray-700;
+    }
 }

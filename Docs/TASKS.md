@@ -7,90 +7,33 @@
 ### Phase 1: Project Setup
 - [ ] Configure PWA manifest & service worker (basic)
 
+## Current Tasks
+<!-- Add today's tasks here -->
+- [ ] Task 4 
 
-### Phase 4: Group Management
-- [ ] Create groups migration & model
-- [ ] Create group_members migration & model
-- [ ] Build "Create Group" form
-- [ ] Implement invite code generation
-- [ ] Build "Join Group" via code/link
-- [ ] Build group list page
-- [ ] Build group detail page
-- [ ] Implement member management (add/remove/leave)
-- [ ] Group settings (edit/delete - admin only)
 
-### Phase 5: Group Expenses
-- [ ] Create expense_splits migration & model
-- [ ] Build "Add Group Expense" form with split options
-- [ ] Implement Equal Split logic
-- [ ] Implement Custom Split logic
-- [ ] Implement Percentage Split logic
-- [ ] Build group expense list with filters
-- [ ] Show member-wise balance in group
-- [ ] Edit/Delete group expense
+### Phase 4: Group Management - DONE (moved to COMPLETED)
 
-### Phase 6: Settlement System
-- [ ] Create settlements migration & model
-- [ ] Implement balance calculation logic
-- [ ] Implement minimum transactions optimization algorithm
-- [ ] Build settlement summary screen
-- [ ] Implement "Settle Individual" transaction
-- [ ] Implement "Settle All" functionality
-- [ ] Build settlement history page
-- [ ] Mark expenses as settled after settlement
 
-### Phase 7: Dashboard
-- [ ] Build dashboard layout (Inertia + Vue)
-- [ ] Personal expense summary widget
-- [ ] Groups overview with balances widget
-- [ ] Recent activity feed
-- [ ] Quick add expense button
-- [ ] Pending settlements indicator
+### Phase 5: Group Expenses - DONE (moved to COMPLETED)
 
-### Phase 8: Admin Dashboard & Role System
-- [ ] Add `role` column to users table (migration)
-- [ ] Update User model (role field, isAdmin helper)
-- [ ] Create admin middleware
-- [ ] Role-based redirect after login
-- [ ] Create AdminLayout (Vue - separate sidebar)
-- [ ] Build admin dashboard overview (stats cards)
-- [ ] Build user management (list, view, change role, ban/unban, delete)
-- [ ] Build category management (CRUD)
-- [ ] Build blog management (CRUD with SEO fields)
-- [ ] Build admin reports page (trends, breakdowns)
-- [ ] Create UserSeeder (1 admin + 4 users)
+### Phase 6: Settlement System - DONE (moved to COMPLETED)
 
-### Phase 9: SEO & Landing Pages (Blade)
-- [ ] Build landing page (hero, features, CTA)
-- [ ] Build features page
-- [ ] Build about, contact, privacy, terms pages
-- [ ] Build blog system (CRUD for admin, list/detail for public)
-- [ ] Build free tool: Expense Splitter Calculator
-- [ ] Setup sitemap.xml auto-generation
-- [ ] Add meta tags, OG tags, structured data
-- [ ] Add schema markup
+### Phase 7: Dashboard - DONE (moved to COMPLETED)
 
-### Phase 10: Notifications
-- [ ] Setup Laravel Notifications
-- [ ] In-app notification system (bell icon, count)
-- [ ] Email notification templates
-- [ ] Notification preferences (toggle on/off)
-- [ ] Notification triggers for all events
+### Phase 8: Admin Dashboard & Role System - DONE (moved to COMPLETED)
 
-### Phase 11: PWA & Polish
-- [ ] Complete PWA setup (icons, manifest, service worker)
-- [ ] Offline caching strategy
-- [ ] Background sync for offline data
-- [ ] "Add to Home Screen" prompt
-- [ ] Dark mode support
-- [ ] Performance optimization
-- [ ] Testing & bug fixes
+### Phase 9: SEO & Landing Pages - DONE (moved to COMPLETED)
+
+### Phase 10: Notifications - DONE (moved to COMPLETED)
+
+### Phase 11: PWA & Polish - DONE (moved to COMPLETED)
 
 ---
 
 ## IN PROGRESS
 
-### Phase 4: Group Management (NEXT UP)
+### Phase 5: Group Expenses (NEXT UP)
 
 ---
 
@@ -127,3 +70,87 @@
 - [x] Google OAuth login (Socialite + GoogleController)
 - [x] Auth middleware & route protection
 - [x] Profile page (update info, change password, delete account)
+
+## Completed Current Tasks
+
+- [x] **Task 1** - Add OTP login functionality with perfect structure (2026-03-09)
+- [x] **Task 2** - Fix profile form UI, 404 error page, phone/email verification (2026-03-09)
+- [x] **Task 3** - Profile avatar (crop), phone verify for groups, email verify UI, add member by phone (2026-03-10)
+
+### Phase 4: Group Management
+- [x] Create groups migration & model
+- [x] Create group_members migration & model
+- [x] Build "Create Group" form
+- [x] Implement invite code generation (auto-generate 8-char code, refresh option)
+- [x] Build "Join Group" via code/link
+- [x] Build group list page
+- [x] Build group detail page (members, invite, actions)
+- [x] Implement member management (add/remove/leave)
+- [x] Group settings (edit/delete - admin only)
+
+### Phase 5: Group Expenses
+- [x] Create expense_splits migration & model
+- [x] Build "Add Group Expense" form with split options (equal/custom/percentage)
+- [x] Implement Equal Split logic (with rounding)
+- [x] Implement Custom Split logic (amount validation)
+- [x] Implement Percentage Split logic (100% validation)
+- [x] Build group expense list with filters & pagination
+- [x] Show member-wise balance in group
+- [x] Edit/Delete group expense (creator or admin)
+
+### Phase 6: Settlement System
+- [x] Create settlements migration & model
+- [x] Implement balance calculation logic (total_paid - total_share per member)
+- [x] Implement minimum transactions optimization algorithm (greedy min-transfers)
+- [x] Build settlement summary screen (balance cards + suggested transactions)
+- [x] Implement "Settle Individual" transaction (mark as paid)
+- [x] Implement "Settle All" functionality (admin only, bulk complete)
+- [x] Build settlement history page (status badges, pagination)
+- [x] Mark expenses as settled after all settlements completed
+
+### Phase 7: Dashboard
+- [x] Build dashboard layout (Inertia + Vue)
+- [x] Personal expense summary widget (this month/last month + category breakdown)
+- [x] Groups overview with balances widget
+- [x] Recent activity feed (mixed: personal, group, settlements)
+- [x] Quick add expense button
+- [x] Pending settlements indicator (amber alert with Pay Now links)
+
+### Phase 8: Admin Dashboard & Role System
+- [x] Add `role` column to users table (migration: enum admin/user)
+- [x] Update User model (role field, isAppAdmin helper)
+- [x] Create admin middleware (EnsureUserIsAdmin)
+- [x] Role-based redirect after login (admin→/admin/dashboard)
+- [x] Create AdminLayout (Vue - dark slate sidebar)
+- [x] Build admin dashboard overview (stats cards + recent users)
+- [x] Build user management (list, search, filter, change role, delete)
+- [x] Build category management (CRUD with expense count protection)
+- [x] Create UserSeeder (1 admin + 4 users with phones)
+
+### Phase 9: SEO & Landing Pages
+- [x] Landing page already built (hero, features, CTA) - Phase 1
+- [x] Build features page (6 feature cards with details)
+- [x] Build about, contact, privacy, terms pages
+- [x] Build blog system (admin CRUD via Inertia + public Blade pages)
+- [x] Build free tool: Expense Splitter Calculator (Alpine.js)
+- [x] Setup sitemap.xml auto-generation
+- [x] Add meta tags, OG tags, Twitter Cards to public layout
+- [x] Add JSON-LD schema markup support (BlogPosting on blog posts)
+
+### Phase 10: Notifications
+- [x] Setup Laravel Notifications (notifications table migration)
+- [x] In-app notification system (bell icon with count badge, dropdown, full page)
+- [x] Email notification templates (4 notification types with mail support)
+- [x] Notification preferences (toggle email/push on/off in profile)
+- [x] Notification triggers: group expense added, added to group, settlement requested, settlement completed
+
+### Phase 11: PWA & Polish
+- [x] Complete PWA setup (manifest.json, icons 72-512px, apple-touch-icon, meta tags)
+- [x] Service worker with caching (Network First for pages/API, Cache First for static assets)
+- [x] Offline fallback page (/offline) with retry button
+- [x] Offline indicator banner in AppLayout (amber bar when connection lost)
+- [x] Service worker registration in app.js with hourly update check
+- [x] Dark mode support (toggle in header, localStorage persistence, system preference detection)
+- [x] Dark mode applied to: AppLayout, Header, Sidebar, BottomNav, Dropdown, DropdownLink, flash messages, form inputs
+- [x] PWA meta tags in both app.blade.php (Inertia) and public.blade.php (Blade SEO)
+- [x] PWA shortcuts: Add Expense, My Groups

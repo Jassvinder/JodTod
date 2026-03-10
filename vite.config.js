@@ -6,7 +6,7 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
     plugins: [
         laravel({
-            input: 'resources/js/app.js',
+            input: ['resources/js/app.js', 'resources/css/app.css'],
             refresh: true,
         }),
         tailwindcss(),
@@ -15,6 +15,10 @@ export default defineConfig({
                 transformAssetUrls: {
                     base: null,
                     includeAbsolute: false,
+                },
+                compilerOptions: {
+                    // Treat cropperjs v2 web components as custom elements
+                    isCustomElement: (tag) => tag.startsWith('cropper-'),
                 },
             },
         }),

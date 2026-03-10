@@ -104,8 +104,8 @@ const hasActiveFilters = () => search.value || category.value || period.value;
             <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Expenses</h2>
-                    <p class="mt-1 text-gray-500">Track your personal expenses</p>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Expenses</h2>
+                    <p class="mt-1 text-gray-500 dark:text-gray-400">Track your personal expenses</p>
                 </div>
                 <Link
                     :href="route('expenses.create')"
@@ -120,16 +120,16 @@ const hasActiveFilters = () => search.value || category.value || period.value;
 
             <!-- Summary Cards -->
             <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-white rounded-xl border border-gray-200 p-5">
-                    <p class="text-sm text-gray-500">This Month</p>
-                    <p class="mt-1 text-2xl font-bold text-gray-900">{{ formatCurrency(summary.monthly_total) }}</p>
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">This Month</p>
+                    <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ formatCurrency(summary.monthly_total) }}</p>
                 </div>
-                <div class="bg-white rounded-xl border border-gray-200 p-5">
-                    <p class="text-sm text-gray-500">Last Month</p>
-                    <p class="mt-1 text-2xl font-bold text-gray-900">{{ formatCurrency(summary.last_month_total) }}</p>
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Last Month</p>
+                    <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ formatCurrency(summary.last_month_total) }}</p>
                 </div>
-                <div class="bg-white rounded-xl border border-gray-200 p-5">
-                    <p class="text-sm text-gray-500">Difference</p>
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Difference</p>
                     <p
                         class="mt-1 text-2xl font-bold"
                         :class="summary.monthly_total > summary.last_month_total ? 'text-accent-600' : 'text-success-600'"
@@ -142,20 +142,20 @@ const hasActiveFilters = () => search.value || category.value || period.value;
             <!-- Charts -->
             <div v-if="summary.category_breakdown.length || summary.daily_trend.length" class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <!-- Category Pie Chart -->
-                <div v-if="summary.category_breakdown.length" class="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 class="text-sm font-medium text-gray-500 mb-3">This Month by Category</h3>
+                <div v-if="summary.category_breakdown.length" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">This Month by Category</h3>
                     <CategoryPieChart :data="summary.category_breakdown" />
                 </div>
 
                 <!-- Daily Trend Bar Chart -->
-                <div v-if="summary.daily_trend.length" class="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 class="text-sm font-medium text-gray-500 mb-3">Daily Spending Trend</h3>
+                <div v-if="summary.daily_trend.length" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Daily Spending Trend</h3>
                     <DailyBarChart :data="summary.daily_trend" />
                 </div>
             </div>
 
             <!-- Filters -->
-            <div class="mt-6 bg-white rounded-xl border border-gray-200 p-4">
+            <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <!-- Search -->
                     <div class="relative">
@@ -166,14 +166,14 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                             v-model="search"
                             type="text"
                             placeholder="Search description..."
-                            class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         />
                     </div>
 
                     <!-- Category filter -->
                     <select
                         v-model="category"
-                        class="w-full py-2.5 px-3 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        class="w-full py-2.5 px-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     >
                         <option value="">All Categories</option>
                         <option v-for="cat in categories" :key="cat.id" :value="cat.id">
@@ -184,7 +184,7 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                     <!-- Period filter -->
                     <select
                         v-model="period"
-                        class="w-full py-2.5 px-3 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        class="w-full py-2.5 px-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     >
                         <option value="">All Time</option>
                         <option value="today">Today</option>
@@ -196,7 +196,7 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                     <button
                         v-if="hasActiveFilters()"
                         @click="clearFilters"
-                        class="py-2.5 px-3 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                        class="py-2.5 px-3 rounded-lg border border-gray-300 dark:border-gray-600 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                         Clear Filters
                     </button>
@@ -204,15 +204,15 @@ const hasActiveFilters = () => search.value || category.value || period.value;
             </div>
 
             <!-- Expenses List -->
-            <div class="mt-4 bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="mt-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <!-- Table Header (desktop) -->
-                <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-5 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button @click="toggleSort('expense_date')" class="col-span-2 flex items-center gap-1 hover:text-gray-700">
+                <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-5 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <button @click="toggleSort('expense_date')" class="col-span-2 flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-300">
                         Date
                         <span v-if="sort === 'expense_date'" class="text-primary-600">{{ direction === 'asc' ? '↑' : '↓' }}</span>
                     </button>
                     <div class="col-span-3">Description</div>
-                    <button @click="toggleSort('category_id')" class="col-span-2 flex items-center gap-1 hover:text-gray-700">
+                    <button @click="toggleSort('category_id')" class="col-span-2 flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-300">
                         Category
                         <span v-if="sort === 'category_id'" class="text-primary-600">{{ direction === 'asc' ? '↑' : '↓' }}</span>
                     </button>
@@ -224,8 +224,8 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                 </div>
 
                 <!-- Expense rows -->
-                <div v-if="expenses.data.length === 0" class="px-5 py-12 text-center text-gray-400">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div v-if="expenses.data.length === 0" class="px-5 py-12 text-center text-gray-400 dark:text-gray-500">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                     <p>No expenses found</p>
@@ -235,17 +235,17 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                 <div
                     v-for="expense in expenses.data"
                     :key="expense.id"
-                    class="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors items-center"
+                    class="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 px-5 py-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors items-center"
                 >
                     <!-- Mobile: stacked layout -->
-                    <div class="sm:col-span-2 text-sm text-gray-500">{{ formatDate(expense.expense_date) }}</div>
-                    <div class="sm:col-span-3 text-sm font-medium text-gray-900">{{ expense.description || '-' }}</div>
+                    <div class="sm:col-span-2 text-sm text-gray-500 dark:text-gray-400">{{ formatDate(expense.expense_date) }}</div>
+                    <div class="sm:col-span-3 text-sm font-medium text-gray-900 dark:text-gray-100">{{ expense.description || '-' }}</div>
                     <div class="sm:col-span-2">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                             {{ expense.category?.name }}
                         </span>
                     </div>
-                    <div class="sm:col-span-2 text-sm font-semibold text-gray-900 sm:text-right">{{ formatCurrency(expense.amount) }}</div>
+                    <div class="sm:col-span-2 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:text-right">{{ formatCurrency(expense.amount) }}</div>
                     <div class="sm:col-span-3 flex items-center gap-2 sm:justify-end">
                         <Link
                             :href="route('expenses.edit', expense.id)"
@@ -263,8 +263,8 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                 </div>
 
                 <!-- Pagination -->
-                <div v-if="expenses.data.length && expenses.last_page > 1" class="px-5 py-3 border-t border-gray-200 flex items-center justify-between">
-                    <p class="text-sm text-gray-500">
+                <div v-if="expenses.data.length && expenses.last_page > 1" class="px-5 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
                         Showing {{ expenses.from }} to {{ expenses.to }} of {{ expenses.total }} expenses
                     </p>
                     <div class="flex gap-1">
@@ -274,7 +274,7 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                             :href="link.url || '#'"
                             :class="[
                                 'px-3 py-1.5 rounded-md text-sm',
-                                link.active ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-100',
+                                link.active ? 'bg-primary-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
                                 !link.url ? 'opacity-50 pointer-events-none' : '',
                             ]"
                             v-html="link.label"
@@ -289,9 +289,9 @@ const hasActiveFilters = () => search.value || category.value || period.value;
         <Teleport to="body">
             <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center">
                 <div class="fixed inset-0 bg-black/50" @click="showDeleteModal = false"></div>
-                <div class="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Delete Expense</h3>
-                    <p class="mt-2 text-sm text-gray-600">
+                <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Delete Expense</h3>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                         Are you sure you want to delete this expense of
                         <strong>{{ expenseToDelete ? formatCurrency(expenseToDelete.amount) : '' }}</strong>?
                         This action cannot be undone.
@@ -299,7 +299,7 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                     <div class="mt-5 flex gap-3 justify-end">
                         <button
                             @click="showDeleteModal = false"
-                            class="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                         >
                             Cancel
                         </button>
