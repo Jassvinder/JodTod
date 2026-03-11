@@ -100,7 +100,7 @@ function settleAll() {
 
 function canMarkAsPaid(settlement) {
     if (isAdmin.value) return true;
-    return settlement.from_user_id === authUser.value.id || settlement.to_user_id === authUser.value.id;
+    return settlement.from_user?.id === authUser.value.id || settlement.to_user?.id === authUser.value.id;
 }
 
 const hasUnsettledBalances = computed(() => {
@@ -156,7 +156,7 @@ const hasPendingSettlements = computed(() => {
                         v-for="balance in balances"
                         :key="balance.user_id"
                         class="rounded-xl border p-4"
-                        :class="balanceCardClass(balance.amount)"
+                        :class="balanceCardClass(balance.balance)"
                     >
                         <div class="flex items-center gap-2 mb-2">
                             <img
@@ -166,17 +166,17 @@ const hasPendingSettlements = computed(() => {
                                 class="w-8 h-8 rounded-full object-cover"
                             />
                             <div v-else class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center font-semibold text-sm"
-                                :class="balanceTextClass(balance.amount)"
+                                :class="balanceTextClass(balance.balance)"
                             >
                                 {{ getUserInitials(balance.name) }}
                             </div>
                             <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ balance.name }}</p>
                         </div>
-                        <p class="text-lg font-bold" :class="balanceTextClass(balance.amount)">
-                            {{ parseFloat(balance.amount) >= 0 ? '+' : '' }}{{ formatCurrency(balance.amount) }}
+                        <p class="text-lg font-bold" :class="balanceTextClass(balance.balance)">
+                            {{ parseFloat(balance.balance) >= 0 ? '+' : '' }}{{ formatCurrency(balance.balance) }}
                         </p>
-                        <p class="text-xs mt-0.5" :class="balanceTextClass(balance.amount)">
-                            {{ balanceLabel(balance.amount) }}
+                        <p class="text-xs mt-0.5" :class="balanceTextClass(balance.balance)">
+                            {{ balanceLabel(balance.balance) }}
                         </p>
                     </div>
                 </div>
@@ -211,15 +211,15 @@ const hasPendingSettlements = computed(() => {
                             <!-- From user -->
                             <div class="flex items-center gap-2 shrink-0">
                                 <img
-                                    v-if="getMember(txn.from_user_id)?.avatar"
-                                    :src="`/storage/${getMember(txn.from_user_id).avatar}`"
-                                    :alt="getMember(txn.from_user_id).name"
+                                    v-if="txn.from?.avatar"
+                                    :src="`/storage/${txn.from.avatar}`"
+                                    :alt="txn.from.name"
                                     class="w-9 h-9 rounded-full object-cover"
                                 />
                                 <div v-else class="w-9 h-9 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-700 dark:text-red-300 font-semibold text-sm">
-                                    {{ getUserInitials(getMember(txn.from_user_id).name) }}
+                                    {{ getUserInitials(txn.from?.name) }}
                                 </div>
-                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 hidden sm:inline">{{ getMember(txn.from_user_id).name }}</span>
+                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 hidden sm:inline">{{ txn.from?.name }}</span>
                             </div>
 
                             <!-- Arrow -->
@@ -233,21 +233,21 @@ const hasPendingSettlements = computed(() => {
                             <!-- To user -->
                             <div class="flex items-center gap-2 shrink-0">
                                 <img
-                                    v-if="getMember(txn.to_user_id)?.avatar"
-                                    :src="`/storage/${getMember(txn.to_user_id).avatar}`"
-                                    :alt="getMember(txn.to_user_id).name"
+                                    v-if="txn.to?.avatar"
+                                    :src="`/storage/${txn.to.avatar}`"
+                                    :alt="txn.to.name"
                                     class="w-9 h-9 rounded-full object-cover"
                                 />
                                 <div v-else class="w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-700 dark:text-green-300 font-semibold text-sm">
-                                    {{ getUserInitials(getMember(txn.to_user_id).name) }}
+                                    {{ getUserInitials(txn.to?.name) }}
                                 </div>
-                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 hidden sm:inline">{{ getMember(txn.to_user_id).name }}</span>
+                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 hidden sm:inline">{{ txn.to?.name }}</span>
                             </div>
                         </div>
 
                         <!-- Mobile names -->
                         <div class="w-full sm:hidden text-center text-sm text-gray-600 dark:text-gray-400">
-                            {{ getMember(txn.from_user_id).name }} pays {{ getMember(txn.to_user_id).name }}
+                            {{ txn.from?.name }} pays {{ txn.to?.name }}
                         </div>
                     </div>
 
@@ -292,15 +292,15 @@ const hasPendingSettlements = computed(() => {
                             <div class="flex items-center gap-2 min-w-0">
                                 <!-- From user avatar -->
                                 <img
-                                    v-if="getMember(settlement.from_user_id)?.avatar"
-                                    :src="`/storage/${getMember(settlement.from_user_id).avatar}`"
-                                    :alt="getMember(settlement.from_user_id).name"
+                                    v-if="settlement.from_user?.avatar"
+                                    :src="`/storage/${settlement.from_user.avatar}`"
+                                    :alt="settlement.from_user?.name"
                                     class="w-8 h-8 rounded-full object-cover shrink-0"
                                 />
                                 <div v-else class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-700 dark:text-red-300 font-semibold text-xs shrink-0">
-                                    {{ getUserInitials(getMember(settlement.from_user_id).name) }}
+                                    {{ getUserInitials(settlement.from_user?.name) }}
                                 </div>
-                                <span class="text-sm text-gray-900 dark:text-gray-100 truncate">{{ getMember(settlement.from_user_id).name }}</span>
+                                <span class="text-sm text-gray-900 dark:text-gray-100 truncate">{{ settlement.from_user?.name || 'Unknown' }}</span>
 
                                 <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -308,15 +308,15 @@ const hasPendingSettlements = computed(() => {
 
                                 <!-- To user avatar -->
                                 <img
-                                    v-if="getMember(settlement.to_user_id)?.avatar"
-                                    :src="`/storage/${getMember(settlement.to_user_id).avatar}`"
-                                    :alt="getMember(settlement.to_user_id).name"
+                                    v-if="settlement.to_user?.avatar"
+                                    :src="`/storage/${settlement.to_user.avatar}`"
+                                    :alt="settlement.to_user?.name"
                                     class="w-8 h-8 rounded-full object-cover shrink-0"
                                 />
                                 <div v-else class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-700 dark:text-green-300 font-semibold text-xs shrink-0">
-                                    {{ getUserInitials(getMember(settlement.to_user_id).name) }}
+                                    {{ getUserInitials(settlement.to_user?.name) }}
                                 </div>
-                                <span class="text-sm text-gray-900 dark:text-gray-100 truncate">{{ getMember(settlement.to_user_id).name }}</span>
+                                <span class="text-sm text-gray-900 dark:text-gray-100 truncate">{{ settlement.to_user?.name || 'Unknown' }}</span>
                             </div>
 
                             <!-- Amount + Status + Action -->

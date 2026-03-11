@@ -107,4 +107,13 @@
     .dark input[type="checkbox"] {
         @apply border-gray-600 bg-gray-700;
     }
+
+    /* Dark mode date/time picker icon (calendar, clock) */
+    .dark input[type="date"],
+    .dark input[type="datetime-local"],
+    .dark input[type="month"],
+    .dark input[type="week"],
+    .dark input[type="time"] {
+        color-scheme: dark;
+    }
 }

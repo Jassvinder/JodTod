@@ -135,4 +135,73 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', "User \"{$userName}\" has been deleted.");
     }
+
+    /**
+     * Display paginated group management list.
+     */
+    public function groups(Request $request): Response
+    {
+        $query = Group::withCount(['members', 'expenses'])
+            ->with(['creator:id,name,email']);
+
+        // Search filter (group name)
+        if ($search = $request->input('search')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $groups = $query->orderByDesc('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        return Inertia::render('Admin/Groups/Index', [
+            'groups' => $groups,
+            'filters' => [
+                'search' => $request->input('search', ''),
+            ],
+        ]);
+    }
+
+    /**
+     * Display detailed view of a single group.
+     */
+    public function groupDetail(Group $group): Response
+    {
+        $group->load([
+            'members.user:id,name,email,avatar,phone',
+            'expenses.user',
+            'expenses.splits.user',
+            'settlements',
+        ]);
+
+        $totalExpenses = round((float) $group->expenses->sum('amount'), 2);
+
+        return Inertia::render('Admin/Groups/Show', [
+            'group' => $group,
+            'totalExpenses' => $totalExpenses,
+        ]);
+    }
+
+    /**
+     * Display detailed view of a single user.
+     */
+    public function userDetail(User $user): Response
+    {
+        $user->loadCount(['expenses', 'groups']);
+
+        $recentExpenses = Expense::where('user_id', $user->id)
+            ->with('category')
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get();
+
+        $groups = $user->groups()
+            ->withCount('members')
+            ->get();
+
+        return Inertia::render('Admin/Users/Show', [
+            'user' => $user,
+            'recentExpenses' => $recentExpenses,
+            'groups' => $groups,
+        ]);
+    }
 }

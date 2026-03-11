@@ -86,11 +86,10 @@ function formatCurrency(amount) {
 }
 
 function formatDate(date) {
-    return new Date(date).toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-    });
+    const d = new Date(date);
+    const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    return `${dateStr}, ${timeStr}`;
 }
 
 const hasActiveFilters = () => search.value || category.value || period.value;

@@ -380,6 +380,82 @@
 
 ---
 
+## Task 4: CMS System
+
+### Admin Pages Management
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| T4.1 | Admin sidebar shows "Pages" nav item | [ ] | |
+| T4.2 | Admin Pages list loads with all pages (about, contact, privacy, terms, features) | [ ] | |
+| T4.3 | Pages list shows title, slug, published status badge, updated date | [ ] | |
+| T4.4 | Click Edit → page editor loads with content | [ ] | |
+| T4.5 | Edit page title → saved | [ ] | |
+| T4.6 | Edit page content via RichTextEditor → saved | [ ] | |
+| T4.7 | Toggle publish on/off → status badge updates | [ ] | |
+| T4.8 | SEO fields (meta_title, meta_description) editable and saved | [ ] | |
+
+### Rich Text Editor (TipTap)
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| T4.9 | Bold, Italic, Strike buttons work | [ ] | |
+| T4.10 | H2, H3 heading buttons work | [ ] | |
+| T4.11 | Bullet list and Ordered list work | [ ] | |
+| T4.12 | Blockquote button works | [ ] | |
+| T4.13 | Horizontal divider button works | [ ] | |
+| T4.14 | Add link → link modal → link inserted | [ ] | |
+| T4.15 | Upload image → image appears in editor | [ ] | Max 2MB |
+| T4.16 | Image upload with invalid file (>2MB) → error | [ ] | |
+| T4.17 | Editor content renders properly on public page | [ ] | |
+
+### Public Pages from DB (CMS)
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| T4.18 | `/about` loads content from database | [ ] | |
+| T4.19 | `/contact` loads content from database | [ ] | |
+| T4.20 | `/privacy` loads content from database | [ ] | |
+| T4.21 | `/terms` loads content from database | [ ] | |
+| T4.22 | `/features` loads content from database | [ ] | |
+| T4.23 | Unpublished page → falls back to static Blade view or 404 | [ ] | |
+| T4.24 | Edit page in admin → public page reflects changes | [ ] | |
+
+### Blog Editor with TipTap
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| T4.25 | Blog Create page uses RichTextEditor (not plain textarea) | [ ] | |
+| T4.26 | Blog Edit page uses RichTextEditor with existing content loaded | [ ] | |
+| T4.27 | Blog post content renders with proper formatting on public page | [ ] | |
+
+---
+
+## Task 5 & 5-A: Current Known Issues
+
+### Date Input & Calendar Icon (Dark Mode)
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| T5.1 | Group expenses: date filter has "From" and "To" labels | [ ] | |
+| T5.2 | Personal expenses: calendar icon visible in light mode | [ ] | |
+| T5.3 | Personal expenses: calendar icon visible in dark mode | [ ] | |
+| T5.4 | Group expenses: calendar icon visible in dark mode | [ ] | |
+| T5.5 | All date inputs across app: calendar icon adapts to theme (black in light, white in dark) | [ ] | |
+
+### Time Picker in Expense Date
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| T5.6 | Personal expense form: date+time picker available | [ ] | |
+| T5.7 | Group expense form: date+time picker available | [ ] | |
+| T5.8 | Expense list shows date with time | [ ] | |
+| T5.9 | Editing expense preserves selected time | [ ] | |
+
+### Group Display Issues
+| # | Test Case | Status | Notes |
+|---|-----------|--------|-------|
+| T5.10 | Group page shows total expenses amount (not missing) | [ ] | |
+| T5.11 | Member balances show correct numbers (no NaN) | [ ] | |
+| T5.12 | Group with expenses: does NOT show "No expenses yet" message | [ ] | |
+| T5.13 | Group without expenses: shows appropriate empty state | [ ] | |
+
+---
+
 ## General / Cross-Feature Tests
 
 | # | Test Case | Status | Notes |
@@ -390,10 +466,11 @@
 | G.4 | Flash messages (success/error) show in green/red bars | [ ] | |
 | G.5 | 404 error page shows for invalid URLs | [ ] | |
 | G.6 | 403 error page shows for unauthorized access | [ ] | |
-| G.7 | Currency format consistent (₹ with proper formatting) | [ ] | |
-| G.8 | All forms show validation errors inline | [ ] | |
-| G.9 | No console errors in browser dev tools | [ ] | |
-| G.10 | Page transitions smooth (Inertia navigation) | [ ] | |
+| G.7 | 500 error page shows for server errors | [ ] | |
+| G.8 | Currency format consistent (₹ with proper formatting) | [ ] | |
+| G.9 | All forms show validation errors inline | [ ] | |
+| G.10 | No console errors in browser dev tools | [ ] | |
+| G.11 | Page transitions smooth (Inertia navigation) | [ ] | |
 
 ---
 

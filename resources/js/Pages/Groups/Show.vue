@@ -10,6 +10,9 @@ import axios from 'axios';
 const props = defineProps({
     group: Object,
     isAdmin: Boolean,
+    recentExpenses: { type: Array, default: () => [] },
+    totalExpensesCount: { type: Number, default: 0 },
+    totalExpensesAmount: { type: Number, default: 0 },
 });
 
 const authUser = computed(() => usePage().props.auth.user);
@@ -229,10 +232,16 @@ const getUserInitials = (name) => {
             <!-- Expenses Section -->
             <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
                 <div class="px-5 py-4 flex items-center justify-between">
-                    <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">Expenses</h2>
+                    <div>
+                        <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">Expenses</h2>
+                        <p v-if="totalExpensesCount > 0" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            {{ totalExpensesCount }} {{ totalExpensesCount === 1 ? 'expense' : 'expenses' }} &middot;
+                            Total: &#8377;{{ totalExpensesAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 }) }}
+                        </p>
+                    </div>
                     <Link
                         :href="route('groups.expenses.index', group.id)"
-                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
                     >
                         View All
                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -241,25 +250,32 @@ const getUserInitials = (name) => {
                     </Link>
                 </div>
 
-                <!-- Mini Balance Summary -->
-                <div v-if="group.balances && group.balances.length" class="px-5 pb-4">
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Balances</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span
-                            v-for="balance in group.balances"
-                            :key="balance.user_id"
-                            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
-                            :class="balance.amount >= 0 ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'"
-                        >
-                            {{ balance.name }}: {{ balance.amount >= 0 ? '+' : '' }}&#8377;{{ Math.abs(balance.amount).toFixed(2) }}
-                        </span>
+                <!-- Recent Expenses List -->
+                <div v-if="recentExpenses.length > 0" class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <div
+                        v-for="expense in recentExpenses"
+                        :key="expense.id"
+                        class="flex items-center gap-3 px-5 py-3"
+                    >
+                        <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-300 font-semibold text-xs shrink-0">
+                            {{ expense.category?.name?.charAt(0) || '?' }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ expense.description || 'No description' }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ expense.category?.name }} &middot; Paid by {{ expense.payer?.name || 'Unknown' }}
+                            </p>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 shrink-0">
+                            &#8377;{{ Number(expense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 }) }}
+                        </p>
                     </div>
                 </div>
 
                 <div v-else class="px-5 pb-4 text-sm text-gray-400 dark:text-gray-500">
-                    No expenses yet.
+                    No expenses added yet.
                     <Link :href="route('groups.expenses.create', group.id)" class="text-primary-600 hover:text-primary-700 font-medium">
-                        Add first expense
+                        Add the first expense
                     </Link>
                 </div>
             </div>

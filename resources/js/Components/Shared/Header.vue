@@ -262,6 +262,9 @@ const markAllAsRead = async () => {
                         </button>
                     </template>
                     <template #content>
+                        <DropdownLink v-if="user?.role === 'admin'" :href="route('admin.dashboard')">
+                            Admin Panel
+                        </DropdownLink>
                         <DropdownLink :href="route('profile.edit')">Profile</DropdownLink>
                         <DropdownLink :href="route('logout')" method="post" as="button">Logout</DropdownLink>
                     </template>

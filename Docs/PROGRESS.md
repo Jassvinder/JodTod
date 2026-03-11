@@ -20,6 +20,31 @@
 - Testing & bug fixes (use TEST.md)
 - Production deployment
 
+### 2026-03-10 - Task 4: CMS System (COMPLETED)
+- Created `pages` table migration (title, slug unique, content longText, meta_title, meta_description, is_published)
+- Created Page model with published scope, boolean cast for is_published
+- Created PageSeeder: seeds 5 pages (about, contact, privacy, terms, features) with HTML content
+- Registered PageSeeder in DatabaseSeeder
+- **Rich Text Editor (TipTap):**
+  - Installed @tiptap/vue-3, @tiptap/starter-kit, @tiptap/extension-image, @tiptap/extension-link
+  - Created RichTextEditor.vue component with toolbar (Bold, Italic, Strike, H2, H3, Bullet/Ordered List, Quote, Divider, Link, Image upload)
+  - Image upload via admin endpoint (stores to public/uploads, max 2MB)
+  - Full prose styling + dark mode support
+- **Admin CMS Pages:**
+  - Admin/PageController: index (list all), edit, update, uploadImage
+  - Admin/Pages/Index.vue: table listing pages with title, slug, status badge, updated date, edit link
+  - Admin/Pages/Edit.vue: page editor with title, RichTextEditor, SEO settings (meta_title, meta_description), publish toggle
+  - Added "Pages" nav item to AdminLayout sidebar (both desktop + mobile) with page icon
+  - Added admin routes: /admin/pages, /admin/pages/{page}/edit, /admin/pages/{page}, /admin/upload-image
+- **Blog Editor Upgrade:**
+  - Updated Blog Create.vue: replaced plain textarea with RichTextEditor component
+  - Updated Blog Edit.vue: replaced plain textarea with RichTextEditor component
+- **Public Pages - DB-driven:**
+  - Updated PageController: loads page content from DB via `showPage()` helper
+  - Falls back to static Blade view if page not found in DB (graceful degradation)
+  - Created `cms.blade.php` generic Blade template: hero section with title + prose content rendering
+  - 5 pages (about, contact, privacy, terms, features) now editable from admin panel
+
 ### 2026-03-10 - Phase 11: PWA & Polish (COMPLETED)
 - **PWA Setup:**
   - Created `manifest.json` with app name, description, theme color (#6366f1), 8 icon sizes, shortcuts

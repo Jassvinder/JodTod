@@ -14,7 +14,7 @@ const form = useForm({
     description: '',
     amount: '',
     category_id: '',
-    expense_date: new Date().toISOString().split('T')[0],
+    expense_date: new Date().toISOString().slice(0, 16),
     paid_by: authUser.value.id,
     split_type: 'equal',
     splits: [],

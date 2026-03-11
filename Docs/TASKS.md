@@ -4,40 +4,23 @@
 
 ## PENDING
 
-### Phase 1: Project Setup
-- [ ] Configure PWA manifest & service worker (basic)
-
-## Current Tasks
-<!-- Add today's tasks here -->
-- [ ] Task 4 
-
-
-### Phase 4: Group Management - DONE (moved to COMPLETED)
-
-
-### Phase 5: Group Expenses - DONE (moved to COMPLETED)
-
-### Phase 6: Settlement System - DONE (moved to COMPLETED)
-
-### Phase 7: Dashboard - DONE (moved to COMPLETED)
-
-### Phase 8: Admin Dashboard & Role System - DONE (moved to COMPLETED)
-
-### Phase 9: SEO & Landing Pages - DONE (moved to COMPLETED)
-
-### Phase 10: Notifications - DONE (moved to COMPLETED)
-
-### Phase 11: PWA & Polish - DONE (moved to COMPLETED)
-
----
-
-## IN PROGRESS
-
-### Phase 5: Group Expenses (NEXT UP)
+- [ ] **Task 5** - Dark mode: calendar icon not visible in date inputs across the app. Icon stays black in dark theme, should adapt to white.
+- [ ] **Task 5** - Group expenses: add "From" and "To" labels on date filter inputs.
+- [ ] **Task 5-A** - Group page: total expenses amount not showing anywhere. Member balances display NaN.
+- [ ] **Task 5-A** - Group with expenses still shows "No expenses yet. Add first expense" — label should change when expenses exist.
+- [ ] **Task 5-A** - Expense date field: add time picker so users can record what time the expense was made.
+- [ ] Manual testing of all features (use `Docs/TEST.md`)
+- [ ] Production deployment
 
 ---
 
 ## COMPLETED
+## Completed Current Tasks
+
+- [x] **Task 1** - Add OTP login functionality with perfect structure (2026-03-09)
+- [x] **Task 2** - Fix profile form UI, 404 error page, phone/email verification (2026-03-09)
+- [x] **Task 3** - Profile avatar (crop), phone verify for groups, email verify UI, add member by phone (2026-03-10)
+- [x] **Task 4** - CMS system: TipTap rich text editor, admin page management, DB-driven public pages, blog editor upgrade (2026-03-10)
 
 ### Phase 1: Project Setup
 - [x] Initialize Laravel project
@@ -70,12 +53,6 @@
 - [x] Google OAuth login (Socialite + GoogleController)
 - [x] Auth middleware & route protection
 - [x] Profile page (update info, change password, delete account)
-
-## Completed Current Tasks
-
-- [x] **Task 1** - Add OTP login functionality with perfect structure (2026-03-09)
-- [x] **Task 2** - Fix profile form UI, 404 error page, phone/email verification (2026-03-09)
-- [x] **Task 3** - Profile avatar (crop), phone verify for groups, email verify UI, add member by phone (2026-03-10)
 
 ### Phase 4: Group Management
 - [x] Create groups migration & model

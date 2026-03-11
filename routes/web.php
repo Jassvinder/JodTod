@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
@@ -121,14 +122,25 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
 
     // User management
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::get('/users/{user}', [AdminController::class, 'userDetail'])->name('admin.users.show');
     Route::put('/users/{user}/role', [AdminController::class, 'updateUserRole'])->name('admin.users.role');
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+
+    // Group management (admin view)
+    Route::get('/groups', [AdminController::class, 'groups'])->name('admin.groups');
+    Route::get('/groups/{group}', [AdminController::class, 'groupDetail'])->name('admin.groups.show');
 
     // Category management
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.categories');
     Route::post('/categories', [AdminCategoryController::class, 'store'])->name('admin.categories.store');
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
+
+    // Page management (CMS)
+    Route::get('/pages', [AdminPageController::class, 'index'])->name('admin.pages');
+    Route::get('/pages/{page}/edit', [AdminPageController::class, 'edit'])->name('admin.pages.edit');
+    Route::put('/pages/{page}', [AdminPageController::class, 'update'])->name('admin.pages.update');
+    Route::post('/upload-image', [AdminPageController::class, 'uploadImage'])->name('admin.upload-image');
 
     // Blog management
     Route::get('/blog', [AdminBlogController::class, 'index'])->name('admin.blog');

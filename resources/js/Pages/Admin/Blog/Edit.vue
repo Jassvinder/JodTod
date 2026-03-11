@@ -2,6 +2,7 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import RichTextEditor from '@/Components/Shared/RichTextEditor.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -80,13 +81,7 @@ function submit() {
                 <!-- Content -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Content</label>
-                    <textarea
-                        v-model="form.content"
-                        rows="16"
-                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 text-sm focus:border-primary-500 focus:ring-primary-500 font-mono"
-                        placeholder="Write your post content here... (HTML supported)"
-                    ></textarea>
-                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">HTML is supported. Use headings, paragraphs, lists, etc.</p>
+                    <RichTextEditor v-model="form.content" />
                     <p v-if="form.errors.content" class="mt-1 text-sm text-red-600">{{ form.errors.content }}</p>
                 </div>
 

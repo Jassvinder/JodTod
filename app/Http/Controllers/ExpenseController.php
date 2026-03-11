@@ -88,7 +88,7 @@ class ExpenseController extends Controller
             ->orderBy('expense_date')
             ->get()
             ->map(fn ($item) => [
-                'date' => $item->date->toDateString(),
+                'date' => \Carbon\Carbon::parse($item->date)->toDateString(),
                 'total' => (float) $item->total,
             ]);
 
@@ -118,7 +118,7 @@ class ExpenseController extends Controller
             'amount' => 'required|numeric|min:0.01|max:99999999.99',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string|max:255',
-            'expense_date' => 'required|date|before_or_equal:today',
+            'expense_date' => 'required|date|before_or_equal:now',
         ]);
 
         Expense::create([
@@ -149,7 +149,7 @@ class ExpenseController extends Controller
             'amount' => 'required|numeric|min:0.01|max:99999999.99',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string|max:255',
-            'expense_date' => 'required|date|before_or_equal:today',
+            'expense_date' => 'required|date|before_or_equal:now',
         ]);
 
         $expense->update($validated);

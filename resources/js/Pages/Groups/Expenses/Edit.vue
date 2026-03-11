@@ -15,7 +15,7 @@ const form = useForm({
     description: props.expense.description || '',
     amount: props.expense.amount,
     category_id: props.expense.category_id,
-    expense_date: props.expense.expense_date.split('T')[0],
+    expense_date: props.expense.expense_date ? props.expense.expense_date.slice(0, 16) : '',
     paid_by: props.expense.paid_by,
     split_type: props.expense.split_type,
     splits: [],

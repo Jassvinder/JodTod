@@ -64,14 +64,14 @@ defineEmits(['submit']);
             <p v-if="form.errors.description" class="mt-1 text-sm text-accent-600">{{ form.errors.description }}</p>
         </div>
 
-        <!-- Date -->
+        <!-- Date & Time -->
         <div>
-            <label for="expense_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+            <label for="expense_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date & Time</label>
             <input
                 id="expense_date"
                 v-model="form.expense_date"
-                type="date"
-                :max="new Date().toISOString().split('T')[0]"
+                type="datetime-local"
+                :max="new Date().toISOString().slice(0, 16)"
                 class="mt-1 block w-full py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 required
             />

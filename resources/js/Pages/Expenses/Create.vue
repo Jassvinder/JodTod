@@ -11,7 +11,7 @@ const form = useForm({
     amount: '',
     category_id: '',
     description: '',
-    expense_date: new Date().toISOString().split('T')[0],
+    expense_date: new Date().toISOString().slice(0, 16),
 });
 
 function submit() {

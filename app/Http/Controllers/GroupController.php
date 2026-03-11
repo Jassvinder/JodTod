@@ -67,9 +67,24 @@ class GroupController extends Controller
                 ->orderByPivot('joined_at');
         }, 'creator:id,name']);
 
+        // Get recent expenses for the group (last 5)
+        $recentExpenses = $group->expenses()
+            ->with(['category', 'payer'])
+            ->whereNull('deleted_at')
+            ->orderBy('expense_date', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Total expenses count and amount
+        $totalExpensesCount = $group->expenses()->whereNull('deleted_at')->count();
+        $totalExpensesAmount = round((float) $group->expenses()->whereNull('deleted_at')->sum('amount'), 2);
+
         return Inertia::render('Groups/Show', [
             'group' => $group,
             'isAdmin' => $group->isAdmin($request->user()),
+            'recentExpenses' => $recentExpenses,
+            'totalExpensesCount' => $totalExpensesCount,
+            'totalExpensesAmount' => $totalExpensesAmount,
         ]);
     }
 

@@ -15,7 +15,11 @@
       "Bash(php -l routes/web.php)",
       "Bash(cd D:/phpserver/www/JodTod && npx vite build 2>&1 | tail -5)",
       "Bash(cd D:/phpserver/www/JodTod && npx vite build 2>&1 | tail -8)",
-      "Bash(cd D:/phpserver/www/JodTod && npx vite build 2>&1)"
+      "Bash(cd D:/phpserver/www/JodTod && npx vite build 2>&1)",
+      "Bash(npx vite:*)",
+      "Bash(python --version 2>&1 && pip show openpyxl 2>&1 | head -5)",
+      "Bash(php -v 2>&1 | head -1)",
+      "Bash(python --version 2>&1; python3 --version 2>&1; py --version 2>&1)"
     ]
   }
 }

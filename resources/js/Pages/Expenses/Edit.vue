@@ -12,7 +12,7 @@ const form = useForm({
     amount: props.expense.amount,
     category_id: props.expense.category_id,
     description: props.expense.description || '',
-    expense_date: props.expense.expense_date.split('T')[0],
+    expense_date: props.expense.expense_date ? props.expense.expense_date.slice(0, 16) : '',
 });
 
 function submit() {
