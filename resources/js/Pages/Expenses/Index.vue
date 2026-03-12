@@ -1,9 +1,11 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import CategoryPieChart from '@/Components/Expenses/CategoryPieChart.vue';
-import DailyBarChart from '@/Components/Expenses/DailyBarChart.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { ref, watch, defineAsyncComponent } from 'vue';
+
+// Lazy-load chart components — chart.js is heavy, load only when charts section renders
+const CategoryPieChart = defineAsyncComponent(() => import('@/Components/Expenses/CategoryPieChart.vue'));
+const DailyBarChart = defineAsyncComponent(() => import('@/Components/Expenses/DailyBarChart.vue'));
 
 const props = defineProps({
     expenses: Object,

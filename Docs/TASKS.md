@@ -4,11 +4,21 @@
 
 ## PENDING
 
-- [ ] **Task 5** - Dark mode: calendar icon not visible in date inputs across the app. Icon stays black in dark theme, should adapt to white.
-- [ ] **Task 5** - Group expenses: add "From" and "To" labels on date filter inputs.
-- [ ] **Task 5-A** - Group page: total expenses amount not showing anywhere. Member balances display NaN.
-- [ ] **Task 5-A** - Group with expenses still shows "No expenses yet. Add first expense" — label should change when expenses exist.
-- [ ] **Task 5-A** - Expense date field: add time picker so users can record what time the expense was made.
+### High Priority (Core functionality gaps)
+- [ ] **Task 6** - Profile page: Add Currency & Language settings UI (DB fields exist: `currency`, `language` — just need form in Profile/Edit.vue)
+- [ ] **Task 7** - Group leave: Fix leave logic — currently nobody can leave. Should allow leave only if balance is zero; block with message if unsettled balance exists
+- [ ] **Task 8** - Admin Reports page (`/admin/reports`): Expense trends, category breakdown, top groups, settlement stats
+
+### Medium Priority (Planned features)
+- [ ] **Task 9** - Admin: Ban/Unban user functionality (add `banned_at` column, block login for banned users, UI in admin users list)
+- [ ] **Task 10** - Admin Settings page (`/admin/settings`): Site name, default currency, maintenance mode toggle
+- [ ] **Task 11** - Weekly summary notification: Scheduled command to email users their weekly expense summary
+
+### Low Priority / Future
+- [ ] **Task 12** - Real-time notifications: Polling interval in Header.vue (currently only fetches on bell-click, not auto-refresh)
+- [ ] **Task 13** - Offline expense sync: Implement IndexedDB storage + background sync in service worker (currently empty placeholder)
+
+### Release
 - [ ] Manual testing of all features (use `Docs/TEST.md`)
 - [ ] Production deployment
 
@@ -17,6 +27,11 @@
 ## COMPLETED
 ## Completed Current Tasks
 
+- [x] **Task 5** - Dark mode: calendar icon color-scheme fix (`color-scheme: dark` in app.css) (2026-03-12)
+- [x] **Task 5** - Group expenses: "From" and "To" labels added on date filter inputs (2026-03-12)
+- [x] **Task 5-A** - Group page: total expenses amount displayed, member balances NaN fixed (explicit float cast + rounding) (2026-03-12)
+- [x] **Task 5-A** - Group expenses: empty state label correctly conditional on `expenses.data.length === 0` (2026-03-12)
+- [x] **Task 5-A** - Expense date field: `datetime-local` input added for date + time recording (2026-03-12)
 - [x] **Task 1** - Add OTP login functionality with perfect structure (2026-03-09)
 - [x] **Task 2** - Fix profile form UI, 404 error page, phone/email verification (2026-03-09)
 - [x] **Task 3** - Profile avatar (crop), phone verify for groups, email verify UI, add member by phone (2026-03-10)

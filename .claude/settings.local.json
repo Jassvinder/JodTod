@@ -19,7 +19,8 @@
       "Bash(npx vite:*)",
       "Bash(python --version 2>&1 && pip show openpyxl 2>&1 | head -5)",
       "Bash(php -v 2>&1 | head -1)",
-      "Bash(python --version 2>&1; python3 --version 2>&1; py --version 2>&1)"
+      "Bash(python --version 2>&1; python3 --version 2>&1; py --version 2>&1)",
+      "Bash(find /d/phpserver/www/JodTod/Docs -type f -name \"*.md\" 2>/dev/null | head -10)"
     ]
   }
 }
