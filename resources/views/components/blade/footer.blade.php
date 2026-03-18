@@ -3,7 +3,9 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <!-- Brand -->
             <div>
-                <h3 class="text-xl font-bold text-white">{{ config('site.app.name') }}</h3>
+                <a href="{{ url('/') }}">
+                    <img src="{{ asset('images/Logo/logo.png') }}" alt="{{ config('site.app.name') }}" class="h-9 w-auto" />
+                </a>
                 <p class="mt-2 text-sm text-gray-400">{{ config('site.footer.description') }}</p>
             </div>
 

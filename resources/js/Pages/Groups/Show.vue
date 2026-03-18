@@ -1,11 +1,11 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/Modal.vue';
-import DangerButton from '@/Components/DangerButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
+import { confirmAction } from '@/Utils/confirm.js';
 
 const props = defineProps({
     group: Object,
@@ -17,10 +17,7 @@ const props = defineProps({
 
 const authUser = computed(() => usePage().props.auth.user);
 const showInviteModal = ref(false);
-const showDeleteModal = ref(false);
-const showRemoveModal = ref(false);
 const showAddMemberModal = ref(false);
-const memberToRemove = ref(null);
 const copied = ref(false);
 
 // Add member search state
@@ -52,23 +49,30 @@ const refreshCode = () => {
     });
 };
 
-const deleteGroup = () => {
-    router.delete(route('groups.destroy', props.group.id));
-};
-
-const confirmRemoveMember = (member) => {
-    memberToRemove.value = member;
-    showRemoveModal.value = true;
-};
-
-const removeMember = () => {
-    router.delete(route('groups.members.remove', [props.group.id, memberToRemove.value.id]), {
-        preserveScroll: true,
-        onSuccess: () => {
-            showRemoveModal.value = false;
-            memberToRemove.value = null;
-        },
+const deleteGroup = async () => {
+    const confirmed = await confirmAction({
+        title: 'Delete Group',
+        text: `Are you sure you want to delete "${props.group.name}"? This will remove all members and group data. This action cannot be undone.`,
+        confirmText: 'Delete Group',
+        danger: true,
     });
+    if (confirmed) {
+        router.delete(route('groups.destroy', props.group.id));
+    }
+};
+
+const confirmRemoveMember = async (member) => {
+    const confirmed = await confirmAction({
+        title: 'Remove Member',
+        text: `Are you sure you want to remove ${member.name} from this group?`,
+        confirmText: 'Remove',
+        danger: true,
+    });
+    if (confirmed) {
+        router.delete(route('groups.members.remove', [props.group.id, member.id]), {
+            preserveScroll: true,
+        });
+    }
 };
 
 // Add member functionality
@@ -283,7 +287,7 @@ const getUserInitials = (name) => {
             <!-- Actions -->
             <div v-if="isAdmin" class="mt-6 flex items-center gap-3">
                 <button
-                    @click="showDeleteModal = true"
+                    @click="deleteGroup"
                     class="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
                 >
                     Delete Group
@@ -410,32 +414,5 @@ const getUserInitials = (name) => {
             </div>
         </Modal>
 
-        <!-- Delete Confirmation Modal -->
-        <Modal :show="showDeleteModal" @close="showDeleteModal = false" max-width="md">
-            <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Delete Group</h2>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Are you sure you want to delete "{{ group.name }}"? This will remove all members and group data. This action cannot be undone.
-                </p>
-                <div class="mt-6 flex justify-end gap-3">
-                    <SecondaryButton @click="showDeleteModal = false">Cancel</SecondaryButton>
-                    <DangerButton @click="deleteGroup">Delete Group</DangerButton>
-                </div>
-            </div>
-        </Modal>
-
-        <!-- Remove Member Modal -->
-        <Modal :show="showRemoveModal" @close="showRemoveModal = false" max-width="md">
-            <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Remove Member</h2>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Are you sure you want to remove <strong>{{ memberToRemove?.name }}</strong> from this group?
-                </p>
-                <div class="mt-6 flex justify-end gap-3">
-                    <SecondaryButton @click="showRemoveModal = false">Cancel</SecondaryButton>
-                    <DangerButton @click="removeMember">Remove</DangerButton>
-                </div>
-            </div>
-        </Modal>
     </AppLayout>
 </template>

@@ -1,10 +1,8 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Modal from '@/Components/Modal.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import DangerButton from '@/Components/DangerButton.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
+import { confirmAction } from '@/Utils/confirm.js';
 
 const props = defineProps({
     group: Object,
@@ -21,8 +19,6 @@ const category = ref(props.filters.category || '');
 const dateFrom = ref(props.filters.date_from || '');
 const dateTo = ref(props.filters.date_to || '');
 
-const showDeleteModal = ref(false);
-const expenseToDelete = ref(null);
 const expandedExpense = ref(null);
 
 let searchTimeout = null;
@@ -56,19 +52,16 @@ function clearFilters() {
 
 const hasActiveFilters = () => search.value || category.value || dateFrom.value || dateTo.value;
 
-function confirmDelete(expense) {
-    expenseToDelete.value = expense;
-    showDeleteModal.value = true;
-}
-
-function deleteExpense() {
-    if (!expenseToDelete.value) return;
-    router.delete(route('groups.expenses.destroy', [props.group.id, expenseToDelete.value.id]), {
-        onFinish: () => {
-            showDeleteModal.value = false;
-            expenseToDelete.value = null;
-        },
+async function confirmDelete(expense) {
+    const confirmed = await confirmAction({
+        title: 'Delete Expense',
+        text: `Are you sure you want to delete this expense of ${formatCurrency(expense.amount)}? This action cannot be undone.`,
+        confirmText: 'Delete',
+        danger: true,
     });
+    if (confirmed) {
+        router.delete(route('groups.expenses.destroy', [props.group.id, expense.id]));
+    }
 }
 
 function toggleExpand(expenseId) {
@@ -375,20 +368,5 @@ function splitTypeBadgeClass(type) {
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
-        <Modal :show="showDeleteModal" @close="showDeleteModal = false" max-width="md">
-            <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Delete Expense</h2>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Are you sure you want to delete this expense of
-                    <strong>{{ expenseToDelete ? formatCurrency(expenseToDelete.amount) : '' }}</strong>?
-                    This action cannot be undone.
-                </p>
-                <div class="mt-6 flex justify-end gap-3">
-                    <SecondaryButton @click="showDeleteModal = false">Cancel</SecondaryButton>
-                    <DangerButton @click="deleteExpense">Delete</DangerButton>
-                </div>
-            </div>
-        </Modal>
     </AppLayout>
 </template>

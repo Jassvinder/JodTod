@@ -168,6 +168,23 @@ class ExpenseController extends Controller
             ->with('success', 'Expense deleted successfully.');
     }
 
+    public function suggestions(Request $request)
+    {
+        $query = $request->input('q', '');
+
+        $suggestions = Expense::where('user_id', Auth::id())
+            ->whereNotNull('description')
+            ->where('description', '!=', '')
+            ->where('description', 'like', '%' . $query . '%')
+            ->select('description')
+            ->distinct()
+            ->orderBy('description')
+            ->limit(10)
+            ->pluck('description');
+
+        return response()->json($suggestions);
+    }
+
     private function authorizeExpense(Expense $expense): void
     {
         if ($expense->user_id !== Auth::id() || $expense->group_id !== null) {

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Expense;
 use App\Models\ExpenseSplit;
+use App\Models\Income;
 use App\Models\Settlement;
+use App\Models\Todo;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,9 +24,12 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard', [
             'personalSummary' => $this->getPersonalSummary($user),
+            'incomeSummary' => $this->getIncomeSummary($user),
+            'monthlyTrend' => $this->getMonthlyTrend($user),
             'groupsSummary' => $this->getGroupsSummary($user),
             'recentActivity' => $this->getRecentActivity($user),
             'pendingSettlements' => $this->getPendingSettlements($user),
+            'todoStats' => $this->getTodoStats($user),
         ]);
     }
 
@@ -71,6 +76,84 @@ class DashboardController extends Controller
             'this_month_total' => round((float) $thisMonthTotal, 2),
             'last_month_total' => round((float) $lastMonthTotal, 2),
             'category_breakdown' => $categoryBreakdown,
+        ];
+    }
+
+    /**
+     * Get income summary for the authenticated user.
+     */
+    private function getIncomeSummary(User $user): array
+    {
+        $now = Carbon::now();
+        $startOfMonth = $now->copy()->startOfMonth();
+        $endOfMonth = $now->copy()->endOfMonth();
+
+        $thisMonthIncome = Income::forUser($user->id)
+            ->whereBetween('income_date', [$startOfMonth, $endOfMonth])
+            ->sum('amount');
+
+        $lastMonthIncome = Income::forUser($user->id)
+            ->whereBetween('income_date', [
+                $now->copy()->subMonth()->startOfMonth(),
+                $now->copy()->subMonth()->endOfMonth(),
+            ])
+            ->sum('amount');
+
+        $thisMonthExpense = Expense::where('user_id', $user->id)
+            ->whereNull('group_id')
+            ->whereBetween('expense_date', [$startOfMonth, $endOfMonth])
+            ->sum('amount');
+
+        return [
+            'this_month_income' => round((float) $thisMonthIncome, 2),
+            'last_month_income' => round((float) $lastMonthIncome, 2),
+            'this_month_savings' => round((float) $thisMonthIncome - (float) $thisMonthExpense, 2),
+        ];
+    }
+
+    /**
+     * Get monthly income vs expense trend (last 6 months).
+     */
+    private function getMonthlyTrend(User $user): array
+    {
+        $now = Carbon::now();
+        $trend = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $month = $now->copy()->subMonths($i);
+            $mStart = $month->copy()->startOfMonth();
+            $mEnd = $month->copy()->endOfMonth();
+
+            $income = Income::forUser($user->id)
+                ->whereBetween('income_date', [$mStart, $mEnd])
+                ->sum('amount');
+
+            $expense = Expense::where('user_id', $user->id)
+                ->whereNull('group_id')
+                ->whereBetween('expense_date', [$mStart, $mEnd])
+                ->sum('amount');
+
+            $trend[] = [
+                'month' => $month->format('M'),
+                'income' => round((float) $income, 2),
+                'expense' => round((float) $expense, 2),
+            ];
+        }
+
+        return $trend;
+    }
+
+    /**
+     * Get todo stats for dashboard widget.
+     */
+    private function getTodoStats(User $user): array
+    {
+        return [
+            'pending' => Todo::forUser($user->id)->pending()->count(),
+            'overdue' => Todo::forUser($user->id)->pending()
+                ->whereNotNull('due_date')
+                ->where('due_date', '<', now()->startOfDay())
+                ->count(),
         ];
     }
 

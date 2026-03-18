@@ -6,7 +6,9 @@ import TextInput from '@/Components/TextInput.vue';
 import Modal from '@/Components/Modal.vue';
 import { Link, useForm, usePage, router } from '@inertiajs/vue3';
 import { ref, computed, nextTick, onBeforeUnmount } from 'vue';
+import { confirmAction } from '@/Utils/confirm.js';
 import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 defineProps({
     mustVerifyEmail: {
@@ -25,7 +27,11 @@ const form = useForm({
 });
 
 // Avatar state
+const avatarOverride = ref(null); // instant preview after upload/remove
+
 const avatarUrl = computed(() => {
+    if (avatarOverride.value === 'removed') return null;
+    if (avatarOverride.value) return avatarOverride.value;
     if (!user.avatar) return null;
     return `/storage/${user.avatar}?t=${avatarTimestamp.value}`;
 });
@@ -87,33 +93,23 @@ const onFileSelected = (event) => {
 const initCropper = () => {
     destroyCropper();
 
-    // Wait for the image to be rendered in the DOM
     nextTick(() => {
         const img = cropImgRef.value;
         if (!img) return;
 
-        // For cropperjs v2, use the template approach with web components
         cropperInstance = new Cropper(img, {
-            template: `
-                <cropper-canvas background>
-                    <cropper-image></cropper-image>
-                    <cropper-shade hidden></cropper-shade>
-                    <cropper-handle action="select" plain></cropper-handle>
-                    <cropper-selection initial-coverage="0.8" aspect-ratio="1" movable resizable outlined>
-                        <cropper-grid role="grid" bordered covered></cropper-grid>
-                        <cropper-crosshair centered></cropper-crosshair>
-                        <cropper-handle action="move" theme-color="rgba(255,255,255,0.35)"></cropper-handle>
-                        <cropper-handle action="n-resize"></cropper-handle>
-                        <cropper-handle action="e-resize"></cropper-handle>
-                        <cropper-handle action="s-resize"></cropper-handle>
-                        <cropper-handle action="w-resize"></cropper-handle>
-                        <cropper-handle action="ne-resize"></cropper-handle>
-                        <cropper-handle action="nw-resize"></cropper-handle>
-                        <cropper-handle action="se-resize"></cropper-handle>
-                        <cropper-handle action="sw-resize"></cropper-handle>
-                    </cropper-selection>
-                </cropper-canvas>
-            `,
+            aspectRatio: 1,
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 0.8,
+            responsive: true,
+            restore: false,
+            guides: true,
+            center: true,
+            highlight: false,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false,
         });
     });
 };
@@ -138,30 +134,30 @@ const saveCroppedAvatar = async () => {
     avatarError.value = '';
 
     try {
-        const selection = cropperInstance.getCropperSelection();
-        if (!selection) {
-            avatarError.value = 'No crop area selected.';
+        const canvas = cropperInstance.getCroppedCanvas({
+            width: 400,
+            height: 400,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high',
+        });
+
+        if (!canvas) {
+            avatarError.value = 'Failed to crop image.';
             avatarUploading.value = false;
             return;
         }
 
-        const canvas = await selection.$toCanvas({
-            width: 400,
-            height: 400,
-        });
-
         const base64 = canvas.toDataURL('image/jpeg', 0.8);
+
+        // Instant preview
+        avatarOverride.value = base64;
 
         const response = await axios.post(route('profile.avatar.update'), {
             avatar: base64,
         });
 
-        // Update timestamp to bust cache
         avatarTimestamp.value = Date.now();
-
-        // Reload auth data to get updated avatar
         router.reload({ only: ['auth'] });
-
         closeCropModal();
     } catch (error) {
         const data = error.response?.data;
@@ -170,6 +166,28 @@ const saveCroppedAvatar = async () => {
         } else {
             avatarError.value = 'Failed to upload avatar. Please try again.';
         }
+    } finally {
+        avatarUploading.value = false;
+    }
+};
+
+const removeAvatar = async () => {
+    const confirmed = await confirmAction({
+        title: 'Remove Photo?',
+        text: 'Your profile photo will be deleted.',
+        confirmText: 'Remove',
+        danger: true,
+    });
+    if (!confirmed) return;
+    avatarUploading.value = true;
+    avatarError.value = '';
+    try {
+        await axios.delete(route('profile.avatar.destroy'));
+        avatarOverride.value = 'removed';
+        avatarTimestamp.value = Date.now();
+        router.reload({ only: ['auth'] });
+    } catch {
+        avatarError.value = 'Failed to remove photo. Please try again.';
     } finally {
         avatarUploading.value = false;
     }
@@ -317,13 +335,24 @@ const cancelPhoneEdit = () => {
                 </div>
             </div>
             <div>
-                <button
-                    type="button"
-                    @click="triggerFileInput"
-                    class="px-4 py-2 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 transition-colors"
-                >
-                    Change Photo
-                </button>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        @click="triggerFileInput"
+                        class="px-4 py-2 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 transition-colors"
+                    >
+                        {{ avatarUrl ? 'Change Photo' : 'Upload Photo' }}
+                    </button>
+                    <button
+                        v-if="avatarUrl"
+                        type="button"
+                        @click="removeAvatar"
+                        :disabled="avatarUploading"
+                        class="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                    >
+                        Remove
+                    </button>
+                </div>
                 <input
                     ref="fileInputRef"
                     type="file"
@@ -338,16 +367,15 @@ const cancelPhoneEdit = () => {
         <!-- Crop Modal -->
         <Modal :show="showCropModal" max-width="lg" @close="closeCropModal">
             <div class="p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Crop Photo</h3>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Crop Photo</h3>
 
-                <div class="relative w-full" style="max-height: 400px; overflow: hidden;">
+                <div class="relative w-full rounded-lg overflow-hidden" style="max-height: 400px;">
                     <img
                         v-if="cropImageSrc"
                         ref="cropImgRef"
                         :src="cropImageSrc"
                         alt="Crop preview"
-                        class="block max-w-full"
-                        style="max-height: 380px;"
+                        style="display: block; max-width: 100%;"
                     />
                 </div>
 
@@ -357,7 +385,7 @@ const cancelPhoneEdit = () => {
                     <button
                         type="button"
                         @click="closeCropModal"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                     >
                         Cancel
                     </button>

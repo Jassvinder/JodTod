@@ -44,13 +44,25 @@ class PageController extends Controller
     public function uploadImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|max:2048',
+            'image' => 'required|image|max:5120',
         ]);
 
-        $path = $request->file('image')->store('uploads', 'public');
+        $file = $request->file('image');
+        $image = imagecreatefromstring(file_get_contents($file->getPathname()));
+
+        if ($image === false) {
+            return response()->json(['error' => 'Could not process image.'], 422);
+        }
+
+        $filename = 'uploads/' . uniqid() . '.webp';
+        ob_start();
+        imagewebp($image, null, 80);
+        $webpData = ob_get_clean();
+
+        \Illuminate\Support\Facades\Storage::disk('public')->put($filename, $webpData);
 
         return response()->json([
-            'url' => '/storage/' . $path,
+            'url' => '/storage/' . $filename,
         ]);
     }
 }

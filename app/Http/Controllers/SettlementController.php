@@ -6,6 +6,7 @@ use App\Models\Expense;
 use App\Models\ExpenseSplit;
 use App\Models\Group;
 use App\Models\Settlement;
+use App\Models\Category;
 use App\Models\User;
 use App\Notifications\SettlementCompleted;
 use App\Notifications\SettlementRequested;
@@ -138,6 +139,9 @@ class SettlementController extends Controller
             }
         });
 
+        // Add as personal expense for the payer (from_user)
+        $this->addSettlementToPersonalExpense($settlement, $group);
+
         // Notify the creditor (to_user) that payment was received
         $toUser = User::find($settlement->to_user);
         $fromUser = User::find($settlement->from_user);
@@ -160,12 +164,17 @@ class SettlementController extends Controller
         }
 
         DB::transaction(function () use ($group) {
-            Settlement::where('group_id', $group->id)
+            $pendingSettlements = Settlement::where('group_id', $group->id)
                 ->where('status', 'pending')
-                ->update([
+                ->get();
+
+            foreach ($pendingSettlements as $settlement) {
+                $settlement->update([
                     'status' => 'completed',
                     'settled_at' => now(),
                 ]);
+                $this->addSettlementToPersonalExpense($settlement, $group);
+            }
 
             $this->markExpensesAsSettled($group);
         });
@@ -307,6 +316,28 @@ class SettlementController extends Controller
         }
 
         return $transactions;
+    }
+
+    /**
+     * Add a completed settlement as a personal expense for the payer.
+     */
+    private function addSettlementToPersonalExpense(Settlement $settlement, Group $group): void
+    {
+        $otherCategory = Category::where('name', 'Other')->first();
+
+        $toUser = User::find($settlement->to_user);
+        $description = "Settlement: {$group->name} - paid to {$toUser->name}";
+
+        Expense::create([
+            'user_id' => $settlement->from_user,
+            'paid_by' => $settlement->from_user,
+            'amount' => $settlement->amount,
+            'category_id' => $otherCategory?->id,
+            'description' => $description,
+            'expense_date' => now(),
+            'group_id' => null,
+            'is_settled' => true,
+        ]);
     }
 
     /**

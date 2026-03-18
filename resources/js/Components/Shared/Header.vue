@@ -131,7 +131,9 @@ const markAllAsRead = async () => {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <Link :href="route('dashboard')" class="text-xl font-bold text-primary-600 dark:text-primary-400">JodTod</Link>
+                <Link :href="route('dashboard')" class="lg:hidden">
+                    <img src="/images/Logo/logo.png" alt="JodTod" class="h-8 w-auto" />
+                </Link>
             </div>
 
             <!-- Right: Dark Mode + Notifications + Profile -->
@@ -252,7 +254,13 @@ const markAllAsRead = async () => {
                 <Dropdown v-if="user" align="right" width="48">
                     <template #trigger>
                         <button class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <div class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-medium">
+                            <img
+                                v-if="user.avatar"
+                                :src="`/storage/${user.avatar}`"
+                                :alt="user.name"
+                                class="w-8 h-8 rounded-full object-cover"
+                            />
+                            <div v-else class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-medium">
                                 {{ user.name?.charAt(0)?.toUpperCase() }}
                             </div>
                             <span class="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">{{ user.name }}</span>

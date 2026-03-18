@@ -5,6 +5,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { confirmAction } from '@/Utils/confirm.js';
 
 const props = defineProps({
     categories: {
@@ -65,23 +66,18 @@ function updateCategory() {
 }
 
 // Delete Category
-const showDeleteModal = ref(false);
-const categoryToDelete = ref(null);
-
-function confirmDelete(category) {
-    categoryToDelete.value = category;
-    showDeleteModal.value = true;
-}
-
-function deleteCategory() {
-    if (!categoryToDelete.value) return;
-    router.delete(route('admin.categories.destroy', categoryToDelete.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            showDeleteModal.value = false;
-            categoryToDelete.value = null;
-        },
+async function confirmDelete(category) {
+    const confirmed = await confirmAction({
+        title: 'Delete Category',
+        text: `Are you sure you want to delete "${category.name}"? This action cannot be undone.`,
+        confirmText: 'Delete Category',
+        danger: true,
     });
+    if (confirmed) {
+        router.delete(route('admin.categories.destroy', category.id), {
+            preserveScroll: true,
+        });
+    }
 }
 </script>
 
@@ -278,37 +274,5 @@ function deleteCategory() {
             </form>
         </Modal>
 
-        <!-- Delete Confirmation Modal -->
-        <Modal :show="showDeleteModal" max-width="md" @close="showDeleteModal = false">
-            <div class="p-6">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
-                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Delete Category</h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Are you sure you want to delete <strong>{{ categoryToDelete?.name }}</strong>? This action cannot be undone.
-                        </p>
-                    </div>
-                </div>
-                <div class="mt-6 flex items-center justify-end gap-3">
-                    <button
-                        @click="showDeleteModal = false"
-                        class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        @click="deleteCategory"
-                        class="px-4 py-2 rounded-lg bg-red-600 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
-                    >
-                        Delete Category
-                    </button>
-                </div>
-            </div>
-        </Modal>
     </AdminLayout>
 </template>

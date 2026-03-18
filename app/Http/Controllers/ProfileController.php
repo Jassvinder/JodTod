@@ -63,21 +63,46 @@ class ProfileController extends Controller
             return back()->withErrors(['avatar' => 'Invalid image data.']);
         }
 
-        // Max 2MB check on decoded image
-        if (strlen($decoded) > 2 * 1024 * 1024) {
-            return back()->withErrors(['avatar' => 'Image must be less than 2MB.']);
+        // Max 5MB check on decoded image
+        if (strlen($decoded) > 5 * 1024 * 1024) {
+            return back()->withErrors(['avatar' => 'Image must be less than 5MB.']);
         }
 
+        // Convert to webp for smaller file size
         $user = $request->user();
-        $path = "avatars/{$user->id}.jpg";
+        $path = "avatars/{$user->id}.webp";
 
-        Storage::disk('public')->put($path, $decoded);
+        $image = imagecreatefromstring($decoded);
+        if ($image === false) {
+            return back()->withErrors(['avatar' => 'Could not process image.']);
+        }
+
+        ob_start();
+        imagewebp($image, null, 80);
+        $webpData = ob_get_clean();
+
+        Storage::disk('public')->put($path, $webpData);
 
         $user->update(['avatar' => $path]);
 
         return response()->json([
             'avatar_url' => Storage::disk('public')->url($path),
         ]);
+    }
+
+    /**
+     * Remove the user's avatar.
+     */
+    public function destroyAvatar(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->update(['avatar' => null]);
+        }
+
+        return response()->json(['message' => 'Avatar removed.']);
     }
 
     /**

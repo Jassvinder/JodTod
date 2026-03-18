@@ -6,17 +6,25 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 
 const sidebarOpen = ref(false);
+const sidebarCollapsed = ref(false);
 const flash = computed(() => usePage().props.flash || {});
 
-// Offline detection
-const isOffline = ref(!navigator.onLine);
-const onOnline = () => { isOffline.value = false; };
-const onOffline = () => { isOffline.value = true; };
-
+// Load collapsed state from localStorage
 onMounted(() => {
+    sidebarCollapsed.value = localStorage.getItem('sidebar_collapsed') === 'true';
     window.addEventListener('online', onOnline);
     window.addEventListener('offline', onOffline);
 });
+
+function toggleCollapse() {
+    sidebarCollapsed.value = !sidebarCollapsed.value;
+    localStorage.setItem('sidebar_collapsed', sidebarCollapsed.value);
+}
+
+// Offline detection
+const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false);
+const onOnline = () => { isOffline.value = false; };
+const onOffline = () => { isOffline.value = true; };
 
 onUnmounted(() => {
     window.removeEventListener('online', onOnline);
@@ -35,10 +43,10 @@ onUnmounted(() => {
         </div>
 
         <!-- Sidebar (Desktop) -->
-        <Sidebar :open="sidebarOpen" @close="sidebarOpen = false" />
+        <Sidebar :open="sidebarOpen" :collapsed="sidebarCollapsed" @close="sidebarOpen = false" @toggle-collapse="toggleCollapse" />
 
         <!-- Main Content -->
-        <div class="lg:pl-64" :class="{ 'pt-8': isOffline }">
+        <div class="transition-all duration-300" :class="[sidebarCollapsed ? 'lg:pl-[68px]' : 'lg:pl-64', { 'pt-8': isOffline }]">
             <!-- Header -->
             <Header @toggle-sidebar="sidebarOpen = !sidebarOpen" />
 

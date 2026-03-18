@@ -5,8 +5,19 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import { ref, computed } from 'vue';
 
 const sidebarOpen = ref(false);
+const sidebarCollapsed = ref(false);
 const flash = computed(() => usePage().props.flash || {});
 const user = computed(() => usePage().props.auth?.user);
+
+import { onMounted } from 'vue';
+onMounted(() => {
+    sidebarCollapsed.value = localStorage.getItem('admin_sidebar_collapsed') === 'true';
+});
+
+function toggleCollapse() {
+    sidebarCollapsed.value = !sidebarCollapsed.value;
+    localStorage.setItem('admin_sidebar_collapsed', sidebarCollapsed.value);
+}
 
 const navigation = [
     { name: 'Dashboard', route: 'admin.dashboard', icon: 'chart' },
@@ -46,31 +57,44 @@ function isActive(item) {
         <!-- Sidebar -->
         <aside
             :class="[
-                'fixed top-0 left-0 z-50 h-full w-64 bg-slate-800 transform transition-transform duration-200',
+                'fixed top-0 left-0 z-50 h-full bg-slate-800 transform transition-all duration-300 ease-in-out',
+                sidebarCollapsed ? 'w-[68px]' : 'w-64',
                 sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
             ]"
         >
-            <!-- Logo -->
-            <div class="flex items-center h-16 px-6 border-b border-slate-700">
-                <Link :href="route('admin.dashboard')" class="text-xl font-bold text-white">
-                    JodTod
+            <!-- Logo + Collapse Toggle -->
+            <div class="flex items-center justify-between h-16 border-b border-slate-700" :class="sidebarCollapsed ? 'px-3' : 'px-6'">
+                <Link :href="route('admin.dashboard')" :class="sidebarCollapsed ? 'mx-auto' : ''">
+                    <img src="/images/Logo/logo.png" alt="JodTod" :class="sidebarCollapsed ? 'h-7 w-auto' : 'h-9 w-auto'" class="transition-all duration-300" />
                 </Link>
-                <span class="ml-2 px-2 py-0.5 text-xs font-medium bg-purple-500 text-white rounded-md">Admin</span>
+                <span v-if="!sidebarCollapsed" class="ml-2 px-2 py-0.5 text-xs font-medium bg-purple-500 text-white rounded-md">Admin</span>
+                <button
+                    @click="toggleCollapse"
+                    class="hidden lg:flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                    :class="sidebarCollapsed ? 'absolute -right-3 top-5 bg-slate-800 border border-slate-600 shadow-sm z-10 rounded-full w-6 h-6' : ''"
+                    :title="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+                >
+                    <svg class="w-4 h-4 transition-transform duration-300" :class="sidebarCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                    </svg>
+                </button>
             </div>
 
             <!-- Navigation -->
-            <nav class="p-4 space-y-1">
+            <nav class="space-y-1" :class="sidebarCollapsed ? 'p-2' : 'p-4'">
                 <Link
                     v-for="item in navigation"
                     :key="item.name"
                     :href="getHref(item)"
                     :class="[
-                        'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                        'flex items-center rounded-lg transition-colors relative group',
+                        sidebarCollapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3',
                         isActive(item)
                             ? 'bg-slate-700 text-white font-medium'
                             : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                     ]"
                     @click="sidebarOpen = false"
+                    :title="sidebarCollapsed ? item.name : ''"
                 >
                     <!-- Chart Icon (Dashboard) -->
                     <svg v-if="item.icon === 'chart'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,32 +120,50 @@ function isActive(item) {
                     <svg v-else-if="item.icon === 'document'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                     </svg>
-                    <span>{{ item.name }}</span>
+                    <span v-if="!sidebarCollapsed">{{ item.name }}</span>
+                    <!-- Tooltip -->
+                    <div
+                        v-if="sidebarCollapsed"
+                        class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
+                    >
+                        {{ item.name }}
+                    </div>
                 </Link>
 
                 <!-- Divider -->
-                <div class="my-4 border-t border-slate-700"></div>
+                <div class="my-3 border-t border-slate-700"></div>
 
                 <!-- Back to App -->
                 <Link
                     :href="route('dashboard')"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+                    :class="[
+                        'flex items-center rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white transition-colors relative group',
+                        sidebarCollapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3',
+                    ]"
                     @click="sidebarOpen = false"
+                    :title="sidebarCollapsed ? 'Back to App' : ''"
                 >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
                     </svg>
-                    <span>Back to App</span>
+                    <span v-if="!sidebarCollapsed">Back to App</span>
+                    <div
+                        v-if="sidebarCollapsed"
+                        class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
+                    >
+                        Back to App
+                    </div>
                 </Link>
             </nav>
 
             <!-- Admin User Info at Bottom -->
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-medium">
+            <div class="absolute bottom-0 left-0 right-0 border-t border-slate-700" :class="sidebarCollapsed ? 'p-2' : 'p-4'">
+                <div class="flex items-center" :class="sidebarCollapsed ? 'justify-center' : 'gap-3'">
+                    <img v-if="user?.avatar" :src="`/storage/${user.avatar}`" :alt="user?.name" class="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                    <div v-else class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
                         {{ user?.name?.charAt(0)?.toUpperCase() }}
                     </div>
-                    <div class="min-w-0">
+                    <div v-if="!sidebarCollapsed" class="min-w-0">
                         <p class="text-sm font-medium text-white truncate">{{ user?.name }}</p>
                         <p class="text-xs text-slate-400 truncate">{{ user?.email }}</p>
                     </div>
@@ -130,7 +172,7 @@ function isActive(item) {
         </aside>
 
         <!-- Main Content -->
-        <div class="lg:pl-64">
+        <div class="transition-all duration-300" :class="sidebarCollapsed ? 'lg:pl-[68px]' : 'lg:pl-64'">
             <!-- Header -->
             <header class="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
@@ -152,7 +194,8 @@ function isActive(item) {
                         <Dropdown v-if="user" align="right" width="48">
                             <template #trigger>
                                 <button class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                    <div class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-medium">
+                                    <img v-if="user.avatar" :src="`/storage/${user.avatar}`" :alt="user.name" class="w-8 h-8 rounded-full object-cover" />
+                                    <div v-else class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-medium">
                                         {{ user.name?.charAt(0)?.toUpperCase() }}
                                     </div>
                                     <span class="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">{{ user.name }}</span>

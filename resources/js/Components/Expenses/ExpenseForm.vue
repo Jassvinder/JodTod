@@ -1,7 +1,8 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 
-defineProps({
+const props = defineProps({
     form: Object,
     categories: Array,
     submitLabel: { type: String, default: 'Save Expense' },
@@ -9,6 +10,39 @@ defineProps({
 });
 
 defineEmits(['submit']);
+
+// Description autocomplete
+const suggestions = ref([]);
+const showSuggestions = ref(false);
+let debounceTimer = null;
+
+function onDescriptionInput(value) {
+    props.form.description = value;
+    clearTimeout(debounceTimer);
+    if (!value || value.length < 2) {
+        suggestions.value = [];
+        showSuggestions.value = false;
+        return;
+    }
+    debounceTimer = setTimeout(async () => {
+        try {
+            const response = await fetch(route('expenses.suggestions') + '?q=' + encodeURIComponent(value));
+            suggestions.value = await response.json();
+            showSuggestions.value = suggestions.value.length > 0;
+        } catch {
+            suggestions.value = [];
+        }
+    }, 300);
+}
+
+function selectSuggestion(suggestion) {
+    props.form.description = suggestion;
+    showSuggestions.value = false;
+}
+
+function hideSuggestions() {
+    setTimeout(() => { showSuggestions.value = false; }, 200);
+}
 </script>
 
 <template>
@@ -50,17 +84,36 @@ defineEmits(['submit']);
             <p v-if="form.errors.category_id" class="mt-1 text-sm text-accent-600">{{ form.errors.category_id }}</p>
         </div>
 
-        <!-- Description -->
-        <div>
+        <!-- Description with Autocomplete -->
+        <div class="relative">
             <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description <span class="text-gray-400 dark:text-gray-500">(optional)</span></label>
             <input
                 id="description"
-                v-model="form.description"
+                :value="form.description"
+                @input="onDescriptionInput($event.target.value)"
+                @focus="onDescriptionInput(form.description || '')"
+                @blur="hideSuggestions"
                 type="text"
                 maxlength="255"
                 placeholder="e.g. Lunch at cafe"
+                autocomplete="off"
                 class="mt-1 block w-full py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
+            <!-- Suggestions dropdown -->
+            <div
+                v-if="showSuggestions && suggestions.length > 0"
+                class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-lg max-h-40 overflow-y-auto"
+            >
+                <button
+                    v-for="suggestion in suggestions"
+                    :key="suggestion"
+                    type="button"
+                    @mousedown.prevent="selectSuggestion(suggestion)"
+                    class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                >
+                    {{ suggestion }}
+                </button>
+            </div>
             <p v-if="form.errors.description" class="mt-1 text-sm text-accent-600">{{ form.errors.description }}</p>
         </div>
 

@@ -20,6 +20,65 @@
 - Testing & bug fixes (use TEST.md)
 - Production deployment
 
+### 2026-03-16 - Task 14 Variations: Favicon, Auth Fixes, Email Templates, Image WebP (COMPLETED)
+- **Task 14-A - Favicon:**
+  - Generated proper favicon from logo.png using GD (32x32 .ico + 48x48 .png)
+  - Both layouts (app.blade.php + public.blade.php) already had favicon references
+- **Task 14-B - Login Button for Logged-in Users:**
+  - Added `@auth`/`@else` check in blade header component
+  - Logged-in users see "Dashboard" button, guests see "Login"
+  - Applied to both desktop nav and mobile menu
+- **Task 14-C - Branded Email Templates:**
+  - Published Laravel mail templates (`vendor:publish --tag=laravel-mail` + `--tag=laravel-notifications`)
+  - Header: JodTod logo image instead of app name text
+  - Footer: "JodTod. All rights reserved." + tagline
+  - Button color: Black (#18181b) changed to Indigo (#6366f1) matching app theme
+  - Panel accent: Indigo border
+  - Applies to all emails: notifications (4 types), password reset, email verification
+- **Task 14-D - Registration Email Validation & Verify Flow:**
+  - Email validation upgraded: `email` to `email:rfc,dns` (now rejects invalid domains like `admin@jodtod`)
+  - VerifyEmail.vue page title fixed: "Email Verify Karein" (Hindi) → "Verify Email" (English)
+  - Verify-email flow is correct: logout button exists so user can re-register with correct email if needed
+- **Task 14-E - Image Upload WebP Conversion:**
+  - Avatar upload: size limit 2MB → 5MB, auto-converts to .webp (80% quality), path changed from `.jpg` to `.webp`
+  - Admin CMS image upload: size limit 2MB → 5MB, auto-converts to .webp
+  - Uses PHP GD `imagewebp()` for conversion
+- **Other Fixes:**
+  - Logo applied to all pages (Sidebar, Header mobile-only, GuestLayout, AdminLayout, Blade header/footer)
+  - Removed duplicate text "JodTod" where logo image is present
+  - Logout fix: `redirect('/')` → `Inertia::location('/')` to prevent Blade page rendering inside Inertia app
+  - SMTP config fixed: MAIL_MAILER log→smtp, host→smtp.gmail.com, port→587, encryption→tls
+
+### 2026-03-16 - New Features: Tasks, Income, Autocomplete, Dashboard Charts, Settlement-to-Expense (COMPLETED)
+- **To Do List (My Tasks):**
+  - Created `todos` table migration (user_id, title, priority enum, due_date, is_completed, completed_at)
+  - Created Todo model with scopes (pending, completed, forUser)
+  - Created TodoController: index (list with filters + stats), store, update, toggle, destroy
+  - Created Todos/Index.vue: inline add form, edit mode, toggle checkbox, delete, priority/status filters, stats cards (total/pending/done/overdue), pagination
+  - Added "My Tasks" to Sidebar navigation with clipboard-check icon
+- **Income Tracking:**
+  - Created `incomes` table migration (user_id, amount, source, description, income_date)
+  - Created Income model with forUser scope
+  - Created IncomeController: index (list + summary + 6-month trend + source breakdown), store, update, destroy
+  - Created Incomes/Index.vue: add form with source autocomplete, edit inline, summary cards (income/expense/savings), 6-month bar chart (income vs expense), source breakdown bars, income history list with pagination
+  - Added "Income" to Sidebar and BottomNav navigation
+- **Expense Description Autocomplete:**
+  - Added `suggestions()` method to ExpenseController: returns distinct descriptions matching query
+  - Added GET /expenses/suggestions route
+  - Updated ExpenseForm.vue: debounced API call on description input, dropdown with matching suggestions
+- **Dashboard Enhancement:**
+  - Added incomeSummary, monthlyTrend, todoStats to DashboardController
+  - Dashboard now shows 5 summary cards: Expenses, Income, Savings/Loss, You Owe, Owed to You
+  - Income vs Expense 6-month bar chart on dashboard
+  - Tasks widget showing pending/overdue count with link to My Tasks page
+- **Settlement to Personal Expense:**
+  - When settlement is marked completed (individual or settle-all), auto-creates personal expense for the payer
+  - Expense gets "Other" category, description includes group name and payee name
+  - Added addSettlementToPersonalExpense() helper to SettlementController
+- **Navigation Updates:**
+  - Sidebar: Added "Income" (currency icon) and "My Tasks" (clipboard icon) nav items
+  - BottomNav: Replaced "Alerts" with "Income" (notifications still accessible via sidebar and header bell)
+
 ### 2026-03-10 - Task 4: CMS System (COMPLETED)
 - Created `pages` table migration (title, slug unique, content longText, meta_title, meta_description, is_published)
 - Created Page model with published scope, boolean cast for is_published

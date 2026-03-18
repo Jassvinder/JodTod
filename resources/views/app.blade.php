@@ -16,10 +16,9 @@
     <meta name="application-name" content="JodTod">
     <meta name="msapplication-TileColor" content="#6366f1">
 
-    <!-- PWA Manifest & Icons -->
-    <link rel="manifest" href="/manifest.json">
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/png" href="/favicon.png">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <link rel="manifest" href="/manifest.json">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

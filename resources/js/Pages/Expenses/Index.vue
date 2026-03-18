@@ -2,6 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch, defineAsyncComponent } from 'vue';
+import { confirmAction } from '@/Utils/confirm.js';
 
 // Lazy-load chart components — chart.js is heavy, load only when charts section renders
 const CategoryPieChart = defineAsyncComponent(() => import('@/Components/Expenses/CategoryPieChart.vue'));
@@ -19,9 +20,6 @@ const category = ref(props.filters.category || '');
 const period = ref(props.filters.period || '');
 const sort = ref(props.filters.sort || 'expense_date');
 const direction = ref(props.filters.direction || 'desc');
-
-const showDeleteModal = ref(false);
-const expenseToDelete = ref(null);
 
 let searchTimeout = null;
 
@@ -63,19 +61,16 @@ function toggleSort(field) {
     }
 }
 
-function confirmDelete(expense) {
-    expenseToDelete.value = expense;
-    showDeleteModal.value = true;
-}
-
-function deleteExpense() {
-    if (!expenseToDelete.value) return;
-    router.delete(route('expenses.destroy', expenseToDelete.value.id), {
-        onFinish: () => {
-            showDeleteModal.value = false;
-            expenseToDelete.value = null;
-        },
+async function confirmDelete(expense) {
+    const confirmed = await confirmAction({
+        title: 'Delete Expense',
+        text: `Are you sure you want to delete this expense of ${formatCurrency(expense.amount)}? This action cannot be undone.`,
+        confirmText: 'Delete',
+        danger: true,
     });
+    if (confirmed) {
+        router.delete(route('expenses.destroy', expense.id));
+    }
 }
 
 function formatCurrency(amount) {
@@ -286,33 +281,5 @@ const hasActiveFilters = () => search.value || category.value || period.value;
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
-        <Teleport to="body">
-            <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center">
-                <div class="fixed inset-0 bg-black/50" @click="showDeleteModal = false"></div>
-                <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Delete Expense</h3>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Are you sure you want to delete this expense of
-                        <strong>{{ expenseToDelete ? formatCurrency(expenseToDelete.amount) : '' }}</strong>?
-                        This action cannot be undone.
-                    </p>
-                    <div class="mt-5 flex gap-3 justify-end">
-                        <button
-                            @click="showDeleteModal = false"
-                            class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            @click="deleteExpense"
-                            class="px-4 py-2 rounded-lg bg-accent-600 text-white text-sm font-semibold hover:bg-accent-700"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
     </AppLayout>
 </template>

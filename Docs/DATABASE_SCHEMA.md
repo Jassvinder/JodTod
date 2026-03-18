@@ -171,6 +171,41 @@
 
 ---
 
+## Table: todos
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | |
+| title | VARCHAR(255) | NOT NULL | Task title |
+| priority | ENUM('low', 'medium', 'high') | DEFAULT 'medium' | |
+| due_date | DATE | NULLABLE | Optional deadline |
+| is_completed | BOOLEAN | DEFAULT false | |
+| completed_at | TIMESTAMP | NULLABLE | When marked as done |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** (user_id, is_completed), due_date
+
+---
+
+## Table: incomes
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | |
+| amount | DECIMAL(12,2) | NOT NULL | Income amount |
+| source | VARCHAR(100) | NOT NULL | Income source (Salary, Freelance, etc.) |
+| description | VARCHAR(255) | NULLABLE | Optional details |
+| income_date | DATE | NOT NULL | Date of income |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** (user_id, income_date)
+
+---
+
 ## Entity Relationship Diagram (Text)
 
 ```
@@ -187,6 +222,8 @@ users (1) ----< (M) group_members (M) >---- (1) groups
   +----< settlements (from_user)
   +----< settlements (to_user)
   +----< blog_posts (author)
+  +----< todos
+  +----< incomes
 
 categories (1) ----< (M) expenses
 ```

@@ -9,12 +9,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupExpenseController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PhoneVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettlementController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\TodoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -59,6 +61,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Personal Expenses
     Route::resource('expenses', ExpenseController::class)
         ->except(['show']);
+    Route::get('/expenses/suggestions', [ExpenseController::class, 'suggestions'])->name('expenses.suggestions');
+
+    // Income
+    Route::get('/incomes', [IncomeController::class, 'index'])->name('incomes.index');
+    Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store');
+    Route::put('/incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update');
+    Route::delete('/incomes/{income}', [IncomeController::class, 'destroy'])->name('incomes.destroy');
+
+    // To Do List
+    Route::get('/todos', [TodoController::class, 'index'])->name('todos.index');
+    Route::post('/todos', [TodoController::class, 'store'])->name('todos.store');
+    Route::put('/todos/{todo}', [TodoController::class, 'update'])->name('todos.update');
+    Route::put('/todos/{todo}/toggle', [TodoController::class, 'toggle'])->name('todos.toggle');
+    Route::delete('/todos/{todo}', [TodoController::class, 'destroy'])->name('todos.destroy');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -103,6 +119,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+    Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Phone verification

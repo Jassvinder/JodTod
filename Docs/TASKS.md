@@ -1,13 +1,25 @@
 # JodTod - Task Tracker
 
----
+- [] **Task 101** - Favicon kabhi aa jata hai kabhi nahi. or kabhi admin pannel par aata hai. to kabhi login/register and landing page par nahi aata. isse achhe se fix karo. bahut chhota and silly issue hai?
+
+- [] **Task 102 Expenses** - Expense and update par date time select me select kiya gya time, list me galat show ho raha hai. 
+
+- [] **Task 103 toDo** - Isme main soch raha tha ke task/todo reminder bhi add karne ka option ho. jaise kisi perticular day me mujhe kitne tasks complete karne hain. subha app me alarm baje or us din ke sabhi tasks list me show ho jaye. or jab alarm set kare to usme time ka option bhi ho. default chahe kisi perticular time pa set ho?
+
+- [] **Task 103-A toDo** - Todo list ke filters me starting me ek "All" ka option bhi add karo. basically wo todos ke main link ko perafar karega. means all todos dikhayega.
+
+- [] **Task 103-B toDo** - Agar hum tasks me category bhi add kare to kaisa rahega. Unche level par socho jara kisi marriage ke liye ye app use ho, jisme bahut saare tasks add ho, or wo bhi category wise. or dusra koi bahut saare tasks bnaye for example 100 tasks bnaye, shayad ek indian marriage me itne tasks hona to asan baat hai. or saare tasks category wise ho. ab tasks bnane wala wo tasks dusro ko assign karde isi app ke through. dusre bhi app user hone chahiye. jaise ki 9 logo ko 10-10 tasks or 10 chahe khud ke liye bhi rakhle. ok or sab ko track bhi kar sake. 
+
+- [] **Task 104-A Group** - Group ka invite code baar-baar change kyu hota hai bas group bante time ek he baar code banna chahiye. agar maine 2 alag users ko invite bheja, or galti se dono baar code change ho gya to, bas last wala he join kar payega. sochna padega iske baare me.
 
 ## PENDING
 
 ### High Priority (Core functionality gaps)
 - [ ] **Task 6** - Profile page: Add Currency & Language settings UI (DB fields exist: `currency`, `language` — just need form in Profile/Edit.vue)
 - [ ] **Task 7** - Group leave: Fix leave logic — currently nobody can leave. Should allow leave only if balance is zero; block with message if unsettled balance exists
-- [ ] **Task 8** - Admin Reports page (`/admin/reports`): Expense trends, category breakdown, top groups, settlement stats
+- [ ] **Task 8 - A** - Admin Reports page (`/admin/reports`): Expense trends, category breakdown, top groups, settlement stats
+- [ ] **Task 8 - B** - User Expenses (individual and group both "optional") add karte time image bhi upload kar sake max 2 images jaise ki bill image ya samaan ki image.
+- [ ] **Task 8 - C** - make sidebar collapsable.
 
 ### Medium Priority (Planned features)
 - [ ] **Task 9** - Admin: Ban/Unban user functionality (add `banned_at` column, block login for banned users, UI in admin users list)
@@ -26,7 +38,23 @@
 
 ## COMPLETED
 ## Completed Current Tasks
+- [x] **Task 100** - check screenshot 11. profile image select karne ke baad jo crop ka popup aata hai wo sahi nahi hai. selected image he center me nahi aati. haan starting me aati thi. shayad kisi css se conflict na hua ho. or dusri baat agar user ne pehle koi image upload ki hai to use only delete karne ka option bhi hona chahiye, yaha sirf change ka option hai. (2026-03-17)
 
+- [x] **Task 100-A** -image remove ke baad turand image section ko refresh kardo. abhi kya hai ke refresh ke baad he image remove ho rahi hai.(2026-03-17)
+    or crop modal khali outer he set hua hai ander image abhi bhi utni he show ho rahi. screenshot 12 dekho full body image hai wo only head ka kuchh part he show ho raha hai. 
+- [x] **Task 100-B** -pure project me jaha bhi confirmation hogi waha ek achha sa alert pupup lagao. for example shayad sweet alert hota tha ek main kabhi use kiya tha.(2026-03-17)
+- [x] **Task 19** - Logo applied to all pages: Sidebar, Header (mobile only), GuestLayout, AdminLayout, Blade header/footer. Text "JodTod" removed where logo present (2026-03-16)
+- [x] **Task 20** - Logout fix: `redirect('/')` changed to `Inertia::location('/')` to prevent Blade page rendering inside Inertia modal (2026-03-16)
+- [x] **Task 14-A** - Favicon: Generated proper 32x32 ico + 48x48 png from logo.png (2026-03-16)
+- [x] **Task 14-B** - Login button: Shows "Dashboard" for logged-in users, "Login" for guests on public pages (2026-03-16)
+- [x] **Task 14-C** - Email templates: Published & branded Laravel mail templates - JodTod logo in header, indigo buttons (#6366f1), branded footer (2026-03-16)
+- [x] **Task 14-D** - Registration email validation: `email` to `email:rfc,dns` (rejects invalid domains like admin@jodtod). VerifyEmail page Hindi title fixed to English (2026-03-16)
+- [x] **Task 14-E** - Image uploads: Size limit 2MB to 5MB, all uploads auto-convert to .webp (80% quality). Applied to avatar upload + admin image upload (2026-03-16)
+- [x] **Task 14** - To Do List (My Tasks): Full CRUD with inline add/edit, toggle complete, priority (low/medium/high), due date, overdue tracking, filters (2026-03-16)
+- [x] **Task 15** - Income Tracking: Full CRUD, source autocomplete, monthly income/expense/savings summary, 6-month trend chart, source breakdown (2026-03-16)
+- [x] **Task 16** - Expense Description Autocomplete: API endpoint returns distinct past descriptions, ExpenseForm shows suggestions on typing (2026-03-16)
+- [x] **Task 17** - Dashboard Enhancement: Income/Savings/Loss cards, Income vs Expense 6-month bar chart, Tasks widget with pending/overdue count (2026-03-16)
+- [x] **Task 18** - Settlement to Personal Expense: When group settlement is completed, auto-creates personal expense for the payer (2026-03-16)
 - [x] **Task 5** - Dark mode: calendar icon color-scheme fix (`color-scheme: dark` in app.css) (2026-03-12)
 - [x] **Task 5** - Group expenses: "From" and "To" labels added on date filter inputs (2026-03-12)
 - [x] **Task 5-A** - Group page: total expenses amount displayed, member balances NaN fixed (explicit float cast + rounding) (2026-03-12)

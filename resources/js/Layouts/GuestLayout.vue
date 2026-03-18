@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/vue3';
             <!-- Logo -->
             <div class="text-center mb-8">
                 <Link href="/">
-                    <h1 class="text-3xl font-bold text-primary-600">JodTod</h1>
+                    <img src="/images/Logo/logo.png" alt="JodTod" class="h-16 w-auto mx-auto" />
                 </Link>
                 <p class="text-gray-500 dark:text-gray-400 mt-1">Split expenses, strengthen friendships</p>
             </div>

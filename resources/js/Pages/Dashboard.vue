@@ -12,6 +12,18 @@ const props = defineProps({
             category_breakdown: [],
         }),
     },
+    incomeSummary: {
+        type: Object,
+        default: () => ({
+            this_month_income: 0,
+            last_month_income: 0,
+            this_month_savings: 0,
+        }),
+    },
+    monthlyTrend: {
+        type: Array,
+        default: () => [],
+    },
     groupsSummary: {
         type: Object,
         default: () => ({
@@ -30,6 +42,10 @@ const props = defineProps({
             count: 0,
             items: [],
         }),
+    },
+    todoStats: {
+        type: Object,
+        default: () => ({ pending: 0, overdue: 0 }),
     },
 });
 
@@ -117,75 +133,131 @@ function relativeDate(dateStr) {
             </div>
 
             <!-- Row 1: Summary Cards -->
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- This Month Personal -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+            <div class="mt-6 grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- This Month Expenses -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
                     <div class="flex items-center justify-between">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">This Month</p>
-                        <span class="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
-                            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Expenses</p>
+                        <span class="p-1.5 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
                             </svg>
                         </span>
                     </div>
-                    <p class="mt-3 text-3xl font-bold text-gray-900 dark:text-gray-100">{{ formatCurrency(personalSummary.this_month_total) }}</p>
-                    <div v-if="personalSummary.last_month_total > 0 || personalSummary.this_month_total > 0" class="mt-2 flex items-center text-sm">
+                    <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ formatCurrency(personalSummary.this_month_total) }}</p>
+                    <div v-if="personalSummary.last_month_total > 0 || personalSummary.this_month_total > 0" class="mt-1.5 flex items-center">
                         <span
                             :class="monthChangeUp ? 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30' : 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/30'"
-                            class="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs font-medium"
+                            class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium"
                         >
-                            <svg v-if="monthChangeUp" class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                            </svg>
-                            <svg v-else class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                            {{ Math.abs(monthChange) }}%
+                            {{ monthChangeUp ? '+' : '' }}{{ monthChange }}%
                         </span>
-                        <span class="ml-1.5 text-gray-500 dark:text-gray-400">vs last month</span>
                     </div>
+                </div>
+
+                <!-- This Month Income -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Income</p>
+                        <span class="p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="mt-2 text-2xl font-bold text-green-600 dark:text-green-400">{{ formatCurrency(incomeSummary.this_month_income) }}</p>
+                    <Link :href="route('incomes.index')" class="mt-1.5 inline-block text-[10px] text-green-600 hover:text-green-700 font-medium">
+                        Manage &rarr;
+                    </Link>
+                </div>
+
+                <!-- Savings/Loss -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ incomeSummary.this_month_savings >= 0 ? 'Savings' : 'Loss' }}</p>
+                        <span class="p-1.5 rounded-lg" :class="incomeSummary.this_month_savings >= 0 ? 'bg-green-50 dark:bg-green-900/30' : 'bg-red-50 dark:bg-red-900/30'">
+                            <svg class="w-4 h-4" :class="incomeSummary.this_month_savings >= 0 ? 'text-green-600' : 'text-red-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="mt-2 text-2xl font-bold" :class="incomeSummary.this_month_savings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                        {{ incomeSummary.this_month_savings >= 0 ? '+' : '' }}{{ formatCurrency(incomeSummary.this_month_savings) }}
+                    </p>
                 </div>
 
                 <!-- You Owe -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
                     <div class="flex items-center justify-between">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">You Owe</p>
-                        <span class="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">
-                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">You Owe</p>
+                        <span class="p-1.5 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7" />
                             </svg>
                         </span>
                     </div>
-                    <p class="mt-3 text-3xl font-bold text-red-600 dark:text-red-400">{{ formatCurrency(groupsSummary.total_you_owe) }}</p>
+                    <p class="mt-2 text-2xl font-bold text-red-600 dark:text-red-400">{{ formatCurrency(groupsSummary.total_you_owe) }}</p>
                     <Link
                         v-if="groupsSummary.groups.length > 0"
                         :href="route('groups.index')"
-                        class="mt-2 inline-block text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium"
+                        class="mt-1.5 inline-block text-[10px] text-red-600 hover:text-red-700 font-medium"
                     >
-                        View groups &rarr;
+                        Groups &rarr;
                     </Link>
-                    <p v-else class="mt-2 text-sm text-gray-400 dark:text-gray-500">No group debts</p>
                 </div>
 
                 <!-- You Are Owed -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
                     <div class="flex items-center justify-between">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">You Are Owed</p>
-                        <span class="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h14m-6-4v-1a3 3 0 013-3h4a3 3 0 013 3v10a3 3 0 01-3 3h-4a3 3 0 01-3-3v-1" />
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Owed to You</p>
+                        <span class="p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h14" />
                             </svg>
                         </span>
                     </div>
-                    <p class="mt-3 text-3xl font-bold text-green-600 dark:text-green-400">{{ formatCurrency(groupsSummary.total_owed_to_you) }}</p>
+                    <p class="mt-2 text-2xl font-bold text-green-600 dark:text-green-400">{{ formatCurrency(groupsSummary.total_owed_to_you) }}</p>
                     <Link
                         v-if="groupsSummary.groups.length > 0"
                         :href="route('groups.index')"
-                        class="mt-2 inline-block text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 font-medium"
+                        class="mt-1.5 inline-block text-[10px] text-green-600 hover:text-green-700 font-medium"
                     >
-                        View groups &rarr;
+                        Groups &rarr;
                     </Link>
-                    <p v-else class="mt-2 text-sm text-gray-400 dark:text-gray-500">No pending payments</p>
+                </div>
+            </div>
+
+            <!-- Monthly Trend Chart (Income vs Expense) -->
+            <div v-if="monthlyTrend && monthlyTrend.length > 0" class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Income vs Expenses (6 Months)</h3>
+                <div class="flex items-end justify-between gap-2 h-36">
+                    <div
+                        v-for="month in monthlyTrend"
+                        :key="month.month"
+                        class="flex-1 flex flex-col items-center gap-1"
+                    >
+                        <div class="w-full flex gap-0.5 items-end justify-center" style="height: 100px;">
+                            <div
+                                class="w-3 sm:w-5 bg-green-400 dark:bg-green-500 rounded-t transition-all"
+                                :style="{
+                                    height: Math.max(4, (month.income / Math.max(...monthlyTrend.map(m => Math.max(m.income, m.expense, 1)))) * 100) + 'px'
+                                }"
+                                :title="'Income: ' + formatCurrency(month.income)"
+                            ></div>
+                            <div
+                                class="w-3 sm:w-5 bg-red-400 dark:bg-red-500 rounded-t transition-all"
+                                :style="{
+                                    height: Math.max(4, (month.expense / Math.max(...monthlyTrend.map(m => Math.max(m.income, m.expense, 1)))) * 100) + 'px'
+                                }"
+                                :title="'Expense: ' + formatCurrency(month.expense)"
+                            ></div>
+                        </div>
+                        <span class="text-[10px] text-gray-500 dark:text-gray-400">{{ month.month }}</span>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-400 rounded"></span> Income</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-400 rounded"></span> Expense</span>
                 </div>
             </div>
 
@@ -193,6 +265,24 @@ function relativeDate(dateStr) {
             <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Left Column -->
                 <div class="space-y-6">
+                    <!-- Tasks Widget -->
+                    <div v-if="todoStats.pending > 0 || todoStats.overdue > 0" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">My Tasks</h3>
+                            <Link :href="route('todos.index')" class="text-sm text-primary-600 hover:text-primary-700 font-medium">View All</Link>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl font-bold text-primary-600">{{ todoStats.pending }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">pending</span>
+                            </div>
+                            <div v-if="todoStats.overdue > 0" class="flex items-center gap-2">
+                                <span class="text-2xl font-bold text-red-600">{{ todoStats.overdue }}</span>
+                                <span class="text-sm text-red-500">overdue</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Pending Settlements -->
                     <div
                         v-if="pendingSettlements.count > 0"
