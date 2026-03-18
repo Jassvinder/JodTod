@@ -2,7 +2,7 @@
 
 - [] **Task 101** - Favicon kabhi aa jata hai kabhi nahi. or kabhi admin pannel par aata hai. to kabhi login/register and landing page par nahi aata. isse achhe se fix karo. bahut chhota and silly issue hai?
 
-- [] **Task 102 Expenses** - Expense and update par date time select me select kiya gya time, list me galat show ho raha hai. 
+- [] **Task 102 Expenses** - Expense add/update par date time select me select kiya gya time, list me galat show ho raha hai. jaise ki maine 10:00 AM add kia to list me use 3:30 PM show karta hai.
 
 - [] **Task 103 toDo** - Isme main soch raha tha ke task/todo reminder bhi add karne ka option ho. jaise kisi perticular day me mujhe kitne tasks complete karne hain. subha app me alarm baje or us din ke sabhi tasks list me show ho jaye. or jab alarm set kare to usme time ka option bhi ho. default chahe kisi perticular time pa set ho?
 
