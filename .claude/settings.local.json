@@ -22,7 +22,8 @@
       "Bash(python --version 2>&1; python3 --version 2>&1; py --version 2>&1)",
       "Bash(find /d/phpserver/www/JodTod/Docs -type f -name \"*.md\" 2>/dev/null | head -10)",
       "Bash(mkdir:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }
