@@ -23,7 +23,30 @@
       "Bash(find /d/phpserver/www/JodTod/Docs -type f -name \"*.md\" 2>/dev/null | head -10)",
       "Bash(mkdir:*)",
       "Bash(ls:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(find /d/phpserver/www/JodTod -maxdepth 2 -type d -iname *mobile* -o -iname *app* -o -iname *react*)",
+      "Bash(composer show:*)",
+      "Bash(npm --version)",
+      "Bash(cd /d)",
+      "Bash(npx create-expo-app@latest JodTodApp --template blank-typescript)",
+      "Read(//d/JodTodApp/**)",
+      "Bash(npx expo:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ipconfig)",
+      "Bash(taskkill //F //IM node.exe //FI 'WINDOWTITLE eq *expo*')",
+      "Bash(taskkill //F //FI 'WINDOWTITLE eq *metro*')",
+      "Bash(lsof -ti:8081)",
+      "Bash(xargs kill:*)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill:*)",
+      "Bash(find /d/phpserver/www/JodTod/resources/js/Pages/Profile -type f -name *.vue)",
+      "Bash(find /d/phpserver/www/JodTod -name *odo* -type f)",
+      "Bash(find /d/phpserver/www/JodTod -type f -name *admin* -o -name *Admin*)",
+      "Bash(npm uninstall:*)",
+      "Bash(tasklist)",
+      "Bash(grep -E \"\\\\.php$\")",
+      "Bash(find /d/phpserver/www/JodTod/app/Http/Controllers/Api -type f -name *.php)",
+      "Bash(grep -l \"Group\\\\|Income\\\\|Todo\\\\|Settlement\\\\|Expense\\\\|Profile\" /d/phpserver/www/JodTod/app/Http/Controllers/*.php)"
     ]
   }
 }

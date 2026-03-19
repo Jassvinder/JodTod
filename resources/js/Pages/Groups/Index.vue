@@ -1,27 +1,10 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
     groups: Array,
 });
-
-const joinCode = ref('');
-const joinError = ref('');
-
-const joinGroup = () => {
-    joinError.value = '';
-    router.post(route('groups.join'), { invite_code: joinCode.value }, {
-        preserveScroll: true,
-        onError: (errors) => {
-            joinError.value = errors.invite_code || 'Invalid invite code.';
-        },
-        onSuccess: () => {
-            joinCode.value = '';
-        },
-    });
-};
 </script>
 
 <template>
@@ -38,28 +21,6 @@ const joinGroup = () => {
                 >
                     + Create Group
                 </Link>
-            </div>
-
-            <!-- Join Group -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6">
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Join a group with invite code</p>
-                <form @submit.prevent="joinGroup" class="flex gap-3">
-                    <input
-                        type="text"
-                        v-model="joinCode"
-                        placeholder="Enter 8-character code"
-                        maxlength="8"
-                        class="flex-1 uppercase tracking-widest"
-                    />
-                    <button
-                        type="submit"
-                        class="px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
-                        :disabled="joinCode.length !== 8"
-                    >
-                        Join
-                    </button>
-                </form>
-                <p v-if="joinError" class="mt-2 text-sm text-red-600 dark:text-red-400">{{ joinError }}</p>
             </div>
 
             <!-- Groups List -->
@@ -96,7 +57,7 @@ const joinGroup = () => {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
                 <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">No groups yet</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create a group or join one with an invite code.</p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create a group and add members from your contacts.</p>
                 <Link
                     :href="route('groups.create')"
                     class="mt-4 inline-flex px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"

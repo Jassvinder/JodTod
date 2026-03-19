@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GroupController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\PhoneVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettlementController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\TodoCategoryController;
 use App\Http\Controllers\TodoController;
 use Illuminate\Support\Facades\Route;
 
@@ -75,6 +77,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/todos/{todo}', [TodoController::class, 'update'])->name('todos.update');
     Route::put('/todos/{todo}/toggle', [TodoController::class, 'toggle'])->name('todos.toggle');
     Route::delete('/todos/{todo}', [TodoController::class, 'destroy'])->name('todos.destroy');
+    Route::get('/todos/check-reminders', [TodoController::class, 'checkReminders'])->name('todos.check-reminders');
+
+    // Todo Categories
+    Route::post('/todo-categories', [TodoCategoryController::class, 'store'])->name('todo-categories.store');
+    Route::put('/todo-categories/{todoCategory}', [TodoCategoryController::class, 'update'])->name('todo-categories.update');
+    Route::delete('/todo-categories/{todoCategory}', [TodoCategoryController::class, 'destroy'])->name('todo-categories.destroy');
+
+    // Contacts
+    Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
+    Route::get('/contacts/search', [ContactController::class, 'search'])->name('contacts.search');
+    Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
+    Route::delete('/contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -91,6 +105,7 @@ Route::middleware(['auth', 'verified', 'phone.verified'])->group(function () {
     Route::post('/groups/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
     Route::delete('/groups/{group}/members/{userId}', [GroupController::class, 'removeMember'])->name('groups.members.remove');
+    Route::post('/groups/{group}/members/{userId}/reactivate', [GroupController::class, 'reactivateMember'])->name('groups.members.reactivate');
     Route::get('/groups/{group}/search-users', [GroupController::class, 'searchUsers'])->name('groups.search-users');
     Route::post('/groups/{group}/add-member', [GroupController::class, 'addMember'])->name('groups.add-member');
 
@@ -140,12 +155,23 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
     // User management
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::get('/users/{user}', [AdminController::class, 'userDetail'])->name('admin.users.show');
+    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
+    Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::put('/users/{user}/role', [AdminController::class, 'updateUserRole'])->name('admin.users.role');
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    Route::put('/users/{user}/ban', [AdminController::class, 'banUser'])->name('admin.users.ban');
+    Route::put('/users/{user}/unban', [AdminController::class, 'unbanUser'])->name('admin.users.unban');
 
     // Group management (admin view)
     Route::get('/groups', [AdminController::class, 'groups'])->name('admin.groups');
     Route::get('/groups/{group}', [AdminController::class, 'groupDetail'])->name('admin.groups.show');
+
+    // Reports
+    Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
+
+    // Settings
+    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::put('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
 
     // Category management
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.categories');

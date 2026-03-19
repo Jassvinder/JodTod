@@ -119,13 +119,21 @@ class ExpenseController extends Controller
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string|max:255',
             'expense_date' => 'required|date|before_or_equal:now',
+            'image_1' => 'nullable|image|max:5120',
+            'image_2' => 'nullable|image|max:5120',
         ]);
 
-        Expense::create([
-            ...$validated,
-            'user_id' => Auth::id(),
-            'paid_by' => Auth::id(),
-        ]);
+        $data = collect($validated)->except(['image_1', 'image_2'])->toArray();
+        $data['user_id'] = Auth::id();
+        $data['paid_by'] = Auth::id();
+
+        foreach (['image_1', 'image_2'] as $field) {
+            if ($request->hasFile($field)) {
+                $data[$field] = $request->file($field)->store('expenses', 'public');
+            }
+        }
+
+        Expense::create($data);
 
         return redirect()->route('expenses.index')
             ->with('success', 'Expense added successfully.');
@@ -150,9 +158,28 @@ class ExpenseController extends Controller
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string|max:255',
             'expense_date' => 'required|date|before_or_equal:now',
+            'image_1' => 'nullable|image|max:5120',
+            'image_2' => 'nullable|image|max:5120',
+            'remove_image_1' => 'nullable|boolean',
+            'remove_image_2' => 'nullable|boolean',
         ]);
 
-        $expense->update($validated);
+        $data = collect($validated)->except(['image_1', 'image_2', 'remove_image_1', 'remove_image_2'])->toArray();
+
+        foreach (['image_1', 'image_2'] as $field) {
+            $removeKey = "remove_{$field}";
+            if ($request->boolean($removeKey) && $expense->{$field}) {
+                \Storage::disk('public')->delete($expense->{$field});
+                $data[$field] = null;
+            } elseif ($request->hasFile($field)) {
+                if ($expense->{$field}) {
+                    \Storage::disk('public')->delete($expense->{$field});
+                }
+                $data[$field] = $request->file($field)->store('expenses', 'public');
+            }
+        }
+
+        $expense->update($data);
 
         return redirect()->route('expenses.index')
             ->with('success', 'Expense updated successfully.');

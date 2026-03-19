@@ -64,6 +64,8 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [ApiAuthController::class, 'login']);
     Route::post('/forgot-password', [ApiAuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [ApiAuthController::class, 'resetPassword']);
+    Route::post('/otp/send', [ApiOtpController::class, 'send']);
+    Route::post('/otp/verify', [ApiOtpController::class, 'verify']);
     Route::post('/auth/google', [ApiAuthController::class, 'googleLogin']);
 
     // Protected routes (require auth token)

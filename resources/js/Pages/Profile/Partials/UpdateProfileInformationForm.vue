@@ -24,6 +24,8 @@ const user = usePage().props.auth.user;
 const form = useForm({
     name: user.name,
     email: user.email,
+    currency: user.currency || 'INR',
+    language: user.language || 'en',
 });
 
 // Avatar state
@@ -434,6 +436,41 @@ const cancelPhoneEdit = () => {
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <InputLabel for="currency" value="Currency" />
+                    <select
+                        id="currency"
+                        v-model="form.currency"
+                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+                    >
+                        <option value="INR">₹ INR - Indian Rupee</option>
+                        <option value="USD">$ USD - US Dollar</option>
+                        <option value="EUR">€ EUR - Euro</option>
+                        <option value="GBP">£ GBP - British Pound</option>
+                        <option value="AED">د.إ AED - UAE Dirham</option>
+                        <option value="SAR">﷼ SAR - Saudi Riyal</option>
+                        <option value="CAD">$ CAD - Canadian Dollar</option>
+                        <option value="AUD">$ AUD - Australian Dollar</option>
+                        <option value="JPY">¥ JPY - Japanese Yen</option>
+                        <option value="SGD">$ SGD - Singapore Dollar</option>
+                    </select>
+                    <InputError class="mt-2" :message="form.errors.currency" />
+                </div>
+                <div>
+                    <InputLabel for="language" value="Language" />
+                    <select
+                        id="language"
+                        v-model="form.language"
+                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+                    >
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                    </select>
+                    <InputError class="mt-2" :message="form.errors.language" />
+                </div>
             </div>
 
             <div class="flex items-center gap-4">

@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 export function confirmAction({
     title = 'Are you sure?',
     text = '',
+    html = '',
     confirmText = 'Yes',
     cancelText = 'Cancel',
     icon = 'warning',
@@ -12,7 +13,7 @@ export function confirmAction({
 
     return Swal.fire({
         title,
-        text,
+        ...(html ? { html } : { text }),
         icon,
         showCancelButton: true,
         confirmButtonText: confirmText,

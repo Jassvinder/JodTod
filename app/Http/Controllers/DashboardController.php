@@ -22,7 +22,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        return Inertia::render('Dashboard', [
+        $data = [
             'personalSummary' => $this->getPersonalSummary($user),
             'incomeSummary' => $this->getIncomeSummary($user),
             'monthlyTrend' => $this->getMonthlyTrend($user),
@@ -30,7 +30,13 @@ class DashboardController extends Controller
             'recentActivity' => $this->getRecentActivity($user),
             'pendingSettlements' => $this->getPendingSettlements($user),
             'todoStats' => $this->getTodoStats($user),
-        ]);
+        ];
+
+        if ($this->wantsJson()) {
+            return $this->success($data);
+        }
+
+        return Inertia::render('Dashboard', $data);
     }
 
     /**

@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ImageUpload from '@/Components/Expenses/ImageUpload.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
@@ -15,11 +16,22 @@ const form = useForm({
     description: props.expense.description || '',
     amount: props.expense.amount,
     category_id: props.expense.category_id,
-    expense_date: props.expense.expense_date ? props.expense.expense_date.slice(0, 16) : '',
+    expense_date: props.expense.expense_date
+        ? props.expense.expense_date.replace(' ', 'T').slice(0, 16)
+        : '',
     paid_by: props.expense.paid_by,
     split_type: props.expense.split_type,
     splits: [],
+    image_1: null,
+    image_2: null,
+    remove_image_1: false,
+    remove_image_2: false,
 });
+
+const existingImages = {
+    image_1: props.expense.image_1,
+    image_2: props.expense.image_2,
+};
 
 const splitType = ref(props.expense.split_type || 'equal');
 
@@ -128,7 +140,12 @@ function buildSplits() {
 function submit() {
     form.split_type = splitType.value;
     form.splits = buildSplits();
-    form.put(route('groups.expenses.update', [props.group.id, props.expense.id]));
+    form.transform((data) => ({
+        ...data,
+        _method: 'PUT',
+    })).post(route('groups.expenses.update', [props.group.id, props.expense.id]), {
+        forceFormData: true,
+    });
 }
 
 function getMemberInitial(name) {
@@ -449,6 +466,9 @@ const canSubmit = computed(() => {
 
                     <p v-if="form.errors.splits" class="mt-3 text-sm text-accent-600">{{ form.errors.splits }}</p>
                 </div>
+
+                <!-- Images -->
+                <ImageUpload :form="form" :existing-images="existingImages" />
 
                 <!-- Actions -->
                 <div class="flex items-center gap-3">

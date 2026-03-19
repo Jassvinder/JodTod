@@ -64,14 +64,22 @@ function balanceLabel(amount) {
     return 'settled up';
 }
 
-function settleUp() {
-    settlingUp.value = true;
-    router.post(route('groups.settle', props.group.id), {}, {
-        preserveScroll: true,
-        onFinish: () => {
-            settlingUp.value = false;
-        },
+async function settleUp() {
+    const confirmed = await confirmAction({
+        title: 'Settle Up',
+        text: 'This will create settlement requests for all pending balances. Continue?',
+        confirmText: 'Settle Up',
+        danger: false,
     });
+    if (confirmed) {
+        settlingUp.value = true;
+        router.post(route('groups.settle', props.group.id), {}, {
+            preserveScroll: true,
+            onFinish: () => {
+                settlingUp.value = false;
+            },
+        });
+    }
 }
 
 function completeSettlement(settlementId) {
@@ -256,11 +264,11 @@ const hasPendingSettlements = computed(() => {
                         </div>
                     </div>
 
-                    <!-- Settle Up button -->
-                    <div class="flex justify-center pt-2">
+                    <!-- Settle Up button (admin only) -->
+                    <div v-if="isAdmin" class="flex flex-col items-center pt-2 gap-2">
                         <button
                             @click="settleUp"
-                            :disabled="settlingUp"
+                            :disabled="settlingUp || hasPendingSettlements"
                             class="inline-flex items-center px-6 py-3 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <svg v-if="settlingUp" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -269,6 +277,12 @@ const hasPendingSettlements = computed(() => {
                             </svg>
                             {{ settlingUp ? 'Creating Settlements...' : 'Settle Up' }}
                         </button>
+                        <p v-if="hasPendingSettlements" class="text-xs text-amber-600 dark:text-amber-400">
+                            Pending settlements exist. Complete them first before creating new ones.
+                        </p>
+                    </div>
+                    <div v-else class="text-center pt-2">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Only group admin can initiate settlements.</p>
                     </div>
                 </div>
             </div>

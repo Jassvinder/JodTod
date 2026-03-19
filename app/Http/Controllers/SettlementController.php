@@ -70,6 +70,20 @@ class SettlementController extends Controller
     {
         $this->ensureMember($group);
 
+        // Only group admin can initiate settle up
+        if (!$group->isAdmin(Auth::user())) {
+            abort(403, 'Only group admin can initiate settlements.');
+        }
+
+        // Prevent duplicate: if pending settlements already exist, don't create new ones
+        $pendingCount = Settlement::where('group_id', $group->id)
+            ->where('status', 'pending')
+            ->count();
+
+        if ($pendingCount > 0) {
+            return redirect()->back()->with('info', 'Pending settlements already exist. Complete or settle them first before creating new ones.');
+        }
+
         $transactions = $this->calculateOptimizedTransactions($group);
 
         if (empty($transactions)) {

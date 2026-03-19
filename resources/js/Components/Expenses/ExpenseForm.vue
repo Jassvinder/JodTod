@@ -1,15 +1,18 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
+import ImageUpload from '@/Components/Expenses/ImageUpload.vue';
 
 const props = defineProps({
     form: Object,
     categories: Array,
+    existingImages: { type: Object, default: () => ({}) },
     submitLabel: { type: String, default: 'Save Expense' },
     processing: { type: Boolean, default: false },
 });
 
 defineEmits(['submit']);
+
 
 // Description autocomplete
 const suggestions = ref([]);
@@ -130,6 +133,9 @@ function hideSuggestions() {
             />
             <p v-if="form.errors.expense_date" class="mt-1 text-sm text-accent-600">{{ form.errors.expense_date }}</p>
         </div>
+
+        <!-- Images -->
+        <ImageUpload :form="form" :existing-images="existingImages" />
 
         <!-- Actions -->
         <div class="flex items-center gap-3 pt-2">

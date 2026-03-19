@@ -138,6 +138,46 @@ JodTod/
 
 ---
 
+## Production Server Setup
+
+### Cron Job (Required)
+
+Laravel's task scheduler needs a cron entry on the server. This handles:
+- **Todo reminders** — checks every minute for due reminders and sends notifications (in-app + email)
+- **Weekly summary** — sends expense summary email to users every Monday at 8 AM
+
+```bash
+# Add this to server's crontab (crontab -e)
+* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### Queue Worker (Recommended)
+
+For faster email delivery, run a queue worker. Without it, emails are sent synchronously (slower page loads).
+
+```bash
+# Start queue worker (use supervisor in production)
+php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+```
+
+### Key Environment Variables
+
+```env
+# Mail (required for email notifications)
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-email
+MAIL_PASSWORD=your-password
+MAIL_FROM_ADDRESS=noreply@jodtod.com
+MAIL_FROM_NAME="JodTod"
+
+# Queue driver (use 'database' or 'redis' in production)
+QUEUE_CONNECTION=database
+```
+
+---
+
 ## Documentation
 
 See `Docs/` folder for detailed documentation:

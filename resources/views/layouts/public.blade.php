@@ -38,13 +38,31 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <!-- Favicon & PWA -->
-    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" href="/favicon.png?v=2">
     <link rel="manifest" href="/manifest.json">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css'])
+
+    <!-- CKEditor 5 content styles for blog/page rendering -->
+    <style>
+        .prose figure.image { margin: 1em 0; display: table; clear: both; }
+        .prose figure.image img { display: block; max-width: 100%; height: auto; }
+        .prose figure.image figcaption { display: table-caption; caption-side: bottom; font-size: 0.875em; color: #6b7280; padding: 0.5em 0; text-align: center; }
+        .prose figure.image-style-align-left { float: left; margin-right: 1.5em; margin-bottom: 0.5em; }
+        .prose figure.image-style-align-right { float: right; margin-left: 1.5em; margin-bottom: 0.5em; }
+        .prose figure.image-style-align-center { margin-left: auto; margin-right: auto; }
+        .prose figure.image.image_resized { max-width: 100%; }
+        .prose figure.image.image_resized img { width: 100%; }
+        .prose .image-style-side { float: right; margin-left: 1.5em; margin-bottom: 0.5em; max-width: 50%; }
+        .prose figure.image-style-block-align-left { margin-right: auto; }
+        .prose figure.image-style-block-align-right { margin-left: auto; }
+        .prose .table table { border-collapse: collapse; width: 100%; }
+        .prose .table table td, .prose .table table th { border: 1px solid #d1d5db; padding: 0.5em 0.75em; }
+        .prose .table table th { background: #f3f4f6; font-weight: 600; }
+    </style>
 </head>
 <body class="font-sans antialiased bg-white text-gray-900">
     <!-- Header -->

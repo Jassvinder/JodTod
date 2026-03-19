@@ -14,8 +14,8 @@
 <!-- Schema.org BlogPosting -->
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    "@@context": "https://schema.org",
+    "@@type": "BlogPosting",
     "headline": "{{ $post->meta_title ?? $post->title }}",
     "description": "{{ $post->meta_description ?? Str::limit(strip_tags($post->content), 160) }}",
     @if($post->featured_image)
@@ -24,17 +24,17 @@
     "datePublished": "{{ $post->published_at ? $post->published_at->toIso8601String() : $post->created_at->toIso8601String() }}",
     "dateModified": "{{ $post->updated_at->toIso8601String() }}",
     "author": {
-        "@type": "Person",
+        "@@type": "Person",
         "name": "{{ $post->author->name ?? 'JodTod Team' }}"
     },
     "publisher": {
-        "@type": "Organization",
+        "@@type": "Organization",
         "name": "JodTod",
         "url": "{{ url('/') }}"
     },
     "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "{{ url()->current() }}"
+        "@@type": "WebPage",
+        "@@id": "{{ url()->current() }}"
     }
 }
 </script>

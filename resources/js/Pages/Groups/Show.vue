@@ -3,8 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { ref, computed, watch } from 'vue';
-import axios from 'axios';
+import { ref, computed } from 'vue';
 import { confirmAction } from '@/Utils/confirm.js';
 
 const props = defineProps({
@@ -13,43 +12,29 @@ const props = defineProps({
     recentExpenses: { type: Array, default: () => [] },
     totalExpensesCount: { type: Number, default: 0 },
     totalExpensesAmount: { type: Number, default: 0 },
+    contacts: { type: Array, default: () => [] },
+    membersWithUnsettled: { type: Array, default: () => [] },
 });
+
+const hasUnsettledExpenses = (memberId) => props.membersWithUnsettled.includes(memberId);
 
 const authUser = computed(() => usePage().props.auth.user);
-const showInviteModal = ref(false);
 const showAddMemberModal = ref(false);
-const copied = ref(false);
 
-// Add member search state
-const phoneSearch = ref('');
-const searchResults = ref([]);
-const isSearching = ref(false);
-const searchPerformed = ref(false);
-let searchTimeout = null;
-
-const inviteLink = computed(() => {
-    return window.location.origin + route('groups.join.link', props.group.invite_code, false);
+const hasUnsettledGroupExpenses = computed(() => {
+    return props.membersWithUnsettled.length > 0;
 });
 
-const copyInviteCode = () => {
-    navigator.clipboard.writeText(props.group.invite_code);
-    copied.value = true;
-    setTimeout(() => copied.value = false, 2000);
-};
-
-const copyInviteLink = () => {
-    navigator.clipboard.writeText(inviteLink.value);
-    copied.value = true;
-    setTimeout(() => copied.value = false, 2000);
-};
-
-const refreshCode = () => {
-    router.post(route('groups.invite', props.group.id), {}, {
-        preserveScroll: true,
-    });
-};
-
 const deleteGroup = async () => {
+    if (hasUnsettledGroupExpenses.value) {
+        await confirmAction({
+            title: 'Cannot Delete Group',
+            text: `"${props.group.name}" has unsettled expenses. Settle all expenses first before deleting the group.`,
+            confirmText: 'OK',
+            danger: false,
+        });
+        return;
+    }
     const confirmed = await confirmAction({
         title: 'Delete Group',
         text: `Are you sure you want to delete "${props.group.name}"? This will remove all members and group data. This action cannot be undone.`,
@@ -62,10 +47,13 @@ const deleteGroup = async () => {
 };
 
 const confirmRemoveMember = async (member) => {
+    const willDeactivate = hasUnsettledExpenses(member.id);
     const confirmed = await confirmAction({
-        title: 'Remove Member',
-        text: `Are you sure you want to remove ${member.name} from this group?`,
-        confirmText: 'Remove',
+        title: willDeactivate ? 'Deactivate Member' : 'Remove Member',
+        text: willDeactivate
+            ? `${member.name} has unsettled expenses. They will be deactivated — excluded from new expenses but their pending balances remain for settlement.`
+            : `Are you sure you want to remove ${member.name} from this group?`,
+        confirmText: willDeactivate ? 'Deactivate' : 'Remove',
         danger: true,
     });
     if (confirmed) {
@@ -75,35 +63,19 @@ const confirmRemoveMember = async (member) => {
     }
 };
 
-// Add member functionality
-watch(phoneSearch, (val) => {
-    if (searchTimeout) clearTimeout(searchTimeout);
-
-    const digits = val.replace(/\D/g, '');
-    if (digits.length < 3) {
-        searchResults.value = [];
-        isSearching.value = false;
-        searchPerformed.value = false;
-        return;
+const reactivateMember = async (member) => {
+    const confirmed = await confirmAction({
+        title: 'Reactivate Member',
+        text: `Are you sure you want to reactivate ${member.name}? They will be included in new expenses again.`,
+        confirmText: 'Reactivate',
+        danger: false,
+    });
+    if (confirmed) {
+        router.post(route('groups.members.reactivate', [props.group.id, member.id]), {}, {
+            preserveScroll: true,
+        });
     }
-
-    isSearching.value = true;
-    searchPerformed.value = false;
-
-    searchTimeout = setTimeout(async () => {
-        try {
-            const response = await axios.get(route('groups.search-users', props.group.id), {
-                params: { phone: digits },
-            });
-            searchResults.value = response.data;
-        } catch (error) {
-            searchResults.value = [];
-        } finally {
-            isSearching.value = false;
-            searchPerformed.value = true;
-        }
-    }, 300);
-});
+};
 
 const addMember = (user) => {
     router.post(route('groups.add-member', props.group.id), {
@@ -111,17 +83,9 @@ const addMember = (user) => {
     }, {
         preserveScroll: true,
         onSuccess: () => {
-            closeAddMemberModal();
+            showAddMemberModal.value = false;
         },
     });
-};
-
-const closeAddMemberModal = () => {
-    showAddMemberModal.value = false;
-    phoneSearch.value = '';
-    searchResults.value = [];
-    isSearching.value = false;
-    searchPerformed.value = false;
 };
 
 const getUserInitials = (name) => {
@@ -162,12 +126,6 @@ const getUserInitials = (name) => {
                     >
                         Settle Up
                     </Link>
-                    <button
-                        @click="showInviteModal = true"
-                        class="px-3 py-2 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 transition-colors"
-                    >
-                        Invite
-                    </button>
                     <Link
                         v-if="isAdmin"
                         :href="route('groups.edit', group.id)"
@@ -221,12 +179,26 @@ const getUserInitials = (name) => {
                             >
                                 Admin
                             </span>
-                            <button
-                                v-if="isAdmin && member.id !== authUser.id && member.pivot?.role !== 'admin'"
-                                @click="confirmRemoveMember(member)"
-                                class="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium"
+                            <span
+                                v-if="member.pivot?.is_active === false || member.pivot?.is_active === 0"
+                                class="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded-full"
                             >
-                                Remove
+                                Inactive
+                            </span>
+                            <button
+                                v-if="isAdmin && member.id !== authUser.id && member.pivot?.role !== 'admin' && (member.pivot?.is_active === false || member.pivot?.is_active === 0)"
+                                @click="reactivateMember(member)"
+                                class="text-xs text-green-500 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium cursor-pointer"
+                            >
+                                Reactivate
+                            </button>
+                            <button
+                                v-if="isAdmin && member.id !== authUser.id && member.pivot?.role !== 'admin' && member.pivot?.is_active !== false && member.pivot?.is_active !== 0"
+                                @click="confirmRemoveMember(member)"
+                                class="text-xs font-medium cursor-pointer"
+                                :class="hasUnsettledExpenses(member.id) ? 'text-amber-500 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300' : 'text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300'"
+                            >
+                                {{ hasUnsettledExpenses(member.id) ? 'Deactivate' : 'Remove' }}
                             </button>
                         </div>
                     </li>
@@ -243,15 +215,26 @@ const getUserInitials = (name) => {
                             Total: &#8377;{{ totalExpensesAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 }) }}
                         </p>
                     </div>
-                    <Link
-                        :href="route('groups.expenses.index', group.id)"
-                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                    >
-                        View All
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
+                    <div class="flex items-center gap-2">
+                        <Link
+                            :href="route('groups.expenses.create', group.id)"
+                            class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
+                        >
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Expense
+                        </Link>
+                        <Link
+                            :href="route('groups.expenses.index', group.id)"
+                            class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                        >
+                            View All
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </Link>
+                    </div>
                 </div>
 
                 <!-- Recent Expenses List -->
@@ -295,121 +278,54 @@ const getUserInitials = (name) => {
             </div>
         </div>
 
-        <!-- Invite Modal -->
-        <Modal :show="showInviteModal" @close="showInviteModal = false" max-width="md">
+        <!-- Add Member Modal (from contacts) -->
+        <Modal :show="showAddMemberModal" @close="showAddMemberModal = false" max-width="md">
             <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Invite Members</h2>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add Member from Contacts</h2>
 
-                <div class="space-y-4">
-                    <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Invite Code</p>
-                        <div class="flex items-center gap-2">
-                            <code class="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-lg tracking-widest font-mono text-center dark:text-gray-100">
-                                {{ group.invite_code }}
-                            </code>
-                            <button @click="copyInviteCode" class="px-3 py-2.5 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50">
-                                {{ copied ? 'Copied!' : 'Copy' }}
-                            </button>
-                        </div>
-                    </div>
+                <div v-if="contacts.length === 0" class="text-center py-8">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">No contacts available to add</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Add users to your contacts first, then add them to groups.</p>
+                    <Link :href="route('contacts.index')" class="mt-3 inline-block px-4 py-2 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors">
+                        Go to Contacts
+                    </Link>
+                </div>
 
-                    <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Invite Link</p>
-                        <div class="flex items-center gap-2">
-                            <input
-                                type="text"
-                                :value="inviteLink"
-                                readonly
-                                class="flex-1 text-sm bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                            />
-                            <button @click="copyInviteLink" class="px-3 py-2.5 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 shrink-0">
-                                Copy
-                            </button>
-                        </div>
-                    </div>
-
-                    <button
-                        v-if="isAdmin"
-                        @click="refreshCode"
-                        class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                <ul v-else class="divide-y divide-gray-100 dark:divide-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg max-h-80 overflow-y-auto">
+                    <li
+                        v-for="user in contacts"
+                        :key="user.id"
+                        class="flex items-center justify-between px-4 py-3"
                     >
-                        Regenerate invite code
-                    </button>
-                </div>
-
-                <div class="mt-6 flex justify-end">
-                    <SecondaryButton @click="showInviteModal = false">Close</SecondaryButton>
-                </div>
-            </div>
-        </Modal>
-
-        <!-- Add Member Modal -->
-        <Modal :show="showAddMemberModal" @close="closeAddMemberModal" max-width="md">
-            <div class="p-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add Member</h2>
-
-                <!-- Phone search input -->
-                <div class="relative">
-                    <div class="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500">
-                        <span class="px-3 py-2.5 bg-gray-50 dark:bg-gray-700 text-sm text-gray-500 dark:text-gray-400 border-r border-gray-300 dark:border-gray-600">+91</span>
-                        <input
-                            v-model="phoneSearch"
-                            type="text"
-                            placeholder="Search by phone number"
-                            class="flex-1 px-3 py-2.5 text-sm border-0 focus:ring-0 focus:outline-none dark:bg-gray-800 dark:text-gray-100"
-                            maxlength="10"
-                        />
-                    </div>
-                </div>
-
-                <!-- Search status messages -->
-                <div class="mt-4">
-                    <p v-if="phoneSearch.replace(/\D/g, '').length < 3 && phoneSearch.length > 0" class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                        Type at least 3 digits to search
-                    </p>
-
-                    <p v-else-if="isSearching" class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                        Searching...
-                    </p>
-
-                    <p v-else-if="searchPerformed && searchResults.length === 0" class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                        No registered user found with this phone number
-                    </p>
-
-                    <!-- Search results -->
-                    <ul v-else-if="searchResults.length > 0" class="divide-y divide-gray-100 dark:divide-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg max-h-60 overflow-y-auto">
-                        <li
-                            v-for="user in searchResults"
-                            :key="user.id"
-                            class="flex items-center justify-between px-4 py-3"
-                        >
-                            <div class="flex items-center gap-3">
-                                <img
-                                    v-if="user.avatar"
-                                    :src="`/storage/${user.avatar}`"
-                                    :alt="user.name"
-                                    class="w-9 h-9 rounded-full object-cover"
-                                />
-                                <div v-else class="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-sm">
-                                    {{ getUserInitials(user.name) }}
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ user.name }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">+91 {{ user.phone }}</p>
-                                </div>
+                        <div class="flex items-center gap-3">
+                            <img
+                                v-if="user.avatar"
+                                :src="`/storage/${user.avatar}`"
+                                :alt="user.name"
+                                class="w-9 h-9 rounded-full object-cover"
+                            />
+                            <div v-else class="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-300 font-semibold text-sm">
+                                {{ getUserInitials(user.name) }}
                             </div>
-                            <button
-                                @click="addMember(user)"
-                                class="px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
-                            >
-                                Add
-                            </button>
-                        </li>
-                    </ul>
-                </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ user.name }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ user.email || user.phone }}</p>
+                            </div>
+                        </div>
+                        <button
+                            @click="addMember(user)"
+                            class="px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+                        >
+                            Add
+                        </button>
+                    </li>
+                </ul>
 
                 <div class="mt-6 flex justify-end">
-                    <SecondaryButton @click="closeAddMemberModal">Close</SecondaryButton>
+                    <SecondaryButton @click="showAddMemberModal = false">Close</SecondaryButton>
                 </div>
             </div>
         </Modal>

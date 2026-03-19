@@ -43,7 +43,15 @@ class Group extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'group_members')
-            ->withPivot('role', 'joined_at')
+            ->withPivot('role', 'is_active', 'joined_at')
+            ->orderByPivot('joined_at');
+    }
+
+    public function activeMembers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'group_members')
+            ->withPivot('role', 'is_active', 'joined_at')
+            ->wherePivot('is_active', true)
             ->orderByPivot('joined_at');
     }
 

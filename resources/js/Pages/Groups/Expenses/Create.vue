@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ImageUpload from '@/Components/Expenses/ImageUpload.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed, watch } from 'vue';
 
@@ -18,6 +19,8 @@ const form = useForm({
     paid_by: authUser.value.id,
     split_type: 'equal',
     splits: [],
+    image_1: null,
+    image_2: null,
 });
 
 const splitType = ref('equal');
@@ -123,7 +126,9 @@ function buildSplits() {
 function submit() {
     form.split_type = splitType.value;
     form.splits = buildSplits();
-    form.post(route('groups.expenses.store', props.group.id));
+    form.post(route('groups.expenses.store', props.group.id), {
+        forceFormData: true,
+    });
 }
 
 function getMemberInitial(name) {
@@ -445,6 +450,9 @@ const canSubmit = computed(() => {
 
                     <p v-if="form.errors.splits" class="mt-3 text-sm text-accent-600">{{ form.errors.splits }}</p>
                 </div>
+
+                <!-- Images -->
+                <ImageUpload :form="form" />
 
                 <!-- Actions -->
                 <div class="flex items-center gap-3">

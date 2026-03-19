@@ -61,6 +61,15 @@ const monthChange = computed(() => {
 
 const monthChangeUp = computed(() => monthChange.value > 0);
 
+// Group expense link: if 1 group -> direct add expense, if multiple -> group listing
+const groupExpenseLink = computed(() => {
+    const groups = props.groupsSummary.groups;
+    if (groups.length === 1) {
+        return route('groups.expenses.create', groups[0].group_id);
+    }
+    return route('groups.index');
+});
+
 // Category breakdown: top 5 with percentage bars
 const topCategories = computed(() => {
     const cats = props.personalSummary.category_breakdown || [];
@@ -113,21 +122,31 @@ function relativeDate(dateStr) {
                 <div class="flex items-center gap-2">
                     <Link
                         :href="route('groups.create')"
-                        class="hidden sm:inline-flex items-center px-3.5 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="inline-flex items-center px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
-                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        New Group
+                        <span class="hidden sm:inline">New Group</span>
+                    </Link>
+                    <Link
+                        v-if="groupsSummary.groups.length > 0"
+                        :href="groupExpenseLink"
+                        class="inline-flex items-center px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-lg border border-blue-300 dark:border-blue-600 text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                    >
+                        <svg class="w-4 h-4 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span class="hidden sm:inline">Group Expense</span>
                     </Link>
                     <Link
                         :href="route('expenses.create')"
-                        class="inline-flex items-center px-4 py-2.5 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors"
+                        class="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-primary-600 text-white text-xs sm:text-sm font-semibold hover:bg-primary-700 transition-colors"
                     >
-                        <svg class="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        Add Expense
+                        <span class="hidden sm:inline">Add Expense</span>
                     </Link>
                 </div>
             </div>

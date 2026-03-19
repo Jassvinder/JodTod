@@ -12,10 +12,14 @@ const form = useForm({
     category_id: '',
     description: '',
     expense_date: new Date().toISOString().slice(0, 16),
+    image_1: null,
+    image_2: null,
 });
 
 function submit() {
-    form.post(route('expenses.store'));
+    form.post(route('expenses.store'), {
+        forceFormData: true,
+    });
 }
 </script>
 

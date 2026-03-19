@@ -18,6 +18,8 @@ class Expense extends Model
         'amount',
         'category_id',
         'description',
+        'image_1',
+        'image_2',
         'expense_date',
         'split_type',
         'is_settled',

@@ -1,163 +1,247 @@
 <script setup>
-import { useEditor, EditorContent } from '@tiptap/vue-3';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import { watch, ref } from 'vue';
+import { ref, watch } from 'vue';
+import { Ckeditor } from '@ckeditor/ckeditor5-vue';
+import {
+    ClassicEditor,
+    Essentials,
+    Bold,
+    Italic,
+    Underline,
+    Strikethrough,
+    Subscript,
+    Superscript,
+    Font,
+    Paragraph,
+    Heading,
+    Link,
+    List,
+    TodoList,
+    BlockQuote,
+    CodeBlock,
+    Code,
+    Table,
+    TableToolbar,
+    TableCellProperties,
+    TableProperties,
+    TableColumnResize,
+    Image,
+    ImageToolbar,
+    ImageCaption,
+    ImageStyle,
+    ImageResize,
+    ImageInsert,
+    ImageUpload,
+    LinkImage,
+    Alignment,
+    Indent,
+    IndentBlock,
+    MediaEmbed,
+    RemoveFormat,
+    SourceEditing,
+    GeneralHtmlSupport,
+    HorizontalLine,
+    FindAndReplace,
+    Highlight,
+    Undo,
+    SimpleUploadAdapter,
+    PasteFromOffice,
+} from 'ckeditor5';
+
+import 'ckeditor5/ckeditor5.css';
 
 const props = defineProps({
     modelValue: { type: String, default: '' },
-    placeholder: { type: String, default: 'Start writing...' },
 });
 
 const emit = defineEmits(['update:modelValue']);
 
-const fileInputRef = ref(null);
-
-const editor = useEditor({
-    content: props.modelValue,
-    extensions: [
-        StarterKit,
-        Image.configure({ inline: false, allowBase64: true }),
-        Link.configure({ openOnClick: false }),
-    ],
-    editorProps: {
-        attributes: {
-            class: 'prose prose-sm max-w-none focus:outline-none min-h-[200px] px-4 py-3 dark:prose-invert',
-        },
-    },
-    onUpdate: ({ editor }) => {
-        emit('update:modelValue', editor.getHTML());
-    },
-});
+const content = ref(props.modelValue);
+const isFullscreen = ref(false);
 
 watch(() => props.modelValue, (val) => {
-    if (editor.value && editor.value.getHTML() !== val) {
-        editor.value.commands.setContent(val || '', false);
+    if (val !== content.value) {
+        content.value = val;
     }
 });
 
-const addLink = () => {
-    const url = window.prompt('Enter URL:');
-    if (url) {
-        editor.value.chain().focus().setLink({ href: url }).run();
-    }
+watch(content, (val) => {
+    emit('update:modelValue', val);
+});
+
+const editorConfig = {
+    licenseKey: 'GPL',
+    plugins: [
+        Essentials,
+        Bold,
+        Italic,
+        Underline,
+        Strikethrough,
+        Subscript,
+        Superscript,
+        Font,
+        Paragraph,
+        Heading,
+        Link,
+        List,
+        TodoList,
+        BlockQuote,
+        CodeBlock,
+        Code,
+        Table,
+        TableToolbar,
+        TableCellProperties,
+        TableProperties,
+        TableColumnResize,
+        Image,
+        ImageToolbar,
+        ImageCaption,
+        ImageStyle,
+        ImageResize,
+        ImageInsert,
+        ImageUpload,
+        LinkImage,
+        Alignment,
+        Indent,
+        IndentBlock,
+        MediaEmbed,
+        RemoveFormat,
+        SourceEditing,
+        GeneralHtmlSupport,
+        HorizontalLine,
+        FindAndReplace,
+        Highlight,
+        Undo,
+        SimpleUploadAdapter,
+        PasteFromOffice,
+    ],
+    toolbar: {
+        items: [
+            'undo', 'redo',
+            '|',
+            'heading',
+            '|',
+            'fontSize', 'fontColor', 'fontBackgroundColor',
+            '|',
+            'bold', 'italic', 'underline', 'strikethrough', 'code', 'removeFormat',
+            '|',
+            'link', 'insertImage', 'insertTable', 'mediaEmbed', 'blockQuote', 'codeBlock', 'horizontalLine',
+            '|',
+            'alignment',
+            '|',
+            'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent',
+            '|',
+            'highlight', 'findAndReplace',
+            '|',
+            'sourceEditing',
+        ],
+        shouldNotGroupWhenFull: true,
+    },
+    heading: {
+        options: [
+            { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+            { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+            { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
+        ],
+    },
+    image: {
+        toolbar: [
+            'imageTextAlternative',
+            'toggleImageCaption',
+            '|',
+            'imageStyle:alignLeft',
+            'imageStyle:alignCenter',
+            'imageStyle:alignRight',
+            '|',
+            'imageStyle:inline',
+            'imageStyle:wrapText',
+            'imageStyle:breakText',
+            '|',
+            'resizeImage',
+        ],
+        resizeOptions: [
+            { name: 'resizeImage:original', value: null, label: 'Original' },
+            { name: 'resizeImage:25', value: '25', label: '25%' },
+            { name: 'resizeImage:50', value: '50', label: '50%' },
+            { name: 'resizeImage:75', value: '75', label: '75%' },
+        ],
+    },
+    table: {
+        contentToolbar: [
+            'tableColumn', 'tableRow', 'mergeTableCells',
+            'tableProperties', 'tableCellProperties',
+        ],
+    },
+    simpleUpload: {
+        uploadUrl: '/admin/upload-image',
+        withCredentials: true,
+        headers: {
+            'X-CSRF-TOKEN': typeof document !== 'undefined'
+                ? document.querySelector('meta[name="csrf-token"]')?.content
+                : '',
+        },
+    },
+    htmlSupport: {
+        allow: [
+            { name: /.*/, attributes: true, classes: true, styles: true },
+        ],
+    },
 };
-
-const triggerImageUpload = () => {
-    fileInputRef.value?.click();
-};
-
-const onImageSelected = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-        const response = await axios.post(route('admin.upload-image'), formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        if (response.data.url) {
-            editor.value.chain().focus().setImage({ src: response.data.url }).run();
-        }
-    } catch {
-        alert('Failed to upload image. Max size: 2MB.');
-    }
-
-    event.target.value = '';
-};
-
-const buttons = [
-    { action: () => editor.value?.chain().focus().toggleBold().run(), icon: 'B', title: 'Bold', check: 'bold', style: 'font-bold' },
-    { action: () => editor.value?.chain().focus().toggleItalic().run(), icon: 'I', title: 'Italic', check: 'italic', style: 'italic' },
-    { action: () => editor.value?.chain().focus().toggleStrike().run(), icon: 'S', title: 'Strikethrough', check: 'strike', style: 'line-through' },
-    { type: 'divider' },
-    { action: () => editor.value?.chain().focus().toggleHeading({ level: 2 }).run(), icon: 'H2', title: 'Heading 2', check: 'heading', checkAttrs: { level: 2 } },
-    { action: () => editor.value?.chain().focus().toggleHeading({ level: 3 }).run(), icon: 'H3', title: 'Heading 3', check: 'heading', checkAttrs: { level: 3 } },
-    { type: 'divider' },
-    { action: () => editor.value?.chain().focus().toggleBulletList().run(), icon: '•', title: 'Bullet List', check: 'bulletList' },
-    { action: () => editor.value?.chain().focus().toggleOrderedList().run(), icon: '1.', title: 'Ordered List', check: 'orderedList' },
-    { type: 'divider' },
-    { action: () => editor.value?.chain().focus().toggleBlockquote().run(), icon: '"', title: 'Quote', check: 'blockquote' },
-    { action: () => editor.value?.chain().focus().setHorizontalRule().run(), icon: '—', title: 'Divider' },
-    { type: 'divider' },
-    { action: addLink, icon: '🔗', title: 'Link' },
-    { action: triggerImageUpload, icon: '📷', title: 'Image' },
-];
 </script>
 
 <template>
-    <div class="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
-        <!-- Toolbar -->
-        <div class="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-            <template v-for="(btn, i) in buttons" :key="i">
-                <div v-if="btn.type === 'divider'" class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></div>
-                <button
-                    v-else
-                    type="button"
-                    @click="btn.action"
-                    :title="btn.title"
-                    class="px-2 py-1 text-sm rounded transition-colors"
-                    :class="[
-                        btn.style || '',
-                        editor?.isActive(btn.check, btn.checkAttrs || {})
-                            ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                    ]"
-                >
-                    {{ btn.icon }}
-                </button>
-            </template>
+    <div :class="{ 'ck-fullscreen': isFullscreen }">
+        <div class="flex justify-end mb-1">
+            <button
+                type="button"
+                @click="isFullscreen = !isFullscreen"
+                class="px-2.5 py-1 text-xs font-medium rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+            >
+                {{ isFullscreen ? 'Exit Fullscreen' : 'Fullscreen' }}
+            </button>
         </div>
-
-        <!-- Editor Content -->
-        <EditorContent :editor="editor" />
-
-        <!-- Hidden file input for image upload -->
-        <input
-            ref="fileInputRef"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            @change="onImageSelected"
+        <ckeditor
+            v-model="content"
+            :editor="ClassicEditor"
+            :config="editorConfig"
         />
     </div>
 </template>
 
 <style>
-/* Editor prose styles */
-.ProseMirror {
-    min-height: 200px;
-    padding: 12px 16px;
+.ck-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    background: white;
+    padding: 1rem;
+    overflow-y: auto;
 }
-.ProseMirror:focus {
-    outline: none;
+
+.dark .ck-fullscreen {
+    background: #1f2937;
 }
-.ProseMirror h2 { font-size: 1.5em; font-weight: 700; margin: 1em 0 0.5em; }
-.ProseMirror h3 { font-size: 1.25em; font-weight: 600; margin: 0.8em 0 0.4em; }
-.ProseMirror p { margin: 0.5em 0; }
-.ProseMirror ul, .ProseMirror ol { padding-left: 1.5em; margin: 0.5em 0; }
-.ProseMirror li { margin: 0.2em 0; }
-.ProseMirror blockquote {
-    border-left: 3px solid #d1d5db;
-    padding-left: 1em;
-    margin: 0.5em 0;
-    color: #6b7280;
+
+.ck-fullscreen .ck-editor {
+    height: calc(100vh - 5rem);
+    display: flex;
+    flex-direction: column;
 }
-.dark .ProseMirror blockquote {
-    border-color: #4b5563;
-    color: #9ca3af;
+
+.ck-fullscreen .ck-editor__editable {
+    flex: 1;
+    overflow-y: auto;
 }
-.ProseMirror img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-    margin: 1em 0;
+
+.ck-editor__editable {
+    min-height: 250px;
 }
-.ProseMirror a { color: #6366f1; text-decoration: underline; }
-.ProseMirror hr { border-color: #e5e7eb; margin: 1em 0; }
-.dark .ProseMirror hr { border-color: #374151; }
-.dark .ProseMirror { color: #e5e7eb; }
+
+.ck-body-wrapper .ck-balloon-panel {
+    z-index: 10001 !important;
+}
 </style>

@@ -13,6 +13,7 @@ class GroupMember extends Model
         'group_id',
         'user_id',
         'role',
+        'is_active',
         'joined_at',
     ];
 
@@ -20,6 +21,7 @@ class GroupMember extends Model
     {
         return [
             'joined_at' => 'datetime',
+            'is_active' => 'boolean',
         ];
     }
 

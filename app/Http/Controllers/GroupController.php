@@ -79,12 +79,41 @@ class GroupController extends Controller
         $totalExpensesCount = $group->expenses()->whereNull('deleted_at')->count();
         $totalExpensesAmount = round((float) $group->expenses()->whereNull('deleted_at')->sum('amount'), 2);
 
+        // Check which members have unsettled expenses (for remove vs deactivate label)
+        $unsettledPayerIds = $group->expenses()
+            ->where('is_settled', false)
+            ->whereNull('deleted_at')
+            ->pluck('paid_by')
+            ->unique()
+            ->toArray();
+
+        $unsettledSplitUserIds = \DB::table('expense_splits')
+            ->join('expenses', 'expenses.id', '=', 'expense_splits.expense_id')
+            ->where('expenses.group_id', $group->id)
+            ->where('expenses.is_settled', false)
+            ->whereNull('expenses.deleted_at')
+            ->pluck('expense_splits.user_id')
+            ->unique()
+            ->toArray();
+
+        $membersWithUnsettled = array_values(array_unique(array_merge($unsettledPayerIds, $unsettledSplitUserIds)));
+
+        // Get admin's contacts (excluding existing group members) for add member
+        $memberIds = $group->members->pluck('id')->toArray();
+        $contacts = \App\Models\Contact::with('contactUser:id,name,email,phone,avatar')
+            ->where('user_id', $request->user()->id)
+            ->whereNotIn('contact_user_id', $memberIds)
+            ->get()
+            ->map(fn ($c) => $c->contactUser);
+
         return Inertia::render('Groups/Show', [
             'group' => $group,
             'isAdmin' => $group->isAdmin($request->user()),
             'recentExpenses' => $recentExpenses,
             'totalExpensesCount' => $totalExpensesCount,
             'totalExpensesAmount' => $totalExpensesAmount,
+            'contacts' => $contacts,
+            'membersWithUnsettled' => $membersWithUnsettled,
         ]);
     }
 
@@ -120,6 +149,15 @@ class GroupController extends Controller
     {
         if (!$group->isAdmin($request->user())) {
             abort(403);
+        }
+
+        $hasUnsettled = $group->expenses()
+            ->where('is_settled', false)
+            ->whereNull('deleted_at')
+            ->exists();
+
+        if ($hasUnsettled) {
+            return back()->withErrors(['group' => 'Cannot delete group — there are unsettled expenses. Settle all expenses first.']);
         }
 
         $group->delete();
@@ -194,7 +232,38 @@ class GroupController extends Controller
 
     public function leave(Request $request, Group $group): RedirectResponse
     {
-        return back()->withErrors(['group' => 'Members cannot leave a group. Only the admin can remove members.']);
+        $user = $request->user();
+
+        if (!$group->isMember($user)) {
+            return back()->withErrors(['group' => 'You are not a member of this group.']);
+        }
+
+        if ($group->isAdmin($user)) {
+            return back()->withErrors(['group' => 'Group admin cannot leave. Transfer admin role or delete the group.']);
+        }
+
+        // Check if member is involved in any unsettled expense (as payer or in splits)
+        $unsettledAsPayer = $group->expenses()
+            ->where('paid_by', $user->id)
+            ->where('is_settled', false)
+            ->exists();
+
+        $unsettledInSplits = \DB::table('expense_splits')
+            ->join('expenses', 'expenses.id', '=', 'expense_splits.expense_id')
+            ->where('expenses.group_id', $group->id)
+            ->where('expenses.is_settled', false)
+            ->where('expense_splits.user_id', $user->id)
+            ->exists();
+
+        if ($unsettledAsPayer || $unsettledInSplits) {
+            // Block member instead of preventing leave - they won't be in new expense splits
+            $group->groupMembers()->where('user_id', $user->id)->update(['is_active' => false]);
+            return redirect()->route('groups.index')->with('success', "You have been deactivated from \"{$group->name}\". You won't be included in new expenses but your pending balances remain for settlement.");
+        }
+
+        $group->groupMembers()->where('user_id', $user->id)->delete();
+
+        return redirect()->route('groups.index')->with('success', "You have left \"{$group->name}\".");
     }
 
     public function removeMember(Request $request, Group $group, int $userId): RedirectResponse
@@ -219,14 +288,47 @@ class GroupController extends Controller
             return back()->withErrors(['member' => 'Cannot remove a group admin.']);
         }
 
-        // Check if group has any expenses
-        if ($group->expenses()->exists()) {
-            return back()->withErrors(['member' => 'Cannot remove member — group has expenses. Settle all expenses first.']);
+        // Check if member is involved in any unsettled expense (as payer or in splits)
+        $unsettledAsPayer = $group->expenses()
+            ->where('paid_by', $userId)
+            ->where('is_settled', false)
+            ->exists();
+
+        $unsettledInSplits = \DB::table('expense_splits')
+            ->join('expenses', 'expenses.id', '=', 'expense_splits.expense_id')
+            ->where('expenses.group_id', $group->id)
+            ->where('expenses.is_settled', false)
+            ->where('expense_splits.user_id', $userId)
+            ->exists();
+
+        if ($unsettledAsPayer || $unsettledInSplits) {
+            // Block member instead of removing - they won't appear in new expense splits
+            $membership->update(['is_active' => false]);
+            return back()->with('success', 'Member has unsettled expenses and has been deactivated. They won\'t be included in new expenses but their pending balances remain for settlement.');
         }
 
         $membership->delete();
 
         return back()->with('success', 'Member removed from group.');
+    }
+
+    public function reactivateMember(Request $request, Group $group, int $userId): RedirectResponse
+    {
+        if (!$group->isAdmin($request->user())) {
+            abort(403);
+        }
+
+        $membership = $group->groupMembers()
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$membership) {
+            return back()->withErrors(['member' => 'User is not a member of this group.']);
+        }
+
+        $membership->update(['is_active' => true]);
+
+        return back()->with('success', 'Member has been reactivated.');
     }
 
     public function searchUsers(Request $request, Group $group): JsonResponse

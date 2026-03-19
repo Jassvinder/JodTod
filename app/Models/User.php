@@ -10,10 +10,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\QueuedResetPassword;
 use App\Notifications\QueuedVerifyEmail;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -28,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'notification_email',
         'notification_push',
         'role',
+        'banned_at',
     ];
 
     protected $hidden = [
@@ -46,6 +48,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(BlogPost::class, 'author_id');
     }
 
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(Contact::class);
+    }
+
     public function groups(): BelongsToMany
     {
         return $this->belongsToMany(Group::class, 'group_members')
@@ -59,6 +66,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAppAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->banned_at !== null;
     }
 
     public function sendEmailVerificationNotification(): void
@@ -79,6 +91,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'notification_email' => 'boolean',
             'notification_push' => 'boolean',
+            'banned_at' => 'datetime',
         ];
     }
 }

@@ -53,6 +53,24 @@ function changeRole(user, newRole) {
     });
 }
 
+// Ban/Unban user
+async function toggleBan(user) {
+    const isBanned = !!user.banned_at;
+    const confirmed = await confirmAction({
+        title: isBanned ? 'Unban User' : 'Ban User',
+        text: isBanned
+            ? `Unban ${user.name}? They will be able to login again.`
+            : `Ban ${user.name}? They will be logged out and unable to login.`,
+        confirmText: isBanned ? 'Unban' : 'Ban',
+        danger: !isBanned,
+    });
+    if (confirmed) {
+        router.put(route(isBanned ? 'admin.users.unban' : 'admin.users.ban', user.id), {}, {
+            preserveScroll: true,
+        });
+    }
+}
+
 // Delete user
 async function confirmDelete(user) {
     const confirmed = await confirmAction({
@@ -122,7 +140,7 @@ function formatDate(dateStr) {
                             <tr class="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Phone</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Joined</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
@@ -160,18 +178,32 @@ function formatDate(dateStr) {
                                     <span v-else class="text-sm text-gray-400 dark:text-gray-500">-</span>
                                 </td>
 
-                                <!-- Role -->
+                                <!-- Status -->
                                 <td class="px-6 py-4">
                                     <span
-                                        :class="[
-                                            'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium',
-                                            user.role === 'admin'
-                                                ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
-                                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                                        ]"
+                                        v-if="user.role === 'admin'"
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400"
                                     >
-                                        {{ user.role === 'admin' ? 'Admin' : 'User' }}
+                                        Admin
                                     </span>
+                                    <template v-else>
+                                        <button
+                                            v-if="user.banned_at"
+                                            @click="toggleBan(user)"
+                                            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors cursor-pointer"
+                                            title="Click to unban"
+                                        >
+                                            Banned
+                                        </button>
+                                        <button
+                                            v-else
+                                            @click="toggleBan(user)"
+                                            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors cursor-pointer"
+                                            title="Click to ban"
+                                        >
+                                            Active
+                                        </button>
+                                    </template>
                                 </td>
 
                                 <!-- Joined -->
@@ -182,21 +214,10 @@ function formatDate(dateStr) {
                                 <!-- Actions -->
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end gap-2">
-                                        <!-- Role Selector -->
-                                        <select
-                                            v-if="user.id !== currentUser?.id"
-                                            :value="user.role"
-                                            @change="changeRole(user, $event.target.value)"
-                                            class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
-                                        >
-                                            <option value="user">User</option>
-                                            <option value="admin">Admin</option>
-                                        </select>
-
                                         <!-- View User Detail -->
                                         <Link
                                             :href="route('admin.users.show', user.id)"
-                                            class="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                                            class="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
                                             title="View details"
                                         >
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,11 +226,23 @@ function formatDate(dateStr) {
                                             </svg>
                                         </Link>
 
-                                        <!-- Delete Button (hidden for current user) -->
+                                        <!-- Edit User -->
+                                        <Link
+                                            v-if="user.id !== currentUser?.id"
+                                            :href="route('admin.users.edit', user.id)"
+                                            class="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                                            title="Edit user"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </Link>
+
+                                        <!-- Delete Button -->
                                         <button
                                             v-if="user.id !== currentUser?.id"
                                             @click="confirmDelete(user)"
-                                            class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                                            class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
                                             title="Delete user"
                                         >
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

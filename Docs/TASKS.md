@@ -1,33 +1,22 @@
 # JodTod - Task Tracker
+- [] **0000**
 
-- [] **Task 101** - Favicon kabhi aa jata hai kabhi nahi. or kabhi admin pannel par aata hai. to kabhi login/register and landing page par nahi aata. isse achhe se fix karo. bahut chhota and silly issue hai?
+**Admin** Section tasks. starts from 500 =======================================
 
-- [] **Task 102 Expenses** - Expense add/update par date time select me select kiya gya time, list me galat show ho raha hai. jaise ki maine 10:00 AM add kia to list me use 3:30 PM show karta hai.
+- [ ] **Task 500**
+A. Users listing me roles dropdown me admin nahi hona chahiye. admin bas ek he rahega. or main to kehta hoon ke abhi ke liye is option ko hide he kardo isme se admin remove karke. 
+B. iski jagah user status dikha do wo ban hai ya unban or usi par click karke change karne ka option bhi movie kardo jo actions me diya hua hai. C. delete button par hand show hona chahiyie hover karne par. or ek jaroori baat bhai admin ko sabhi rights hone chahiye to wo user ko complete edit/update kar sake. 
+D. User listing me View to aayega he to usme user ke contacts ki listing bhi honi chahiye, or usme contact add/delete karne ka option bhi hona chahiye. 
 
-- [] **Task 103 toDo** - Isme main soch raha tha ke task/todo reminder bhi add karne ka option ho. jaise kisi perticular day me mujhe kitne tasks complete karne hain. subha app me alarm baje or us din ke sabhi tasks list me show ho jaye. or jab alarm set kare to usme time ka option bhi ho. default chahe kisi perticular time pa set ho?
-
-- [] **Task 103-A toDo** - Todo list ke filters me starting me ek "All" ka option bhi add karo. basically wo todos ke main link ko perafar karega. means all todos dikhayega.
-
-- [] **Task 103-B toDo** - Agar hum tasks me category bhi add kare to kaisa rahega. Unche level par socho jara kisi marriage ke liye ye app use ho, jisme bahut saare tasks add ho, or wo bhi category wise. or dusra koi bahut saare tasks bnaye for example 100 tasks bnaye, shayad ek indian marriage me itne tasks hona to asan baat hai. or saare tasks category wise ho. ab tasks bnane wala wo tasks dusro ko assign karde isi app ke through. dusre bhi app user hone chahiye. jaise ki 9 logo ko 10-10 tasks or 10 chahe khud ke liye bhi rakhle. ok or sab ko track bhi kar sake. 
-
-- [] **Task 104-A Group** - Group ka invite code baar-baar change kyu hota hai bas group bante time ek he baar code banna chahiye. agar maine 2 alag users ko invite bheja, or galti se dono baar code change ho gya to, bas last wala he join kar payega. sochna padega iske baare me.
+- [ ] **Task 503**
+expense me abhi ke liye 2 images upload ka option hai to waha se ek hide kardo ek he rehna chahiye bas. or pure project me jaha bhi image upload ho rahi hai wo webp me convert ho rahi hai na. ye maine shyad pehle bhi bola tha. ye must hai karna padega.
 
 ## PENDING
 
-### High Priority (Core functionality gaps)
-- [ ] **Task 6** - Profile page: Add Currency & Language settings UI (DB fields exist: `currency`, `language` — just need form in Profile/Edit.vue)
-- [ ] **Task 7** - Group leave: Fix leave logic — currently nobody can leave. Should allow leave only if balance is zero; block with message if unsettled balance exists
-- [ ] **Task 8 - A** - Admin Reports page (`/admin/reports`): Expense trends, category breakdown, top groups, settlement stats
-- [ ] **Task 8 - B** - User Expenses (individual and group both "optional") add karte time image bhi upload kar sake max 2 images jaise ki bill image ya samaan ki image.
-- [ ] **Task 8 - C** - make sidebar collapsable.
-
-### Medium Priority (Planned features)
-- [ ] **Task 9** - Admin: Ban/Unban user functionality (add `banned_at` column, block login for banned users, UI in admin users list)
-- [ ] **Task 10** - Admin Settings page (`/admin/settings`): Site name, default currency, maintenance mode toggle
-- [ ] **Task 11** - Weekly summary notification: Scheduled command to email users their weekly expense summary
+### High Priority
+(No pending high priority tasks)
 
 ### Low Priority / Future
-- [ ] **Task 12** - Real-time notifications: Polling interval in Header.vue (currently only fetches on bell-click, not auto-refresh)
 - [ ] **Task 13** - Offline expense sync: Implement IndexedDB storage + background sync in service worker (currently empty placeholder)
 
 ### Release
@@ -38,6 +27,26 @@
 
 ## COMPLETED
 ## Completed Current Tasks
+- [x] **Task 502** - Settle up fixes: (1) Duplicate prevention - if pending settlements exist, new ones won't be created. Button disabled with warning. (2) Only group admin can initiate settle up (backend + frontend enforced). (3) Confirmation dialog added. (4) Member deactivation system - members with unsettled expenses get deactivated (is_active=false) instead of removed. Deactivated members excluded from new expense splits but remain in settlement calculations. Admin can reactivate. Migration: added `is_active` to group_members. (2026-03-19)
+- [x] **Task 501** - Admin Dashboard: Added phone number column to Recent Users table. Backend query updated to include phone field. Column hidden on mobile for responsiveness. (2026-03-19)
+- [x] **Task 104** - Admin panel group detail page error: `Call to undefined relationship [user] on model [App\Models\User]`. Fixed eager loading `members.user` to `members` since BelongsToMany already returns User objects directly. (2026-03-19)
+- [x] **Task 103-B** - Added "Group Expense" quick action button on Dashboard (single group → direct add expense, multiple → group listing). Added "Add Expense" button next to "View All" on Group Show page. All buttons responsive (icon-only on mobile, icon+text on desktop). (2026-03-19)
+- [x] **Task 101 Expenses** - Expense add/update par date time select me select kiya gya time, list me galat show ho raha hai. Fixed timezone handling for correct time display. (2026-03-18)
+- [x] **Task 102-A toDo** - Todo list ke filters me starting me ek "All" ka option add kiya. All todos dikhata hai. (2026-03-18)
+- [x] **Task 102 toDo** - Todo reminder feature: reminder_at datetime field, bell icon UI in add/edit, alarm sound (Web Audio API), SweetAlert popup, browser notifications, multi-tab safe polling (60s), scheduled command for email notifications. (2026-03-18)
+- [x] **Task 102-B toDo (Categories)** - User-specific todo categories with color picker (10 preset colors). Full CRUD management panel, category dropdown in add/edit forms, category filter buttons, color-coded category badges on tasks, category color bar on task cards. (2026-03-18)
+- [x] **Task 102-B-ii toDo (Assignment)** - Todo assignment to contacts. Assign dropdown in add/edit forms, "Assigned to me" / "Assigned by me" scope filters, assignment badges on tasks, TodoAssigned notification (in-app + email). Assignee can toggle complete. (2026-03-18)
+- [x] **Task Contacts** - Contacts system: search JodTod users by name/email/phone, add to contacts, remove. Contacts page in sidebar. Foundation for group member addition and todo assignment. (2026-03-18)
+- [x] **Task 103-A Group (Contacts-based)** - Replaced invite code + phone search with contacts-based member addition. Admin sees contacts list in "Add Member" modal. Removed invite modal and join-by-code UI. Invite code column kept in DB. (2026-03-18)
+- [x] **Task 6** - Profile page: Currency & Language dropdowns added (10 currencies, 2 languages). Validation in ProfileUpdateRequest. (2026-03-18)
+- [x] **Task 7** - Group leave: Fixed leave logic. Members can leave if balance is zero. Blocks with unsettled balance message. Also fixed removeMember to check per-member balance instead of blocking all. (2026-03-18)
+- [x] **Task 8-A** - Admin Reports page: Monthly expense trends (6-month bar chart), category breakdown (top 10), top groups table, settlement stats cards (total/completed/pending/amount). (2026-03-18)
+- [x] **Task 8-C** - Sidebar collapsible: Already implemented with localStorage persistence, tooltip on collapsed state. (2026-03-18)
+- [x] **Task 9** - Ban/Unban users: `banned_at` column, `isBanned()` helper, CheckBanned middleware (auto-logout + blocks login), ban/unban buttons in admin users list with confirmation, "Banned" badge. (2026-03-18)
+- [x] **Task 10** - Admin Settings page: DB-backed key-value settings table with caching. Site name, default currency, maintenance mode toggle. Settings nav item in admin sidebar. (2026-03-18)
+- [x] **Task 11** - Weekly summary notification: `summary:weekly` command scheduled Monday 8 AM. Emails users with: total expenses, transaction count, top category, income, pending tasks. Skips inactive users. (2026-03-18)
+- [x] **Task 12** - Real-time notification polling: Header.vue auto-refreshes unread count every 60 seconds via `notifications.recent` endpoint. Updates badge and dropdown without page reload. (2026-03-18)
+- [x] **Task 8-B** - Expense image upload: Max 2 images per expense (personal + group). Reusable ImageUpload.vue component. Dashed upload boxes with preview, hover-to-remove. 5MB max per image. Images stored in `storage/expenses/`. Edit supports add/remove/replace. Both controllers updated (ExpenseController + GroupExpenseController). (2026-03-18)
 - [x] **Task 100** - check screenshot 11. profile image select karne ke baad jo crop ka popup aata hai wo sahi nahi hai. selected image he center me nahi aati. haan starting me aati thi. shayad kisi css se conflict na hua ho. or dusri baat agar user ne pehle koi image upload ki hai to use only delete karne ka option bhi hona chahiye, yaha sirf change ka option hai. (2026-03-17)
 
 - [x] **Task 100-A** -image remove ke baad turand image section ko refresh kardo. abhi kya hai ke refresh ke baad he image remove ho rahi hai.(2026-03-17)
