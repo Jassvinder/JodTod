@@ -20,7 +20,7 @@ const getNotificationIcon = (type) => {
 };
 
 const getNotificationLink = (notification) => {
-    const data = notification.data;
+    const data = notification.data || {};
     if (data.type === 'todo_reminder' || data.type === 'todo_assigned') {
         return route('todos.index');
     }

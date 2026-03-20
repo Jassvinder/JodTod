@@ -1,12 +1,35 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { confirmAction } from '@/Utils/confirm.js';
 
 const props = defineProps({
     user: Object,
     recentExpenses: Array,
     groups: Array,
+    contacts: Array,
 });
+
+const deletingContactId = ref(null);
+
+async function deleteContact(contact) {
+    const confirmed = await confirmAction({
+        title: 'Delete Contact',
+        text: `Are you sure you want to remove ${contact.contact_user?.name || 'this contact'} from ${props.user.name}'s contacts?`,
+        confirmText: 'Delete',
+        danger: true,
+    });
+    if (confirmed) {
+        deletingContactId.value = contact.id;
+        router.delete(route('admin.users.contacts.delete', [props.user.id, contact.id]), {
+            preserveScroll: true,
+            onFinish: () => {
+                deletingContactId.value = null;
+            },
+        });
+    }
+}
 
 function formatDate(dateStr) {
     if (!dateStr) return '-';
@@ -199,6 +222,66 @@ function formatCurrency(amount) {
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
                                         {{ group.members_count ?? 0 }}
                                     </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Contacts -->
+            <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Contacts</h3>
+                </div>
+
+                <div v-if="!contacts || contacts.length === 0" class="px-6 py-8 text-center">
+                    <p class="text-gray-500 dark:text-gray-400">No contacts added yet</p>
+                </div>
+
+                <div v-else class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Phone</th>
+                                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                            <tr v-for="contact in contacts" :key="contact.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img
+                                            v-if="contact.contact_user?.avatar"
+                                            :src="`/storage/${contact.contact_user.avatar}`"
+                                            :alt="contact.contact_user?.name"
+                                            class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                        />
+                                        <div v-else class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                                            {{ contact.contact_user?.name?.charAt(0)?.toUpperCase() || '?' }}
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ contact.contact_user?.name || 'Unknown' }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 hidden sm:table-cell">
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ contact.contact_user?.email || '-' }}</span>
+                                </td>
+                                <td class="px-6 py-4 hidden md:table-cell">
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ contact.contact_user?.phone || '-' }}</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button
+                                        @click="deleteContact(contact)"
+                                        :disabled="deletingContactId === contact.id"
+                                        class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
+                                    >
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        {{ deletingContactId === contact.id ? 'Deleting...' : 'Delete' }}
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>

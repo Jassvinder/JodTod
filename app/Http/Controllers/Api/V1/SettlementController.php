@@ -1,26 +1,27 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Expense;
 use App\Models\ExpenseSplit;
 use App\Models\Group;
 use App\Models\Settlement;
-use App\Models\Category;
 use App\Models\User;
 use App\Notifications\SettlementCompleted;
 use App\Notifications\SettlementRequested;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
 
 class SettlementController extends Controller
 {
     /**
-     * Settlement summary + history for a group.
+     * Return balances, suggested transactions, and settlement history.
      */
-    public function index(Request $request, Group $group)
+    public function index(Request $request, Group $group): JsonResponse
     {
         $this->ensureMember($group);
 
@@ -48,58 +49,60 @@ class SettlementController extends Controller
             ];
         }, $transactions);
 
-        // Calculate each member's total share from unsettled expenses
-        $memberShares = $this->calculateMemberShares($group);
-
-        // Settlement history
+        // Settlement history (paginated)
         $settlements = Settlement::where('group_id', $group->id)
             ->with(['fromUser:id,name,avatar', 'toUser:id,name,avatar'])
             ->orderBy('created_at', 'desc')
-            ->paginate(20)
-            ->withQueryString();
+            ->paginate(20);
 
-        return Inertia::render('Groups/Settlements/Index', [
-            'group' => $group->load('members'),
+        return $this->success([
             'balances' => $balances,
             'suggestedTransactions' => $suggestedTransactions,
-            'settlements' => $settlements,
-            'memberShares' => $memberShares,
+            'settlements' => [
+                'data' => $settlements->items(),
+                'meta' => [
+                    'current_page' => $settlements->currentPage(),
+                    'last_page' => $settlements->lastPage(),
+                    'per_page' => $settlements->perPage(),
+                    'total' => $settlements->total(),
+                ],
+            ],
         ]);
     }
 
     /**
-     * Create settlement records from optimized transactions.
+     * Create settlement records from optimized transactions. Admin only.
      */
-    public function settle(Request $request, Group $group)
+    public function settle(Request $request, Group $group): JsonResponse
     {
         $this->ensureMember($group);
 
-        // Only group admin can initiate settle up
         if (!$group->isAdmin(Auth::user())) {
-            abort(403, 'Only group admin can initiate settlements.');
+            return $this->forbidden('Only group admin can initiate settlements.');
         }
 
-        $result = DB::transaction(function () use ($group) {
-            // Lock check: prevent duplicate pending settlements (race condition safe)
-            $pendingCount = Settlement::where('group_id', $group->id)
-                ->where('status', 'pending')
-                ->lockForUpdate()
-                ->count();
+        // Block if pending settlements already exist
+        $pendingCount = Settlement::where('group_id', $group->id)
+            ->where('status', 'pending')
+            ->count();
 
-            if ($pendingCount > 0) {
-                return 'pending_exists';
-            }
+        if ($pendingCount > 0) {
+            return $this->error('Pending settlements already exist. Complete or settle them first before creating new ones.', 422);
+        }
 
-            $transactions = $this->calculateOptimizedTransactions($group);
+        $transactions = $this->calculateOptimizedTransactions($group);
 
-            if (empty($transactions)) {
-                return 'no_expenses';
-            }
+        if (empty($transactions)) {
+            return $this->error('No unsettled expenses found.', 422);
+        }
 
-            $members = $group->members()->get()->keyBy('id');
+        $members = $group->members()->get()->keyBy('id');
+
+        $settlements = DB::transaction(function () use ($transactions, $group, $members) {
+            $created = [];
 
             foreach ($transactions as $transaction) {
-                Settlement::create([
+                $settlement = Settlement::create([
                     'group_id' => $group->id,
                     'from_user' => $transaction['from'],
                     'to_user' => $transaction['to'],
@@ -107,6 +110,9 @@ class SettlementController extends Controller
                     'status' => 'pending',
                 ]);
 
+                $created[] = $settlement;
+
+                // Notify the debtor about the settlement request
                 $fromUser = $members->get($transaction['from']);
                 $toUser = $members->get($transaction['to']);
                 if ($fromUser && $toUser) {
@@ -114,31 +120,28 @@ class SettlementController extends Controller
                 }
             }
 
-            return 'success';
+            return $created;
         });
 
-        if ($result === 'pending_exists') {
-            return redirect()->back()->with('info', 'Pending settlements already exist. Complete or settle them first before creating new ones.');
+        // Load relationships for response
+        foreach ($settlements as $settlement) {
+            $settlement->load(['fromUser:id,name,avatar', 'toUser:id,name,avatar']);
         }
 
-        if ($result === 'no_expenses') {
-            return redirect()->back()->with('info', 'No unsettled expenses found.');
-        }
-
-        return redirect()->route('groups.settlements.index', $group)
-            ->with('success', 'Settlement created successfully. Pending confirmation from members.');
+        return $this->created($settlements, 'Settlement created successfully. Pending confirmation from members.');
     }
 
     /**
      * Mark an individual settlement as completed.
+     * From_user, to_user, or admin can do this.
      */
-    public function markCompleted(Request $request, Group $group, Settlement $settlement)
+    public function markCompleted(Request $request, Group $group, Settlement $settlement): JsonResponse
     {
         $this->ensureMember($group);
 
         // Verify settlement belongs to this group
         if ($settlement->group_id !== $group->id) {
-            abort(404);
+            return $this->notFound('Settlement not found in this group.');
         }
 
         // Verify user is either from_user, to_user, or group admin
@@ -148,7 +151,7 @@ class SettlementController extends Controller
             $settlement->to_user !== $user->id &&
             !$group->isAdmin($user)
         ) {
-            abort(403, 'You are not authorized to mark this settlement as completed.');
+            return $this->forbidden('You are not authorized to mark this settlement as completed.');
         }
 
         DB::transaction(function () use ($settlement, $group) {
@@ -177,24 +180,30 @@ class SettlementController extends Controller
             $toUser->notify(new SettlementCompleted($group, (float) $settlement->amount, $fromUser->name));
         }
 
-        return redirect()->back()->with('success', 'Settlement marked as completed.');
+        $settlement->load(['fromUser:id,name,avatar', 'toUser:id,name,avatar']);
+
+        return $this->success($settlement, 'Settlement marked as completed.');
     }
 
     /**
-     * Mark ALL pending settlements as completed (admin only).
+     * Mark ALL pending settlements as completed. Admin only.
      */
-    public function settleAll(Request $request, Group $group)
+    public function settleAll(Request $request, Group $group): JsonResponse
     {
         $this->ensureMember($group);
 
         if (!$group->isAdmin(Auth::user())) {
-            abort(403, 'Only group admin can settle all at once.');
+            return $this->forbidden('Only group admin can settle all at once.');
         }
 
-        DB::transaction(function () use ($group) {
+        $completedSettlements = DB::transaction(function () use ($group) {
             $pendingSettlements = Settlement::where('group_id', $group->id)
                 ->where('status', 'pending')
                 ->get();
+
+            if ($pendingSettlements->isEmpty()) {
+                return null;
+            }
 
             foreach ($pendingSettlements as $settlement) {
                 $settlement->update([
@@ -205,9 +214,15 @@ class SettlementController extends Controller
             }
 
             $this->markExpensesAsSettled($group);
+
+            return $pendingSettlements;
         });
 
-        return redirect()->back()->with('success', 'All settlements marked as completed.');
+        if ($completedSettlements === null) {
+            return $this->error('No pending settlements found.', 422);
+        }
+
+        return $this->success(null, 'All settlements marked as completed.');
     }
 
     /**
@@ -270,45 +285,6 @@ class SettlementController extends Controller
         }
 
         return $balances;
-    }
-
-    /**
-     * Calculate each member's total share from unsettled expenses.
-     */
-    private function calculateMemberShares(Group $group): array
-    {
-        $members = $group->members()->get();
-
-        $unsettledExpenseIds = $group->expenses()
-            ->where('is_settled', false)
-            ->whereNull('deleted_at')
-            ->pluck('id');
-
-        $totalExpenseAmount = $group->expenses()
-            ->where('is_settled', false)
-            ->whereNull('deleted_at')
-            ->sum('amount');
-
-        $shares = [];
-
-        foreach ($members as $member) {
-            $totalShare = ExpenseSplit::whereIn('expense_id', $unsettledExpenseIds)
-                ->where('user_id', $member->id)
-                ->where('is_settled', false)
-                ->sum('share_amount');
-
-            $shares[] = [
-                'user_id' => $member->id,
-                'name' => $member->name,
-                'avatar' => $member->avatar,
-                'total_share' => round((float) $totalShare, 2),
-            ];
-        }
-
-        return [
-            'total_expense' => round((float) $totalExpenseAmount, 2),
-            'members' => $shares,
-        ];
     }
 
     /**
@@ -413,7 +389,10 @@ class SettlementController extends Controller
     private function ensureMember(Group $group): void
     {
         if (!$group->isMember(Auth::user())) {
-            abort(403, 'You are not a member of this group.');
+            abort(response()->json([
+                'success' => false,
+                'message' => 'You are not a member of this group.',
+            ], 403));
         }
     }
 }

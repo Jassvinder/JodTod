@@ -169,30 +169,37 @@ class DashboardController extends Controller
     private function getGroupsSummary(User $user): array
     {
         $groups = $user->groups()->withCount('members')->get();
+        $groupIds = $groups->pluck('id');
+
+        // Bulk fetch: total paid by user per group (unsettled)
+        $paidPerGroup = Expense::whereIn('group_id', $groupIds)
+            ->where('paid_by', $user->id)
+            ->where('is_settled', false)
+            ->whereNull('deleted_at')
+            ->groupBy('group_id')
+            ->selectRaw('group_id, SUM(amount) as total_paid')
+            ->pluck('total_paid', 'group_id');
+
+        // Bulk fetch: total share user owes per group (unsettled)
+        $sharePerGroup = DB::table('expense_splits')
+            ->join('expenses', 'expenses.id', '=', 'expense_splits.expense_id')
+            ->whereIn('expenses.group_id', $groupIds)
+            ->where('expense_splits.user_id', $user->id)
+            ->where('expenses.is_settled', false)
+            ->whereNull('expenses.deleted_at')
+            ->where('expense_splits.is_settled', false)
+            ->groupBy('expenses.group_id')
+            ->selectRaw('expenses.group_id, SUM(expense_splits.share_amount) as total_share')
+            ->pluck('total_share', 'expenses.group_id');
 
         $groupBalances = [];
         $totalYouOwe = 0;
         $totalOwedToYou = 0;
 
         foreach ($groups as $group) {
-            // Get unsettled expense IDs for this group
-            $unsettledExpenseIds = $group->expenses()
-                ->where('is_settled', false)
-                ->pluck('id');
-
-            // Total paid by user for unsettled expenses in this group
-            $totalPaid = $group->expenses()
-                ->where('paid_by', $user->id)
-                ->where('is_settled', false)
-                ->sum('amount');
-
-            // Total share user owes across unsettled expenses in this group
-            $totalShare = ExpenseSplit::whereIn('expense_id', $unsettledExpenseIds)
-                ->where('user_id', $user->id)
-                ->where('is_settled', false)
-                ->sum('share_amount');
-
-            $balance = round((float) $totalPaid - (float) $totalShare, 2);
+            $paid = (float) ($paidPerGroup[$group->id] ?? 0);
+            $share = (float) ($sharePerGroup[$group->id] ?? 0);
+            $balance = round($paid - $share, 2);
 
             if ($balance < 0) {
                 $totalYouOwe += abs($balance);

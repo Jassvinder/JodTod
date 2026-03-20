@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Group extends Model
@@ -13,9 +14,21 @@ class Group extends Model
     protected $fillable = [
         'name',
         'description',
+        'photo',
         'invite_code',
         'created_by',
     ];
+
+    protected $appends = ['photo_url'];
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if (!$this->photo) {
+            return null;
+        }
+
+        return url('/storage/' . $this->photo);
+    }
 
     protected static function booted(): void
     {
@@ -43,15 +56,25 @@ class Group extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'group_members')
-            ->withPivot('role', 'is_active', 'joined_at')
+            ->withPivot('role', 'is_active', 'is_approved', 'joined_at')
+            ->wherePivot('is_approved', true)
+            ->orderByPivot('joined_at');
+    }
+
+    public function pendingMembers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'group_members')
+            ->withPivot('role', 'is_active', 'is_approved', 'joined_at')
+            ->wherePivot('is_approved', false)
             ->orderByPivot('joined_at');
     }
 
     public function activeMembers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'group_members')
-            ->withPivot('role', 'is_active', 'joined_at')
+            ->withPivot('role', 'is_active', 'is_approved', 'joined_at')
             ->wherePivot('is_active', true)
+            ->wherePivot('is_approved', true)
             ->orderByPivot('joined_at');
     }
 

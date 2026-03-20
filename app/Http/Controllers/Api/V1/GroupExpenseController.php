@@ -1,30 +1,29 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
-use App\Models\Category;
+use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Models\ExpenseSplit;
 use App\Models\Group;
 use App\Notifications\GroupExpenseAdded;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 
 class GroupExpenseController extends Controller
 {
     /**
-     * List group expenses with filters and member balances.
+     * List group expenses paginated with filters.
      */
-    public function index(Request $request, Group $group)
+    public function index(Request $request, Group $group): JsonResponse
     {
         $this->ensureMember($group);
 
         $query = $group->expenses()
-            ->with(['category', 'payer', 'splits.user'])
+            ->with(['category', 'payer'])
             ->whereNull('deleted_at');
 
         // Filter by category
@@ -45,46 +44,17 @@ class GroupExpenseController extends Controller
             $query->where('description', 'like', '%' . $request->search . '%');
         }
 
-        $expenses = $query->orderBy('expense_date', 'desc')
+        $paginator = $query->orderBy('expense_date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->paginate(20)
-            ->withQueryString();
+            ->paginate(20);
 
-        // Calculate member balances
-        $balances = $this->calculateBalances($group);
-
-        return Inertia::render('Groups/Expenses/Index', [
-            'group' => $group->load('members'),
-            'expenses' => $expenses,
-            'balances' => $balances,
-            'categories' => Category::orderBy('name')->get(),
-            'filters' => $request->only(['category', 'date_from', 'date_to', 'search']),
-        ]);
+        return $this->paginated($paginator);
     }
 
     /**
-     * Show form to create a new group expense.
+     * Create a group expense with splits.
      */
-    public function create(Request $request, Group $group)
-    {
-        $this->ensureMember($group);
-
-        $group->load(['activeMembers' => function ($query) {
-            $query->select('users.id', 'users.name', 'users.avatar', 'users.phone');
-        }]);
-        // Map activeMembers to members key so Vue components work without changes
-        $group->setRelation('members', $group->activeMembers);
-
-        return Inertia::render('Groups/Expenses/Create', [
-            'group' => $group,
-            'categories' => Category::orderBy('name')->get(),
-        ]);
-    }
-
-    /**
-     * Store a new group expense with splits.
-     */
-    public function store(Request $request, Group $group)
+    public function store(Request $request, Group $group): JsonResponse
     {
         $this->ensureMember($group);
 
@@ -111,7 +81,7 @@ class GroupExpenseController extends Controller
         $imagePaths = [];
         foreach (['image_1', 'image_2'] as $field) {
             if ($request->hasFile($field)) {
-                $imagePaths[$field] = $this->storeImageAsWebp($request->file($field));
+                $imagePaths[$field] = $request->file($field)->store('expenses', 'public');
             }
         }
 
@@ -142,35 +112,28 @@ class GroupExpenseController extends Controller
         $membersToNotify = $group->members()->where('users.id', '!=', $payer->id)->get();
         Notification::send($membersToNotify, new GroupExpenseAdded($group, $expense, $payer->name));
 
-        return redirect()->route('groups.expenses.index', $group)
-            ->with('success', 'Expense added successfully.');
+        $expense->load(['category', 'payer', 'splits.user']);
+
+        return $this->created($expense, 'Expense added successfully.');
     }
 
     /**
-     * Show form to edit a group expense.
+     * Single expense with splits loaded.
      */
-    public function edit(Request $request, Group $group, Expense $expense)
+    public function show(Group $group, Expense $expense): JsonResponse
     {
         $this->ensureMember($group);
         $this->ensureExpenseBelongsToGroup($expense, $group);
-        $this->ensureCanModify($group, $expense);
 
-        $group->load(['activeMembers' => function ($query) {
-            $query->select('users.id', 'users.name', 'users.avatar', 'users.phone');
-        }]);
-        $group->setRelation('members', $group->activeMembers);
+        $expense->load(['category', 'payer', 'splits.user']);
 
-        return Inertia::render('Groups/Expenses/Edit', [
-            'group' => $group,
-            'expense' => $expense->load('splits'),
-            'categories' => Category::orderBy('name')->get(),
-        ]);
+        return $this->success($expense);
     }
 
     /**
-     * Update a group expense and its splits.
+     * Update expense and recalculate splits. Creator or admin only.
      */
-    public function update(Request $request, Group $group, Expense $expense)
+    public function update(Request $request, Group $group, Expense $expense): JsonResponse
     {
         $this->ensureMember($group);
         $this->ensureExpenseBelongsToGroup($expense, $group);
@@ -202,13 +165,13 @@ class GroupExpenseController extends Controller
         foreach (['image_1', 'image_2'] as $field) {
             $removeKey = "remove_{$field}";
             if ($request->boolean($removeKey) && $expense->{$field}) {
-                Storage::disk('public')->delete($expense->{$field});
+                \Storage::disk('public')->delete($expense->{$field});
                 $imageUpdates[$field] = null;
             } elseif ($request->hasFile($field)) {
                 if ($expense->{$field}) {
-                    Storage::disk('public')->delete($expense->{$field});
+                    \Storage::disk('public')->delete($expense->{$field});
                 }
-                $imageUpdates[$field] = $this->storeImageAsWebp($request->file($field));
+                $imageUpdates[$field] = $request->file($field)->store('expenses', 'public');
             }
         }
 
@@ -233,14 +196,15 @@ class GroupExpenseController extends Controller
             }
         });
 
-        return redirect()->route('groups.expenses.index', $group)
-            ->with('success', 'Expense updated successfully.');
+        $expense->load(['category', 'payer', 'splits.user']);
+
+        return $this->success($expense, 'Expense updated successfully.');
     }
 
     /**
-     * Soft delete a group expense.
+     * Soft delete a group expense. Creator or admin only.
      */
-    public function destroy(Request $request, Group $group, Expense $expense)
+    public function destroy(Group $group, Expense $expense): JsonResponse
     {
         $this->ensureMember($group);
         $this->ensureExpenseBelongsToGroup($expense, $group);
@@ -248,20 +212,17 @@ class GroupExpenseController extends Controller
 
         $expense->delete(); // soft delete
 
-        return redirect()->route('groups.expenses.index', $group)
-            ->with('success', 'Expense deleted successfully.');
+        return $this->success(null, 'Expense deleted successfully.');
     }
 
     /**
-     * Get member balances for the group (JSON response).
+     * Return member-wise balances for the group.
      */
-    public function balances(Request $request, Group $group)
+    public function balances(Group $group): JsonResponse
     {
         $this->ensureMember($group);
 
-        return response()->json([
-            'balances' => $this->calculateBalances($group),
-        ]);
+        return $this->success($this->calculateBalances($group));
     }
 
     /**
@@ -274,21 +235,20 @@ class GroupExpenseController extends Controller
     {
         $members = $group->members()->get();
 
-        // Get unsettled expense IDs for this group
         $unsettledExpenseIds = $group->expenses()
             ->where('is_settled', false)
+            ->whereNull('deleted_at')
             ->pluck('id');
 
         $balances = [];
 
         foreach ($members as $member) {
-            // Total amount paid by this member for unsettled group expenses
             $totalPaid = $group->expenses()
                 ->where('paid_by', $member->id)
                 ->where('is_settled', false)
+                ->whereNull('deleted_at')
                 ->sum('amount');
 
-            // Total share this member owes across unsettled expenses
             $totalShare = ExpenseSplit::whereIn('expense_id', $unsettledExpenseIds)
                 ->where('user_id', $member->id)
                 ->where('is_settled', false)
@@ -321,14 +281,20 @@ class GroupExpenseController extends Controller
         // Validate split amounts sum to total (within 0.01 tolerance for rounding)
         $splitSum = array_sum(array_column($splits, 'share_amount'));
         if (abs($splitSum - $amount) > 0.01) {
-            abort(422, 'Split amounts must equal the total expense amount.');
+            abort(response()->json([
+                'success' => false,
+                'message' => 'Split amounts must equal the total expense amount.',
+            ], 422));
         }
 
         // For percentage split, validate percentages sum to 100
         if ($splitType === 'percentage') {
             $percentageSum = array_sum(array_column($splits, 'percentage'));
             if (abs($percentageSum - 100) > 0.01) {
-                abort(422, 'Split percentages must equal 100.');
+                abort(response()->json([
+                    'success' => false,
+                    'message' => 'Split percentages must equal 100.',
+                ], 422));
             }
         }
     }
@@ -345,7 +311,7 @@ class GroupExpenseController extends Controller
 
         if ($splitType === 'equal') {
             $count = count($splits);
-            $perPerson = floor($amount * 100 / $count) / 100; // floor to avoid over-splitting
+            $perPerson = floor($amount * 100 / $count) / 100;
             $remainder = round($amount - ($perPerson * $count), 2);
 
             return array_map(function ($split, $index) use ($perPerson, $remainder) {
@@ -371,34 +337,15 @@ class GroupExpenseController extends Controller
     }
 
     /**
-     * Convert uploaded image to webp and store it.
-     */
-    private function storeImageAsWebp($file): string
-    {
-        $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
-        if ($image === false) {
-            // Fallback: store as-is if conversion fails
-            return $file->store('expenses', 'public');
-        }
-
-        $filename = 'expenses/' . uniqid() . '.webp';
-        ob_start();
-        imagewebp($image, null, 80);
-        $webpData = ob_get_clean();
-        imagedestroy($image);
-
-        Storage::disk('public')->put($filename, $webpData);
-
-        return $filename;
-    }
-
-    /**
      * Ensure the authenticated user is a member of the group.
      */
     private function ensureMember(Group $group): void
     {
         if (!$group->isMember(Auth::user())) {
-            abort(403, 'You are not a member of this group.');
+            abort(response()->json([
+                'success' => false,
+                'message' => 'You are not a member of this group.',
+            ], 403));
         }
     }
 
@@ -408,7 +355,10 @@ class GroupExpenseController extends Controller
     private function ensureExpenseBelongsToGroup(Expense $expense, Group $group): void
     {
         if ($expense->group_id !== $group->id) {
-            abort(404);
+            abort(response()->json([
+                'success' => false,
+                'message' => 'Expense not found in this group.',
+            ], 404));
         }
     }
 
@@ -420,7 +370,10 @@ class GroupExpenseController extends Controller
         $user = Auth::user();
 
         if ($expense->user_id !== $user->id && !$group->isAdmin($user)) {
-            abort(403, 'Only the expense creator or group admin can modify this expense.');
+            abort(response()->json([
+                'success' => false,
+                'message' => 'Only the expense creator or group admin can modify this expense.',
+            ], 403));
         }
     }
 }

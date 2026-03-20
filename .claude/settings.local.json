@@ -46,7 +46,21 @@
       "Bash(tasklist)",
       "Bash(grep -E \"\\\\.php$\")",
       "Bash(find /d/phpserver/www/JodTod/app/Http/Controllers/Api -type f -name *.php)",
-      "Bash(grep -l \"Group\\\\|Income\\\\|Todo\\\\|Settlement\\\\|Expense\\\\|Profile\" /d/phpserver/www/JodTod/app/Http/Controllers/*.php)"
+      "Bash(grep -l \"Group\\\\|Income\\\\|Todo\\\\|Settlement\\\\|Expense\\\\|Profile\" /d/phpserver/www/JodTod/app/Http/Controllers/*.php)",
+      "Bash(grep -r \"from ''''expo-\" \"D:/JodTodApp/app/\" --include=\"*.tsx\" -oh)",
+      "Bash(netsh advfirewall:*)",
+      "Bash(php:*)",
+      "Bash(ls -la \"D:\\\\JodTodApp\\\\app\\\\\\(tabs\\)\")",
+      "Bash(ls -la \"D:\\\\JodTodApp\\\\app\\\\\\(tabs\\)\\\\expenses\")",
+      "Bash(ls -la \"D:\\\\JodTodApp\\\\app\\\\\\(tabs\\)\\\\groups\")",
+      "Bash(ls -la \"D:\\\\JodTodApp\\\\app\\\\\\(tabs\\)\\\\incomes\")",
+      "Bash(ls -la \"D:\\\\JodTodApp\\\\app\\\\\\(tabs\\)\\\\profile\")",
+      "Bash(find D:/JodTodApp/app -path */node_modules -prune -o -type f -name *notification* -o -name *Notification* -print)",
+      "Bash(grep -r \"notifications.tsx\\\\|notifications screen\" D:/JodTodApp --include=*.tsx --include=*.ts)",
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "Bash(grep -r \"notification.*router\\\\|router.*notification\\\\|group_id\\\\|todo_id\" D:/JodTodApp --include=*.tsx --include=*.ts)",
+      "Bash(grep -r \"getNotificationLink\\\\|notificationLink\" D:/JodTodApp --include=*.tsx --include=*.ts)",
+      "Bash(grep -r \"index\\\\|foreign\\\\|primary\" /d/phpserver/www/JodTod/database/migrations/*.php)"
     ]
   }
 }

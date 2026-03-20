@@ -52,10 +52,10 @@ function getImageSrc(slot) {
 <template>
     <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Images <span class="text-gray-400 dark:text-gray-500">(optional, max 2)</span>
+            Image <span class="text-gray-400 dark:text-gray-500">(optional)</span>
         </label>
         <div class="flex gap-3">
-            <template v-for="slot in [1, 2]" :key="slot">
+            <template v-for="slot in [1]" :key="slot">
                 <div class="relative">
                     <div v-if="getImageSrc(slot)" class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 relative group">
                         <img :src="getImageSrc(slot)" class="w-full h-full object-cover" />
@@ -80,6 +80,5 @@ function getImageSrc(slot) {
             </template>
         </div>
         <p v-if="form.errors.image_1" class="mt-1 text-sm text-accent-600">{{ form.errors.image_1 }}</p>
-        <p v-if="form.errors.image_2" class="mt-1 text-sm text-accent-600">{{ form.errors.image_2 }}</p>
     </div>
 </template>

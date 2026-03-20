@@ -14,6 +14,7 @@ const props = defineProps({
     totalExpensesAmount: { type: Number, default: 0 },
     contacts: { type: Array, default: () => [] },
     membersWithUnsettled: { type: Array, default: () => [] },
+    pendingMembers: { type: Array, default: () => [] },
 });
 
 const hasUnsettledExpenses = (memberId) => props.membersWithUnsettled.includes(memberId);
@@ -77,6 +78,26 @@ const reactivateMember = async (member) => {
     }
 };
 
+const approveMember = (member) => {
+    router.post(route('groups.members.approve', [props.group.id, member.id]), {}, {
+        preserveScroll: true,
+    });
+};
+
+const rejectMember = async (member) => {
+    const confirmed = await confirmAction({
+        title: 'Reject Join Request',
+        text: `Are you sure you want to reject ${member.name}'s request to join this group?`,
+        confirmText: 'Reject',
+        danger: true,
+    });
+    if (confirmed) {
+        router.delete(route('groups.members.reject', [props.group.id, member.id]), {
+            preserveScroll: true,
+        });
+    }
+};
+
 const addMember = (user) => {
     router.post(route('groups.add-member', props.group.id), {
         user_id: user.id,
@@ -106,6 +127,15 @@ const getUserInitials = (name) => {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
                     </Link>
+                    <img
+                        v-if="group.photo_url"
+                        :src="group.photo_url"
+                        :alt="group.name"
+                        class="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div v-else class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold text-lg">
+                        {{ group.name.charAt(0).toUpperCase() }}
+                    </div>
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ group.name }}</h1>
                         <p v-if="group.description" class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ group.description }}</p>
@@ -134,6 +164,52 @@ const getUserInitials = (name) => {
                         Edit
                     </Link>
                 </div>
+            </div>
+
+            <!-- Pending Join Requests -->
+            <div v-if="isAdmin && pendingMembers.length > 0" class="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 mb-6">
+                <div class="px-5 py-4 border-b border-amber-200 dark:border-amber-800">
+                    <h2 class="text-base font-semibold text-amber-800 dark:text-amber-200">
+                        Pending Requests ({{ pendingMembers.length }})
+                    </h2>
+                </div>
+                <ul class="divide-y divide-amber-100 dark:divide-amber-800">
+                    <li
+                        v-for="member in pendingMembers"
+                        :key="member.id"
+                        class="flex items-center justify-between px-5 py-3"
+                    >
+                        <div class="flex items-center gap-3">
+                            <img
+                                v-if="member.avatar"
+                                :src="`/storage/${member.avatar}`"
+                                :alt="member.name"
+                                class="w-9 h-9 rounded-full object-cover"
+                            />
+                            <div v-else class="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-800 flex items-center justify-center text-amber-700 dark:text-amber-300 font-semibold text-sm">
+                                {{ getUserInitials(member.name) }}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ member.name }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ member.email }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                @click="approveMember(member)"
+                                class="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                                Approve
+                            </button>
+                            <button
+                                @click="rejectMember(member)"
+                                class="px-3 py-1.5 text-xs font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                            >
+                                Reject
+                            </button>
+                        </div>
+                    </li>
+                </ul>
             </div>
 
             <!-- Members -->

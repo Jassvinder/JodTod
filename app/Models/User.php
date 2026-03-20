@@ -38,6 +38,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'google_id',
     ];
 
+    protected $appends = ['avatar_url'];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (!$this->avatar) return null;
+        return url('/storage/' . $this->avatar);
+    }
+
     public function expenses(): HasMany
     {
         return $this->hasMany(Expense::class);

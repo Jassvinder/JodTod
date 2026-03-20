@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
-use App\Models\Category;
+use App\Http\Controllers\Controller;
 use App\Models\Expense;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 
 class ExpenseController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $query = Expense::personal()
             ->forUser(Auth::id())
@@ -48,7 +48,7 @@ class ExpenseController extends Controller
             $query->orderBy($sortField, $sortDir === 'asc' ? 'asc' : 'desc');
         }
 
-        $expenses = $query->paginate(20)->withQueryString();
+        $paginator = $query->paginate(20);
 
         // Summary data
         $userId = Auth::id();
@@ -58,6 +58,14 @@ class ExpenseController extends Controller
         $monthlyTotal = Expense::personal()
             ->forUser($userId)
             ->whereBetween('expense_date', [$monthStart, $monthEnd])
+            ->sum('amount');
+
+        $lastMonthTotal = Expense::personal()
+            ->forUser($userId)
+            ->whereBetween('expense_date', [
+                now()->subMonth()->startOfMonth(),
+                now()->subMonth()->endOfMonth(),
+            ])
             ->sum('amount');
 
         $categoryBreakdown = Expense::personal()
@@ -73,47 +81,25 @@ class ExpenseController extends Controller
                 'total' => (float) $item->total,
             ]);
 
-        $lastMonthTotal = Expense::personal()
-            ->forUser($userId)
-            ->whereBetween('expense_date', [
-                now()->subMonth()->startOfMonth(),
-                now()->subMonth()->endOfMonth(),
-            ])
-            ->sum('amount');
-
-        $dailyTrend = Expense::personal()
-            ->forUser($userId)
-            ->whereBetween('expense_date', [$monthStart, $monthEnd])
-            ->selectRaw('expense_date as date, SUM(amount) as total')
-            ->groupBy('expense_date')
-            ->orderBy('expense_date')
-            ->get()
-            ->map(fn ($item) => [
-                'date' => \Carbon\Carbon::parse($item->date)->toDateString(),
-                'total' => (float) $item->total,
-            ]);
-
-        return Inertia::render('Expenses/Index', [
-            'expenses' => $expenses,
-            'categories' => Category::orderBy('name')->get(),
+        return response()->json([
+            'success' => true,
+            'message' => 'Success',
+            'data' => $paginator->items(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
             'summary' => [
                 'monthly_total' => (float) $monthlyTotal,
                 'last_month_total' => (float) $lastMonthTotal,
                 'category_breakdown' => $categoryBreakdown,
-                'daily_trend' => $dailyTrend,
             ],
-            'filters' => $request->only(['category', 'date_from', 'date_to', 'period', 'search', 'sort', 'direction']),
-        ]);
+        ], 200);
     }
 
-    public function create()
-    {
-        return Inertia::render('Expenses/Create', [
-            'categories' => Category::orderBy('name')->get(),
-        ]);
-    }
-
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0.01|max:99999999.99',
@@ -130,27 +116,26 @@ class ExpenseController extends Controller
 
         foreach (['image_1', 'image_2'] as $field) {
             if ($request->hasFile($field)) {
-                $data[$field] = $this->storeImageAsWebp($request->file($field));
+                $data[$field] = $request->file($field)->store('expenses', 'public');
             }
         }
 
-        Expense::create($data);
+        $expense = Expense::create($data);
+        $expense->load('category');
 
-        return redirect()->route('expenses.index')
-            ->with('success', 'Expense added successfully.');
+        return $this->created($expense, 'Expense added successfully.');
     }
 
-    public function edit(Expense $expense)
+    public function show(Expense $expense): JsonResponse
     {
         $this->authorizeExpense($expense);
 
-        return Inertia::render('Expenses/Edit', [
-            'expense' => $expense,
-            'categories' => Category::orderBy('name')->get(),
-        ]);
+        $expense->load('category');
+
+        return $this->success($expense);
     }
 
-    public function update(Request $request, Expense $expense)
+    public function update(Request $request, Expense $expense): JsonResponse
     {
         $this->authorizeExpense($expense);
 
@@ -176,27 +161,26 @@ class ExpenseController extends Controller
                 if ($expense->{$field}) {
                     Storage::disk('public')->delete($expense->{$field});
                 }
-                $data[$field] = $this->storeImageAsWebp($request->file($field));
+                $data[$field] = $request->file($field)->store('expenses', 'public');
             }
         }
 
         $expense->update($data);
+        $expense->load('category');
 
-        return redirect()->route('expenses.index')
-            ->with('success', 'Expense updated successfully.');
+        return $this->success($expense, 'Expense updated successfully.');
     }
 
-    public function destroy(Expense $expense)
+    public function destroy(Expense $expense): JsonResponse
     {
         $this->authorizeExpense($expense);
 
-        $expense->delete(); // soft delete
+        $expense->delete();
 
-        return redirect()->route('expenses.index')
-            ->with('success', 'Expense deleted successfully.');
+        return $this->success(null, 'Expense deleted successfully.');
     }
 
-    public function suggestions(Request $request)
+    public function suggestions(Request $request): JsonResponse
     {
         $query = $request->input('q', '');
 
@@ -210,36 +194,17 @@ class ExpenseController extends Controller
             ->limit(10)
             ->pluck('description');
 
-        return response()->json($suggestions);
+        return $this->success($suggestions);
     }
 
     private function authorizeExpense(Expense $expense): void
     {
         if ($expense->user_id !== Auth::id() || $expense->group_id !== null) {
-            abort(403);
+            abort(response()->json([
+                'success' => false,
+                'message' => 'Forbidden',
+            ], 403));
         }
-    }
-
-    /**
-     * Convert uploaded image to webp and store it.
-     */
-    private function storeImageAsWebp($file): string
-    {
-        $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
-        if ($image === false) {
-            // Fallback: store as-is if conversion fails
-            return $file->store('expenses', 'public');
-        }
-
-        $filename = 'expenses/' . uniqid() . '.webp';
-        ob_start();
-        imagewebp($image, null, 80);
-        $webpData = ob_get_clean();
-        imagedestroy($image);
-
-        Storage::disk('public')->put($filename, $webpData);
-
-        return $filename;
     }
 
     private function applyPeriodFilter($query, string $period)

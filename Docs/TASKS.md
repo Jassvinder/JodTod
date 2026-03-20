@@ -3,13 +3,7 @@
 
 **Admin** Section tasks. starts from 500 =======================================
 
-- [ ] **Task 500**
-A. Users listing me roles dropdown me admin nahi hona chahiye. admin bas ek he rahega. or main to kehta hoon ke abhi ke liye is option ko hide he kardo isme se admin remove karke. 
-B. iski jagah user status dikha do wo ban hai ya unban or usi par click karke change karne ka option bhi movie kardo jo actions me diya hua hai. C. delete button par hand show hona chahiyie hover karne par. or ek jaroori baat bhai admin ko sabhi rights hone chahiye to wo user ko complete edit/update kar sake. 
-D. User listing me View to aayega he to usme user ke contacts ki listing bhi honi chahiye, or usme contact add/delete karne ka option bhi hona chahiye. 
 
-- [ ] **Task 503**
-expense me abhi ke liye 2 images upload ka option hai to waha se ek hide kardo ek he rehna chahiye bas. or pure project me jaha bhi image upload ho rahi hai wo webp me convert ho rahi hai na. ye maine shyad pehle bhi bola tha. ye must hai karna padega.
 
 ## PENDING
 
@@ -27,6 +21,9 @@ expense me abhi ke liye 2 images upload ka option hai to waha se ek hide kardo e
 
 ## COMPLETED
 ## Completed Current Tasks
+- [x] **Task 504** - (A) Group expense image upload already implemented. (B) Member shares section added to settle up page - shows each member's total share from unsettled expenses with avatar, name, amount. Backend: calculateMemberShares() added to SettlementController. (C) Already done in Task 502 - only admin can settle up. (2026-03-19)
+- [x] **Task 503** - (A) Expense image upload reduced to 1 image (hidden image_2 slot). WebP auto-conversion added to ExpenseController and GroupExpenseController via storeImageAsWebp() method. (B) Admin Pages listing: "Edit" text replaced with pencil icon. (2026-03-19)
+- [x] **Task 500** - (A) Role dropdown removed from admin users listing. (B) Status column with clickable Active/Banned badges for ban/unban toggle. (C) Cursor pointer on all action buttons + Edit button with pencil icon added. (D) Admin user detail page: contacts listing with delete option. Edit page: name editable, email/phone disabled (verification required). (2026-03-19)
 - [x] **Task 502** - Settle up fixes: (1) Duplicate prevention - if pending settlements exist, new ones won't be created. Button disabled with warning. (2) Only group admin can initiate settle up (backend + frontend enforced). (3) Confirmation dialog added. (4) Member deactivation system - members with unsettled expenses get deactivated (is_active=false) instead of removed. Deactivated members excluded from new expense splits but remain in settlement calculations. Admin can reactivate. Migration: added `is_active` to group_members. (2026-03-19)
 - [x] **Task 501** - Admin Dashboard: Added phone number column to Recent Users table. Backend query updated to include phone field. Column hidden on mobile for responsiveness. (2026-03-19)
 - [x] **Task 104** - Admin panel group detail page error: `Call to undefined relationship [user] on model [App\Models\User]`. Fixed eager loading `members.user` to `members` since BelongsToMany already returns User objects directly. (2026-03-19)

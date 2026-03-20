@@ -106,6 +106,8 @@ Route::middleware(['auth', 'verified', 'phone.verified'])->group(function () {
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
     Route::delete('/groups/{group}/members/{userId}', [GroupController::class, 'removeMember'])->name('groups.members.remove');
     Route::post('/groups/{group}/members/{userId}/reactivate', [GroupController::class, 'reactivateMember'])->name('groups.members.reactivate');
+    Route::post('/groups/{group}/members/{userId}/approve', [GroupController::class, 'approveMember'])->name('groups.members.approve');
+    Route::delete('/groups/{group}/members/{userId}/reject', [GroupController::class, 'rejectMember'])->name('groups.members.reject');
     Route::get('/groups/{group}/search-users', [GroupController::class, 'searchUsers'])->name('groups.search-users');
     Route::post('/groups/{group}/add-member', [GroupController::class, 'addMember'])->name('groups.add-member');
 
@@ -161,6 +163,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
     Route::put('/users/{user}/ban', [AdminController::class, 'banUser'])->name('admin.users.ban');
     Route::put('/users/{user}/unban', [AdminController::class, 'unbanUser'])->name('admin.users.unban');
+    Route::delete('/users/{user}/contacts/{contact}', [AdminController::class, 'deleteUserContact'])->name('admin.users.contacts.delete');
 
     // Group management (admin view)
     Route::get('/groups', [AdminController::class, 'groups'])->name('admin.groups');

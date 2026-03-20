@@ -32,9 +32,20 @@ defineProps({
                     class="block bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-sm transition-all"
                 >
                     <div class="flex items-center justify-between">
-                        <div class="min-w-0 flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">{{ group.name }}</h3>
-                            <p v-if="group.description" class="mt-1 text-sm text-gray-500 dark:text-gray-400 truncate">{{ group.description }}</p>
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <img
+                                v-if="group.photo_url"
+                                :src="group.photo_url"
+                                :alt="group.name"
+                                class="w-11 h-11 rounded-full object-cover shrink-0"
+                            />
+                            <div v-else class="w-11 h-11 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold text-base shrink-0">
+                                {{ group.name.charAt(0).toUpperCase() }}
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">{{ group.name }}</h3>
+                                <p v-if="group.description" class="text-sm text-gray-500 dark:text-gray-400 truncate">{{ group.description }}</p>
+                            </div>
                         </div>
                         <div class="ml-4 flex items-center gap-3 shrink-0">
                             <span v-if="group.pivot?.role === 'admin'" class="px-2 py-0.5 text-xs font-medium bg-primary-100 text-primary-700 rounded-full">

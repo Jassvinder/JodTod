@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contact;
 use App\Models\Expense;
 use App\Models\Group;
 use App\Models\Setting;
@@ -236,11 +237,31 @@ class AdminController extends Controller
             ->withCount('members')
             ->get();
 
+        $contacts = $user->contacts()
+            ->with('contactUser:id,name,email,phone,avatar')
+            ->get();
+
         return Inertia::render('Admin/Users/Show', [
             'user' => $user,
             'recentExpenses' => $recentExpenses,
             'groups' => $groups,
+            'contacts' => $contacts,
         ]);
+    }
+
+    /**
+     * Delete a user's contact (admin action).
+     */
+    public function deleteUserContact(User $user, Contact $contact): RedirectResponse
+    {
+        // Ensure the contact belongs to this user
+        if ($contact->user_id !== $user->id) {
+            abort(404);
+        }
+
+        $contact->delete();
+
+        return redirect()->back()->with('success', 'Contact removed successfully.');
     }
 
     public function reports(): Response

@@ -9,6 +9,7 @@ const props = defineProps({
     balances: Array,
     suggestedTransactions: Array,
     settlements: Object,
+    memberShares: Object,
 });
 
 const authUser = computed(() => usePage().props.auth.user);
@@ -24,7 +25,7 @@ const completingId = ref(null);
 const settlingAll = ref(false);
 
 function formatCurrency(amount) {
-    return 'Rs. ' + parseFloat(amount).toFixed(2);
+    return '₹' + Math.abs(parseFloat(amount)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatDate(date) {
@@ -42,7 +43,7 @@ function getUserInitials(name) {
 }
 
 function getMember(userId) {
-    return props.group.members?.find(m => m.id === userId) || { name: 'Unknown' };
+    return props.group.members?.find(m => m.id === userId) || { name: 'Unknown', avatar: null };
 }
 
 function balanceCardClass(amount) {
@@ -195,6 +196,40 @@ const hasPendingSettlements = computed(() => {
                 </div>
                 <div v-else class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-5 py-8 text-center text-gray-400 dark:text-gray-500">
                     <p>No balance data available.</p>
+                </div>
+            </div>
+
+            <!-- Section: Member Shares -->
+            <div v-if="memberShares && memberShares.members?.length && memberShares.total_expense > 0" class="mt-6">
+                <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Member Shares</h2>
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        Total unsettled expenses: <span class="font-bold text-gray-900 dark:text-gray-100">{{ formatCurrency(memberShares.total_expense) }}</span>
+                    </p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        <div
+                            v-for="member in memberShares.members"
+                            :key="member.user_id"
+                            class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-3 text-center"
+                        >
+                            <div class="flex items-center justify-center gap-2 mb-1.5">
+                                <img
+                                    v-if="member.avatar"
+                                    :src="`/storage/${member.avatar}`"
+                                    :alt="member.name"
+                                    class="w-7 h-7 rounded-full object-cover"
+                                />
+                                <div v-else class="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-xs">
+                                    {{ getUserInitials(member.name) }}
+                                </div>
+                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ member.name }}</span>
+                            </div>
+                            <p class="text-lg font-bold text-gray-900 dark:text-gray-100">
+                                {{ formatCurrency(member.total_share) }}
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">share</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 

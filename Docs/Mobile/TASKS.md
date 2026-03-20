@@ -5,8 +5,9 @@
 
 ## Current Tasks
 
-- [] **Task 1**
-
+- [] **Task 5**
+- [] **Task 6**
+- [] **Task 7**
 
 ## PENDING
 
@@ -48,102 +49,93 @@
 - [ ] **M-209** - Logout - API: POST /api/v1/logout (DONE)
 
 ### Phase 3: Personal Expenses
-> API Controller: MISSING - Need to create Api/V1/ExpenseController
+> API Controller: DONE
 
-- [ ] **M-301** - **[API]** Create ExpenseController with: index (paginated + filters), store, show, update, destroy
-- [ ] **M-302** - **[API]** Expense description autocomplete endpoint
-- [ ] **M-303** - **[API]** Categories list endpoint (GET /api/v1/categories)
-- [ ] **M-304** - Expense list screen (paginated, pull-to-refresh)
-- [ ] **M-305** - Expense filters (category dropdown, date range picker, search)
-- [ ] **M-306** - Add expense screen (amount, category, description with autocomplete, date/time picker)
-- [ ] **M-307** - Edit expense screen (same form, pre-filled)
-- [ ] **M-308** - Delete expense (swipe-to-delete or long press → confirm)
-- [ ] **M-309** - Image upload for expense (2 max, camera + gallery, preview, remove)
+- [x] **M-301** - **[API]** Create ExpenseController with: index (paginated + filters), store, show, update, destroy (2026-03-19)
+- [x] **M-302** - **[API]** Expense description autocomplete endpoint (2026-03-19)
+- [x] **M-303** - **[API]** Categories list endpoint (GET /api/v1/categories) (2026-03-19)
+- [x] **M-304** - Expense list screen (paginated, pull-to-refresh) (2026-03-19)
+- [x] **M-305** - Expense filters (category dropdown, search) (2026-03-19)
+- [x] **M-306** - Add expense screen (amount, category, description with autocomplete, date picker) (2026-03-19)
+- [x] **M-307** - Edit expense screen (same form, pre-filled) (2026-03-19)
+- [x] **M-308** - Delete expense (long press → confirm) (2026-03-19)
+- [x] **M-309** - Image upload for expense (2 max, camera + gallery, preview, remove) (2026-03-19)
 - [ ] **M-310** - Expense summary/charts (category breakdown pie chart, monthly trends)
 
 ### Phase 4: Income Tracking
-> API Controller: MISSING - Need to create Api/V1/IncomeController
+> API Controller: DONE
 
-- [ ] **M-401** - **[API]** Create IncomeController with: index (paginated), store, update, destroy, summary
-- [ ] **M-402** - **[API]** Income source autocomplete endpoint
-- [ ] **M-403** - Income list screen (paginated, grouped by month)
-- [ ] **M-404** - Add/Edit income (amount, source with autocomplete, description, date)
-- [ ] **M-405** - Delete income (swipe/long press → confirm)
-- [ ] **M-406** - Income summary cards (this month income, last month, savings)
+- [x] **M-401** - **[API]** Create IncomeController with: index (paginated), store, update, destroy, summary (2026-03-19)
+- [x] **M-402** - **[API]** Income source autocomplete endpoint (2026-03-19)
+- [x] **M-403** - Income list screen (paginated, search, pull-to-refresh) (2026-03-19)
+- [x] **M-404** - Add/Edit income (amount, source with autocomplete, description, date) (2026-03-19)
+- [x] **M-405** - Delete income (long press → confirm) (2026-03-19)
+- [x] **M-406** - Income summary cards (this month income, savings/loss) (2026-03-19)
 - [ ] **M-407** - Income vs Expense chart (6-month trend)
 
 ### Phase 5: Todos/Tasks
-> API Controller: MISSING - Need to create Api/V1/TodoController, TodoCategoryController
+> API Controller: DONE
 
-- [ ] **M-501** - **[API]** Create TodoController with: index (filters), store, update, destroy, toggle
-- [ ] **M-502** - **[API]** Create TodoCategoryController with: index, store, update, destroy
-- [ ] **M-503** - Todo list screen (filters: All, Pending, Completed, Assigned to me, Assigned by me, By category)
-- [ ] **M-504** - Add/Edit todo (title, priority, due date, category, assign to contact, reminder)
-- [ ] **M-505** - Toggle complete (tap checkbox)
-- [ ] **M-506** - Delete todo (swipe/long press → confirm)
-- [ ] **M-507** - Todo categories management screen (CRUD with color picker)
+- [x] **M-501** - **[API]** Create TodoController with: index (filters + stats), store, update, destroy, toggle (2026-03-19)
+- [x] **M-502** - **[API]** Create TodoCategoryController with: index, store, update, destroy (2026-03-19)
+- [x] **M-503** - Todo list screen (filters: All, Pending, Completed, Assigned to me/by me, priority, category) (2026-03-19)
+- [x] **M-504** - Add/Edit todo (title, priority, due date, category, assign to contact, reminder) (2026-03-19)
+- [x] **M-505** - Toggle complete (tap checkbox, strikethrough) (2026-03-19)
+- [x] **M-506** - Delete todo (long press → confirm) (2026-03-19)
+- [x] **M-507** - Todo categories management screen (CRUD with 10 preset color circles) (2026-03-19)
 - [ ] **M-508** - Reminder notifications (local push notifications using expo-notifications)
-- [ ] **M-509** - Overdue visual indicators (red badge/highlight)
+- [x] **M-509** - Overdue visual indicators (red date highlight) (2026-03-19)
 
 ### Phase 6: Contacts
-> API Controller: MISSING - Need to create Api/V1/ContactController
+> API Controller: DONE
 
-- [ ] **M-601** - **[API]** Create ContactController with: index, search, store, destroy
-- [ ] **M-602** - Contacts list screen (alphabetical, search bar)
-- [ ] **M-603** - Search & add JodTod users (by name/email/phone)
-- [ ] **M-604** - Remove contact (swipe/long press → confirm)
+- [x] **M-601** - **[API]** Create ContactController with: index, search, store, destroy (2026-03-19)
+- [x] **M-602** - Contacts list screen (search, paginated, pull-to-refresh, FAB to add) (2026-03-19)
+- [x] **M-603** - Search & add JodTod users screen (debounced search, add button per result) (2026-03-19)
+- [x] **M-604** - Remove contact (long press → confirm) (2026-03-19)
 
 ### Phase 7: Group Management
-> API Controller: MISSING - Need to create Api/V1/GroupController
+> API Controller: DONE
 
-- [ ] **M-701** - **[API]** Create GroupController with: index, store, show, update, destroy, join, leave, addMember, removeMember, reactivateMember
-- [ ] **M-702** - Groups list screen (my groups with member count, balance badge)
-- [ ] **M-703** - Create group screen (name, description)
-- [ ] **M-704** - Group detail screen (members list with status badges: Admin/Inactive, expenses preview, total amount)
-- [ ] **M-705** - Join group (enter invite code or deep link /join/{code})
-- [ ] **M-706** - Edit group (admin only - name, description)
-- [ ] **M-707** - Add member from contacts (modal with contacts list, admin only)
-- [ ] **M-708** - Remove/Deactivate member (admin only, proper labels based on unsettled expenses)
-- [ ] **M-709** - Reactivate member (admin only)
-- [ ] **M-710** - Leave group (with unsettled expense check → deactivate if needed)
-- [ ] **M-711** - Delete group (admin only, blocked if unsettled expenses)
-- [ ] **M-712** - Invite code share (copy code, share link via native share sheet)
+- [x] **M-701** - **[API]** Create GroupController with: index, store, show, update, destroy, join, leave, addMember, removeMember, reactivateMember (2026-03-19)
+- [x] **M-702** - Groups list screen (my groups with member count, balance badge, FAB, join button) (2026-03-19)
+- [x] **M-703** - Create group screen (name, description) (2026-03-19)
+- [x] **M-704** - Group detail screen (members, expenses preview, balances, invite code, admin actions) (2026-03-19)
+- [x] **M-705** - Join group (invite code input) (2026-03-19)
+- [x] **M-706** - Edit group (admin only) (2026-03-19)
+- [x] **M-707** - Add member from contacts (admin only) (2026-03-19)
+- [x] **M-708** - Remove/Deactivate member (admin only, correct labels) (2026-03-19)
+- [x] **M-709** - Reactivate member (admin only) (2026-03-19)
+- [x] **M-710** - Leave group (deactivate if unsettled) (2026-03-19)
+- [x] **M-711** - Delete group (blocked if unsettled) (2026-03-19)
+- [x] **M-712** - Invite code copy (expo-clipboard) (2026-03-19)
 
 ### Phase 8: Group Expenses
-> API Controller: MISSING - Need to create Api/V1/GroupExpenseController
+> API Controller: DONE
 
-- [ ] **M-801** - **[API]** Create GroupExpenseController with: index (paginated + filters), store, show, update, destroy, balances
-- [ ] **M-802** - Group expense list screen (paginated, filters: category, date range)
-- [ ] **M-803** - Add group expense screen:
-    - Amount, description, category, date/time
-    - Paid by (member dropdown, default: me)
-    - Split type tabs: Equal / Custom / Percentage
-    - Equal: checkboxes to select members, auto-calculate per person
-    - Custom: amount input per member, total validation
-    - Percentage: % input per member, 100% validation
-- [ ] **M-804** - Edit group expense (same form, pre-filled with existing splits)
-- [ ] **M-805** - Delete group expense (creator or admin, confirm dialog)
-- [ ] **M-806** - Member-wise balance display on group detail
+- [x] **M-801** - **[API]** Create GroupExpenseController with: index, store, show, update, destroy, balances (2026-03-19)
+- [x] **M-802** - Group expense list screen (paginated, category filter, search, FAB) (2026-03-19)
+- [x] **M-803** - Add group expense (amount, category, description, date, paid by, split types: equal/custom/percentage with validation) (2026-03-19)
+- [x] **M-804** - Edit group expense (pre-filled with existing splits) (2026-03-19)
+- [x] **M-805** - Delete group expense (long press → confirm) (2026-03-19)
+- [x] **M-806** - Member-wise balance display on group detail (2026-03-19)
 
 ### Phase 9: Settlements
-> API Controller: MISSING - Need to create Api/V1/SettlementController
+> API Controller: DONE
 
-- [ ] **M-901** - **[API]** Create SettlementController with: index (balances + suggestions + history), settle (admin only), markCompleted, settleAll (admin only)
-- [ ] **M-902** - Settlement screen (3 sections):
-    - Balance overview cards (per member: gets back/owes/settled)
-    - Suggested transactions (optimized min-transfers)
-    - Settlement history (paginated, status badges)
-- [ ] **M-903** - Settle Up button (admin only, disabled if pending settlements exist, confirm dialog)
-- [ ] **M-904** - Mark as Paid button (debtor/creditor/admin can mark individual settlement)
-- [ ] **M-905** - Settle All button (admin only, confirm dialog)
+- [x] **M-901** - **[API]** Create SettlementController with: index, settle, markCompleted, settleAll (exact min-transfers algorithm) (2026-03-19)
+- [x] **M-902** - Settlement screen (balance cards, suggested transactions, history) (2026-03-19)
+- [x] **M-903** - Settle Up button (admin only, disabled if pending exist, confirm) (2026-03-19)
+- [x] **M-904** - Mark as Paid button (from_user/to_user/admin) (2026-03-19)
+- [x] **M-905** - Settle All button (admin only, confirm) (2026-03-19)
 
 ### Phase 10: Notifications
-> API Controller: MISSING - Need to create Api/V1/NotificationController
+> API Controller: DONE
 
-- [ ] **M-1001** - **[API]** Create NotificationController with: index (paginated), recent (latest 10 + unread count), markRead, markAllRead
-- [ ] **M-1002** - Notifications list screen (paginated, pull-to-refresh)
-- [ ] **M-1003** - Mark as read (tap notification) / Mark all as read button
-- [ ] **M-1004** - Unread count badge on bottom tab bell icon
+- [x] **M-1001** - **[API]** Create NotificationController with: index, recent (10 + unread count), markRead, markAllRead (2026-03-19)
+- [x] **M-1002** - Notifications list screen (paginated, pull-to-refresh, type-based icons) (2026-03-19)
+- [x] **M-1003** - Mark as read (tap) / Mark all as read button (2026-03-19)
+- [x] **M-1004** - Unread count badge on dashboard bell icon (2026-03-19)
 - [ ] **M-1005** - Push notifications setup (expo-notifications, device token registration)
 - [ ] **M-1006** - **[API]** Device token storage endpoint (POST /api/v1/device-token)
 - [ ] **M-1007** - Notification tap → deep link to relevant screen (group, settlement, todo etc.)
@@ -170,6 +162,11 @@
 ## COMPLETED =================================================
 
 ## Completed Current Tasks
+
+- [x] **Task 4** Group photo upload added to both Create Group and Edit Group screens. Photo shows in group list and group detail. Backend supports upload/change/remove on both web and API. (2026-03-20)
+- [x] **Task 3** Added header with hamburger menu (left) + user avatar (right) on dashboard. Hamburger drawer has all web navigation links. Footer nav: replaced Income tab with Tasks tab. Income accessible from drawer menu. (2026-03-20)
+- [x] **Task 2** Group join by invite code now requires admin approval. Join creates pending request, admin gets notification, can approve/reject from group detail. Implemented on both web and mobile. (2026-03-20)
+- [x] **Task 1** Notification tap now navigates to relevant screen: todo notifications → tasks, group expense → group expenses, settlement → settlements, group → group detail. (2026-03-20)
 
 
 ### Phase 1: Project Setup

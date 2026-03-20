@@ -6,9 +6,11 @@ use App\Models\Group;
 use App\Models\GroupMember;
 use App\Models\User;
 use App\Notifications\AddedToGroup;
+use App\Notifications\GroupJoinRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,12 +40,20 @@ class GroupController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'description' => ['nullable', 'string', 'max:500'],
+            'photo' => ['nullable', 'image', 'max:5120'],
         ]);
 
-        $group = Group::create([
-            ...$validated,
+        $data = [
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
             'created_by' => $request->user()->id,
-        ]);
+        ];
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('groups', 'public');
+        }
+
+        $group = Group::create($data);
 
         // Creator becomes admin
         GroupMember::create([
@@ -106,6 +116,14 @@ class GroupController extends Controller
             ->get()
             ->map(fn ($c) => $c->contactUser);
 
+        // Pending members (for admin approval)
+        $pendingMembers = [];
+        if ($group->isAdmin($request->user())) {
+            $pendingMembers = $group->pendingMembers()
+                ->select('users.id', 'users.name', 'users.email', 'users.phone', 'users.avatar')
+                ->get();
+        }
+
         return Inertia::render('Groups/Show', [
             'group' => $group,
             'isAdmin' => $group->isAdmin($request->user()),
@@ -114,6 +132,7 @@ class GroupController extends Controller
             'totalExpensesAmount' => $totalExpensesAmount,
             'contacts' => $contacts,
             'membersWithUnsettled' => $membersWithUnsettled,
+            'pendingMembers' => $pendingMembers,
         ]);
     }
 
@@ -137,9 +156,26 @@ class GroupController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'description' => ['nullable', 'string', 'max:500'],
+            'photo' => ['nullable', 'image', 'max:5120'],
+            'remove_photo' => ['nullable', 'boolean'],
         ]);
 
-        $group->update($validated);
+        $data = [
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+        ];
+
+        if ($request->hasFile('photo')) {
+            if ($group->photo) {
+                Storage::disk('public')->delete($group->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('groups', 'public');
+        } elseif ($request->boolean('remove_photo') && $group->photo) {
+            Storage::disk('public')->delete($group->photo);
+            $data['photo'] = null;
+        }
+
+        $group->update($data);
 
         return redirect()->route('groups.show', $group)
             ->with('success', 'Group updated successfully.');
@@ -200,10 +236,17 @@ class GroupController extends Controller
             'group_id' => $group->id,
             'user_id' => $request->user()->id,
             'role' => 'member',
+            'is_approved' => false,
         ]);
 
-        return redirect()->route('groups.show', $group)
-            ->with('success', 'You have joined the group.');
+        // Notify group admins about the join request
+        $admins = $group->groupMembers()->where('role', 'admin')->with('user')->get();
+        foreach ($admins as $adminMembership) {
+            $adminMembership->user->notify(new GroupJoinRequest($group, $request->user()));
+        }
+
+        return redirect()->route('groups.index')
+            ->with('success', 'Join request sent. The group admin will review your request.');
     }
 
     public function joinViaLink(Request $request, string $inviteCode): Response|RedirectResponse
@@ -353,6 +396,51 @@ class GroupController extends Controller
             ->get();
 
         return response()->json($users);
+    }
+
+    public function approveMember(Request $request, Group $group, int $userId): RedirectResponse
+    {
+        if (!$group->isAdmin($request->user())) {
+            abort(403);
+        }
+
+        $membership = $group->groupMembers()
+            ->where('user_id', $userId)
+            ->where('is_approved', false)
+            ->first();
+
+        if (!$membership) {
+            return back()->withErrors(['member' => 'No pending request found for this user.']);
+        }
+
+        $membership->update(['is_approved' => true]);
+
+        $user = User::find($userId);
+        if ($user) {
+            $user->notify(new AddedToGroup($group, $request->user()->name));
+        }
+
+        return back()->with('success', 'Member approved successfully.');
+    }
+
+    public function rejectMember(Request $request, Group $group, int $userId): RedirectResponse
+    {
+        if (!$group->isAdmin($request->user())) {
+            abort(403);
+        }
+
+        $membership = $group->groupMembers()
+            ->where('user_id', $userId)
+            ->where('is_approved', false)
+            ->first();
+
+        if (!$membership) {
+            return back()->withErrors(['member' => 'No pending request found for this user.']);
+        }
+
+        $membership->delete();
+
+        return back()->with('success', 'Join request rejected.');
     }
 
     public function addMember(Request $request, Group $group): RedirectResponse
