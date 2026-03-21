@@ -53,7 +53,9 @@ class PhoneVerificationController extends Controller
         ]);
 
         // TODO: Integrate SMS provider (MSG91, Twilio, etc.)
-        Log::info("Phone verification OTP for +91{$phone}: {$code}");
+        if (app()->environment('local')) {
+            Log::info("Phone verification OTP for +91{$phone}: {$code}");
+        }
 
         return response()->json([
             'message' => 'OTP sent successfully.',

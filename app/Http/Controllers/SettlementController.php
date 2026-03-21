@@ -141,6 +141,11 @@ class SettlementController extends Controller
             abort(404);
         }
 
+        // Prevent double completion
+        if ($settlement->status === 'completed') {
+            return redirect()->back()->with('info', 'Settlement is already completed.');
+        }
+
         // Verify user is either from_user, to_user, or group admin
         $user = Auth::user();
         if (

@@ -1,6 +1,7 @@
 # JodTod - Task Tracker
 - [] **0000**
 
+
 **Admin** Section tasks. starts from 500 =======================================
 
 
@@ -21,6 +22,10 @@
 
 ## COMPLETED
 ## Completed Current Tasks
+- [x] **Task 508** - (A) Tick icon added to "All Settled" badge on groups listing. (B) Settlement page: Member Shares hides after all settled (reverted). (C) Group detail page: new "Member Shares" section between Members and Expenses - purple themed, shows all-time total share per member, collapsible. (D) "Settle Up" → "Settlement" button text. (E) All 4 settlement page sections (Balance Overview, Member Shares, Suggested Settlements, Settlement History) made collapsible with smooth CSS grid transitions. (2026-03-21)
+- [x] **Task 507** - (A) Member Shares section now always visible even after all settled. (B) Added stats summary bar (Expenses count, Total Spent highlighted, Members count) on group detail page. (C) "All Settled" green badge on groups listing when all expenses settled. (D) Members and Pending Requests sections collapsible with smooth CSS grid transition + animated chevron. (E) Group expense list: Edit/Delete text replaced with pencil/trash icons, expand/collapse uses Vue Transition with smooth max-height animation. (2026-03-21)
+- [x] **Task 506** - (A) Description field moved after Category in group expense Create and Edit forms. New order: Amount → Category → Description → Date → Paid By. (B) Split Between section made collapsible with animated arrow, default closed. Shows current split type label. Applied to both Create and Edit. (C) Custom/Percentage split explained to user. (2026-03-20)
+- [x] **Task 505** - (A) Added cursor-pointer to group expense Create/Edit save buttons. (B) Fixed missing notifications: added RemovedFromGroup and JoinRequestRejected notification classes. Added notifications to removeMember, rejectMember in both web and API controllers. Root cause of notifications not arriving: QUEUE_CONNECTION=database requires queue:work to be running. (2026-03-20)
 - [x] **Task 504** - (A) Group expense image upload already implemented. (B) Member shares section added to settle up page - shows each member's total share from unsettled expenses with avatar, name, amount. Backend: calculateMemberShares() added to SettlementController. (C) Already done in Task 502 - only admin can settle up. (2026-03-19)
 - [x] **Task 503** - (A) Expense image upload reduced to 1 image (hidden image_2 slot). WebP auto-conversion added to ExpenseController and GroupExpenseController via storeImageAsWebp() method. (B) Admin Pages listing: "Edit" text replaced with pencil icon. (2026-03-19)
 - [x] **Task 500** - (A) Role dropdown removed from admin users listing. (B) Status column with clickable Active/Banned badges for ban/unban toggle. (C) Cursor pointer on all action buttons + Edit button with pencil icon added. (D) Admin user detail page: contacts listing with delete option. Edit page: name editable, email/phone disabled (verification required). (2026-03-19)

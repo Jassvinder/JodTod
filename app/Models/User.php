@@ -28,8 +28,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'language',
         'notification_email',
         'notification_push',
-        'role',
-        'banned_at',
     ];
 
     protected $hidden = [

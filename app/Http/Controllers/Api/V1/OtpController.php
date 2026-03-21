@@ -52,7 +52,10 @@ class OtpController extends Controller
         ]);
 
         // TODO: Integrate SMS provider (MSG91, Twilio, etc.)
-        Log::info("OTP for +91{$phone}: {$code}");
+        // OTP is only logged in local environment for development
+        if (app()->environment('local')) {
+            Log::info("OTP for +91{$phone}: {$code}");
+        }
 
         $data = app()->environment('local') ? ['otp_debug' => $code] : null;
 

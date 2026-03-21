@@ -137,7 +137,7 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'You cannot change your own role.');
         }
 
-        $user->update(['role' => $request->role]);
+        $user->forceFill(['role' => $request->role])->save();
 
         return redirect()->back()->with('success', "User role updated to {$request->role}.");
     }
@@ -163,14 +163,14 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'You cannot ban yourself.');
         }
 
-        $user->update(['banned_at' => now()]);
+        $user->forceFill(['banned_at' => now()])->save();
 
         return redirect()->back()->with('success', "{$user->name} has been banned.");
     }
 
     public function unbanUser(Request $request, User $user): RedirectResponse
     {
-        $user->update(['banned_at' => null]);
+        $user->forceFill(['banned_at' => null])->save();
 
         return redirect()->back()->with('success', "{$user->name} has been unbanned.");
     }

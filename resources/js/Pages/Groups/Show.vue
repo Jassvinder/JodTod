@@ -15,6 +15,7 @@ const props = defineProps({
     contacts: { type: Array, default: () => [] },
     membersWithUnsettled: { type: Array, default: () => [] },
     pendingMembers: { type: Array, default: () => [] },
+    memberShares: { type: Array, default: () => [] },
 });
 
 const hasUnsettledExpenses = (memberId) => props.membersWithUnsettled.includes(memberId);
@@ -112,7 +113,31 @@ const addMember = (user) => {
 const getUserInitials = (name) => {
     return name ? name.charAt(0).toUpperCase() : '?';
 };
+
+const pendingOpen = ref(true);
+const membersOpen = ref(true);
+const memberSharesOpen = ref(true);
 </script>
+
+<style scoped>
+.collapse-content {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.3s ease;
+}
+.collapse-content.collapsed {
+    grid-template-rows: 0fr;
+}
+.collapse-inner {
+    overflow: hidden;
+}
+.chevron-icon {
+    transition: transform 0.3s ease;
+}
+.chevron-icon.rotated {
+    transform: rotate(180deg);
+}
+</style>
 
 <template>
     <Head :title="group.name" />
@@ -154,7 +179,7 @@ const getUserInitials = (name) => {
                         :href="route('groups.settlements.index', group.id)"
                         class="px-3 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-700 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors"
                     >
-                        Settle Up
+                        Settlement
                     </Link>
                     <Link
                         v-if="isAdmin"
@@ -166,13 +191,34 @@ const getUserInitials = (name) => {
                 </div>
             </div>
 
+            <!-- Stats Summary -->
+            <div v-if="totalExpensesCount > 0" class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ totalExpensesCount }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Expenses</p>
+                </div>
+                <div class="bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-200 dark:border-primary-800 p-4 text-center">
+                    <p class="text-2xl font-bold text-primary-700 dark:text-primary-300">&#8377;{{ totalExpensesAmount.toLocaleString('en-IN', { minimumFractionDigits: 0 }) }}</p>
+                    <p class="text-xs text-primary-600 dark:text-primary-400 mt-1">Total Spent</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ group.members.length }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Members</p>
+                </div>
+            </div>
+
             <!-- Pending Join Requests -->
-            <div v-if="isAdmin && pendingMembers.length > 0" class="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 mb-6">
-                <div class="px-5 py-4 border-b border-amber-200 dark:border-amber-800">
+            <div v-if="isAdmin && pendingMembers.length > 0" class="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 mb-6 overflow-hidden">
+                <button @click="pendingOpen = !pendingOpen" class="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-amber-100/50 dark:hover:bg-amber-900/30 transition-colors">
                     <h2 class="text-base font-semibold text-amber-800 dark:text-amber-200">
                         Pending Requests ({{ pendingMembers.length }})
                     </h2>
-                </div>
+                    <svg class="w-5 h-5 text-amber-600 chevron-icon" :class="{ rotated: !pendingOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
+                <div class="collapse-content" :class="{ collapsed: !pendingOpen }">
+                <div class="collapse-inner">
                 <ul class="divide-y divide-amber-100 dark:divide-amber-800">
                     <li
                         v-for="member in pendingMembers"
@@ -210,16 +256,23 @@ const getUserInitials = (name) => {
                         </div>
                     </li>
                 </ul>
+                </div>
+                </div>
             </div>
 
             <!-- Members -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <button @click="membersOpen = !membersOpen" class="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
                         Members ({{ group.members.length }})
                     </h2>
-                </div>
+                    <svg class="w-5 h-5 text-gray-400 chevron-icon" :class="{ rotated: !membersOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
 
+                <div class="collapse-content" :class="{ collapsed: !membersOpen }">
+                <div class="collapse-inner">
                 <ul class="divide-y divide-gray-100 dark:divide-gray-700">
                     <li
                         v-for="member in group.members"
@@ -279,6 +332,50 @@ const getUserInitials = (name) => {
                         </div>
                     </li>
                 </ul>
+                </div>
+                </div>
+            </div>
+
+            <!-- Member Shares Section -->
+            <div v-if="memberShares.length > 0 && totalExpensesCount > 0" class="mt-6 bg-purple-50 dark:bg-purple-900/10 rounded-xl border border-purple-200 dark:border-purple-800 overflow-hidden">
+                <button @click="memberSharesOpen = !memberSharesOpen" class="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-purple-100/50 dark:hover:bg-purple-900/20 transition-colors">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                        </svg>
+                        <h2 class="text-base font-semibold text-purple-800 dark:text-purple-200">Member Shares</h2>
+                        <span class="text-xs text-purple-500 dark:text-purple-400">(All time)</span>
+                    </div>
+                    <svg class="w-5 h-5 text-purple-400 chevron-icon" :class="{ rotated: !memberSharesOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
+                <div class="collapse-content" :class="{ collapsed: !memberSharesOpen }">
+                <div class="collapse-inner">
+                    <div class="flex items-center justify-between px-5 py-2.5 border-t border-purple-200 dark:border-purple-800 bg-purple-100/50 dark:bg-purple-900/20">
+                        <span class="text-xs text-purple-600 dark:text-purple-400">Total Expenses</span>
+                        <span class="text-sm font-bold text-purple-800 dark:text-purple-200">&#8377;{{ totalExpensesAmount.toLocaleString('en-IN', { minimumFractionDigits: 0 }) }}</span>
+                    </div>
+                    <div
+                        v-for="member in memberShares"
+                        :key="member.user_id"
+                        class="flex items-center gap-3 px-5 py-2.5 border-t border-purple-100 dark:border-purple-800/50"
+                    >
+                        <img
+                            v-if="member.avatar"
+                            :src="`/storage/${member.avatar}`"
+                            :alt="member.name"
+                            class="w-6 h-6 rounded-full object-cover shrink-0"
+                        />
+                        <div v-else class="w-6 h-6 rounded-full bg-purple-200 dark:bg-purple-800 flex items-center justify-center text-purple-700 dark:text-purple-300 font-semibold text-[10px] shrink-0">
+                            {{ getUserInitials(member.name) }}
+                        </div>
+                        <span class="text-sm text-gray-700 dark:text-gray-300 flex-1 truncate">{{ member.name }}</span>
+                        <span class="text-sm font-semibold text-purple-700 dark:text-purple-300">&#8377;{{ member.total_share.toLocaleString('en-IN', { minimumFractionDigits: 2 }) }}</span>
+                    </div>
+                </div>
+                </div>
             </div>
 
             <!-- Expenses Section -->

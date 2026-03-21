@@ -48,6 +48,10 @@ defineProps({
                             </div>
                         </div>
                         <div class="ml-4 flex items-center gap-3 shrink-0">
+                            <span v-if="group.is_all_settled" class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                All Settled
+                            </span>
                             <span v-if="group.pivot?.role === 'admin'" class="px-2 py-0.5 text-xs font-medium bg-primary-100 text-primary-700 rounded-full">
                                 Admin
                             </span>

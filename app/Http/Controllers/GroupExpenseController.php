@@ -100,7 +100,7 @@ class GroupExpenseController extends Controller
             'split_type' => 'required|in:equal,custom,percentage',
             'splits' => 'required|array|min:1',
             'splits.*.user_id' => ['required', 'integer', "in:{$memberIdList}"],
-            'splits.*.share_amount' => 'required|numeric|min:0',
+            'splits.*.share_amount' => 'required|numeric|min:0.01',
             'splits.*.percentage' => 'nullable|numeric|min:0|max:100',
             'image_1' => 'nullable|image|max:5120',
             'image_2' => 'nullable|image|max:5120',
@@ -188,7 +188,7 @@ class GroupExpenseController extends Controller
             'split_type' => 'required|in:equal,custom,percentage',
             'splits' => 'required|array|min:1',
             'splits.*.user_id' => ['required', 'integer', "in:{$memberIdList}"],
-            'splits.*.share_amount' => 'required|numeric|min:0',
+            'splits.*.share_amount' => 'required|numeric|min:0.01',
             'splits.*.percentage' => 'nullable|numeric|min:0|max:100',
             'image_1' => 'nullable|image|max:5120',
             'image_2' => 'nullable|image|max:5120',
@@ -377,8 +377,7 @@ class GroupExpenseController extends Controller
     {
         $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
         if ($image === false) {
-            // Fallback: store as-is if conversion fails
-            return $file->store('expenses', 'public');
+            throw new \RuntimeException('Unable to process uploaded image.');
         }
 
         $filename = 'expenses/' . uniqid() . '.webp';

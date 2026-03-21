@@ -287,7 +287,7 @@ function splitTypeBadgeClass(type) {
                         <div class="flex items-center gap-3 shrink-0">
                             <p class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ formatCurrency(expense.amount) }}</p>
                             <svg
-                                class="w-4 h-4 text-gray-400 transition-transform"
+                                class="w-4 h-4 text-gray-400 transition-transform duration-300"
                                 :class="{ 'rotate-180': expandedExpense === expense.id }"
                                 fill="none"
                                 stroke="currentColor"
@@ -299,9 +299,17 @@ function splitTypeBadgeClass(type) {
                     </div>
 
                     <!-- Expanded split details -->
+                    <Transition
+                        enter-active-class="transition-all duration-300 ease-out"
+                        enter-from-class="max-h-0 opacity-0"
+                        enter-to-class="max-h-[500px] opacity-100"
+                        leave-active-class="transition-all duration-200 ease-in"
+                        leave-from-class="max-h-[500px] opacity-100"
+                        leave-to-class="max-h-0 opacity-0"
+                    >
                     <div
                         v-if="expandedExpense === expense.id"
-                        class="px-5 pb-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700"
+                        class="px-5 pb-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 overflow-hidden"
                     >
                         <div class="pt-3">
                             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Split Details</p>
@@ -326,23 +334,30 @@ function splitTypeBadgeClass(type) {
                             </div>
 
                             <!-- Actions -->
-                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex items-center gap-2 justify-end">
+                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex items-center gap-1 justify-end">
                                 <Link
                                     :href="route('groups.expenses.edit', [group.id, expense.id])"
-                                    class="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium text-primary-600 hover:bg-primary-50 transition-colors"
+                                    class="p-2 rounded-lg text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
+                                    title="Edit"
                                 >
-                                    Edit
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
                                 </Link>
                                 <button
                                     v-if="canDelete(expense)"
                                     @click.stop="confirmDelete(expense)"
-                                    class="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                                    class="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                                    title="Delete"
                                 >
-                                    Delete
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
                     </div>
+                    </Transition>
                 </div>
 
                 <!-- Pagination -->

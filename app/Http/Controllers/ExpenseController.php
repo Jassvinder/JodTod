@@ -227,8 +227,7 @@ class ExpenseController extends Controller
     {
         $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
         if ($image === false) {
-            // Fallback: store as-is if conversion fails
-            return $file->store('expenses', 'public');
+            throw new \RuntimeException('Unable to process uploaded image.');
         }
 
         $filename = 'expenses/' . uniqid() . '.webp';

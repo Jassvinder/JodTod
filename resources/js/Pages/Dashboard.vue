@@ -205,10 +205,10 @@ function relativeDate(dateStr) {
                     </p>
                 </div>
 
-                <!-- You Owe -->
+                <!-- To Pay -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
                     <div class="flex items-center justify-between">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">You Owe</p>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">To Pay</p>
                         <span class="p-1.5 bg-red-50 dark:bg-red-900/30 rounded-lg">
                             <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7" />
@@ -225,10 +225,10 @@ function relativeDate(dateStr) {
                     </Link>
                 </div>
 
-                <!-- You Are Owed -->
+                <!-- To Receive -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
                     <div class="flex items-center justify-between">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Owed to You</p>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">To Receive</p>
                         <span class="p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg">
                             <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h14" />

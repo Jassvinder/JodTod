@@ -55,9 +55,12 @@ class SettlementController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
+        $memberShares = $this->calculateMemberShares($group);
+
         return $this->success([
             'balances' => $balances,
             'suggestedTransactions' => $suggestedTransactions,
+            'memberShares' => $memberShares,
             'settlements' => [
                 'data' => $settlements->items(),
                 'meta' => [
@@ -142,6 +145,11 @@ class SettlementController extends Controller
         // Verify settlement belongs to this group
         if ($settlement->group_id !== $group->id) {
             return $this->notFound('Settlement not found in this group.');
+        }
+
+        // Prevent double completion
+        if ($settlement->status === 'completed') {
+            return $this->error('Settlement is already completed.', 422);
         }
 
         // Verify user is either from_user, to_user, or group admin
@@ -285,6 +293,47 @@ class SettlementController extends Controller
         }
 
         return $balances;
+    }
+
+    /**
+     * Calculate each member's total share of unsettled expenses.
+     */
+    private function calculateMemberShares(Group $group): array
+    {
+        $members = $group->members()->get();
+
+        $unsettledExpenseIds = $group->expenses()
+            ->where('is_settled', false)
+            ->whereNull('deleted_at')
+            ->pluck('id');
+
+        $totalExpenseAmount = $group->expenses()
+            ->where('is_settled', false)
+            ->whereNull('deleted_at')
+            ->sum('amount');
+
+        // Bulk fetch shares per user
+        $sharesPerUser = DB::table('expense_splits')
+            ->whereIn('expense_id', $unsettledExpenseIds)
+            ->where('is_settled', false)
+            ->groupBy('user_id')
+            ->selectRaw('user_id, SUM(share_amount) as total_share')
+            ->pluck('total_share', 'user_id');
+
+        $shares = [];
+        foreach ($members as $member) {
+            $shares[] = [
+                'user_id' => $member->id,
+                'name' => $member->name,
+                'avatar' => $member->avatar,
+                'total_share' => round((float) ($sharesPerUser[$member->id] ?? 0), 2),
+            ];
+        }
+
+        return [
+            'total_expense' => round((float) $totalExpenseAmount, 2),
+            'members' => $shares,
+        ];
     }
 
     /**

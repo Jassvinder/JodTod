@@ -129,6 +129,11 @@ class TodoController extends Controller
             'assigned_to' => 'nullable|exists:users,id',
         ]);
 
+        // Only the todo owner can change assignment
+        if (array_key_exists('assigned_to', $validated) && $todo->user_id !== Auth::id()) {
+            return $this->forbidden('Only the task owner can change assignment.');
+        }
+
         // Reset reminder_sent if reminder time changed
         if (isset($validated['reminder_at']) && $validated['reminder_at'] !== $todo->reminder_at?->toDateTimeString()) {
             $validated['reminder_sent'] = false;

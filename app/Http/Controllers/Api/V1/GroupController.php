@@ -9,6 +9,8 @@ use App\Models\GroupMember;
 use App\Models\User;
 use App\Notifications\AddedToGroup;
 use App\Notifications\GroupJoinRequest;
+use App\Notifications\JoinRequestRejected;
+use App\Notifications\RemovedFromGroup;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +30,12 @@ class GroupController extends Controller
             ->withPivot('role')
             ->latest()
             ->get();
+
+        $groups->each(function ($group) {
+            $hasExpenses = $group->expenses()->whereNull('deleted_at')->exists();
+            $hasUnsettled = $group->expenses()->where('is_settled', false)->whereNull('deleted_at')->exists();
+            $group->is_all_settled = $hasExpenses && !$hasUnsettled;
+        });
 
         return $this->success($groups);
     }
@@ -133,6 +141,26 @@ class GroupController extends Controller
                 ->get();
         }
 
+        // Calculate each member's total share across ALL expenses
+        $allExpenseIds = $group->expenses()->whereNull('deleted_at')->pluck('id');
+        $sharesPerUser = DB::table('expense_splits')
+            ->whereIn('expense_id', $allExpenseIds)
+            ->groupBy('user_id')
+            ->selectRaw('user_id, SUM(share_amount) as total_share')
+            ->pluck('total_share', 'user_id');
+
+        $memberShares = $group->members->map(fn ($m) => [
+            'user_id' => $m->id,
+            'name' => $m->name,
+            'avatar' => $m->avatar,
+            'total_share' => round((float) ($sharesPerUser[$m->id] ?? 0), 2),
+        ])->values();
+
+        // Check if all settled
+        $hasExpenses = $totalExpensesCount > 0;
+        $hasUnsettled = $group->expenses()->where('is_settled', false)->whereNull('deleted_at')->exists();
+        $isAllSettled = $hasExpenses && !$hasUnsettled;
+
         return $this->success([
             'group' => $group,
             'isAdmin' => $group->isAdmin($request->user()),
@@ -142,6 +170,8 @@ class GroupController extends Controller
             'contacts' => $contacts,
             'membersWithUnsettled' => $membersWithUnsettled,
             'pendingMembers' => $pendingMembers,
+            'memberShares' => $memberShares,
+            'isAllSettled' => $isAllSettled,
         ]);
     }
 
@@ -287,7 +317,12 @@ class GroupController extends Controller
             return $this->error('No pending request found for this user.', 404);
         }
 
+        $rejectedUser = User::find($userId);
         $membership->delete();
+
+        if ($rejectedUser) {
+            $rejectedUser->notify(new JoinRequestRejected($group));
+        }
 
         return $this->success(null, 'Join request rejected.');
     }
@@ -405,13 +440,23 @@ class GroupController extends Controller
             ->where('expense_splits.user_id', $userId)
             ->exists();
 
+        $removedUser = User::find($userId);
+
         if ($unsettledAsPayer || $unsettledInSplits) {
             $membership->update(['is_active' => false]);
+
+            if ($removedUser) {
+                $removedUser->notify(new RemovedFromGroup($group, $request->user()->name, true));
+            }
 
             return $this->success(null, 'Member has unsettled expenses and has been deactivated. They won\'t be included in new expenses but their pending balances remain for settlement.');
         }
 
         $membership->delete();
+
+        if ($removedUser) {
+            $removedUser->notify(new RemovedFromGroup($group, $request->user()->name));
+        }
 
         return $this->success(null, 'Member removed from group.');
     }

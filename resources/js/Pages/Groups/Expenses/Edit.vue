@@ -34,6 +34,7 @@ const existingImages = {
 };
 
 const splitType = ref(props.expense.split_type || 'equal');
+const splitOpen = ref(false);
 
 // Initialize selected members from existing splits
 const selectedMembers = ref(
@@ -193,21 +194,6 @@ const canSubmit = computed(() => {
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- Basic Details Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
-                    <!-- Description -->
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                        <input
-                            id="description"
-                            v-model="form.description"
-                            type="text"
-                            maxlength="255"
-                            placeholder="e.g. Dinner at restaurant"
-                            class="mt-1 block w-full py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                            required
-                        />
-                        <p v-if="form.errors.description" class="mt-1 text-sm text-accent-600">{{ form.errors.description }}</p>
-                    </div>
-
                     <!-- Amount -->
                     <div>
                         <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount</label>
@@ -245,6 +231,21 @@ const canSubmit = computed(() => {
                         <p v-if="form.errors.category_id" class="mt-1 text-sm text-accent-600">{{ form.errors.category_id }}</p>
                     </div>
 
+                    <!-- Description -->
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                        <input
+                            id="description"
+                            v-model="form.description"
+                            type="text"
+                            maxlength="255"
+                            placeholder="e.g. Dinner at restaurant"
+                            class="mt-1 block w-full py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            required
+                        />
+                        <p v-if="form.errors.description" class="mt-1 text-sm text-accent-600">{{ form.errors.description }}</p>
+                    </div>
+
                     <!-- Date -->
                     <div>
                         <label for="expense_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
@@ -276,9 +277,31 @@ const canSubmit = computed(() => {
                     </div>
                 </div>
 
-                <!-- Split Section -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Split Between</h3>
+                <!-- Split Section (Collapsible) -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <button
+                        type="button"
+                        @click="splitOpen = !splitOpen"
+                        class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    >
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                </svg>
+                            </div>
+                            <span class="text-base font-semibold text-gray-900 dark:text-gray-100">Split Between</span>
+                            <span class="text-xs text-gray-400 dark:text-gray-500">({{ splitType === 'equal' ? 'Equal' : splitType === 'custom' ? 'Custom' : 'Percentage' }})</span>
+                        </div>
+                        <svg
+                            class="w-5 h-5 text-gray-400 transition-transform duration-200"
+                            :class="splitOpen ? 'rotate-180' : ''"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        </svg>
+                    </button>
+                    <div v-show="splitOpen" class="px-6 pb-6">
 
                     <!-- Split Type Tabs -->
                     <div class="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden mb-5">
@@ -465,6 +488,7 @@ const canSubmit = computed(() => {
                     </div>
 
                     <p v-if="form.errors.splits" class="mt-3 text-sm text-accent-600">{{ form.errors.splits }}</p>
+                    </div>
                 </div>
 
                 <!-- Images -->
@@ -475,7 +499,7 @@ const canSubmit = computed(() => {
                     <button
                         type="submit"
                         :disabled="form.processing || !canSubmit"
-                        class="flex-1 py-3 px-4 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
+                        class="flex-1 py-3 px-4 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     >
                         {{ form.processing ? 'Updating...' : 'Update Expense' }}
                     </button>

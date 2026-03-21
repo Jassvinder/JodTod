@@ -60,7 +60,17 @@
       "Bash(grep -E \"\\\\.tsx$\")",
       "Bash(grep -r \"notification.*router\\\\|router.*notification\\\\|group_id\\\\|todo_id\" D:/JodTodApp --include=*.tsx --include=*.ts)",
       "Bash(grep -r \"getNotificationLink\\\\|notificationLink\" D:/JodTodApp --include=*.tsx --include=*.ts)",
-      "Bash(grep -r \"index\\\\|foreign\\\\|primary\" /d/phpserver/www/JodTod/database/migrations/*.php)"
+      "Bash(grep -r \"index\\\\|foreign\\\\|primary\" /d/phpserver/www/JodTod/database/migrations/*.php)",
+      "Bash(find D:phpserverwwwJodTodappHttp -maxdepth 1 -name *.php -o -path */Middleware/* -type f)",
+      "Bash(find /d/phpserver/www/JodTod/app/Http/Requests -type f -name *.php)",
+      "Bash(grep -r \"raw\\\\|Raw\\\\|whereRaw\\\\|DB::select\\\\|DB::statement\\\\|DB::delete\\\\|DB::insert\\\\|DB::update\" /d/phpserver/www/JodTod/app/Http/Controllers --include=*.php)",
+      "Bash(grep -r \"dd\\\\|dump\\\\|var_dump\" D:phpserverwwwJodTodapp --include=*.php)",
+      "Bash(grep -r Log:: D:phpserverwwwJodTodapp --include=*.php)",
+      "Bash(grep -rn \"sql\\\\|execute\\\\|statement\" D:phpserverwwwJodTodappHttpControllersApiV1 --include=*.php)",
+      "Bash(grep -rn \"$_ET\\\\|$_OST\\\\|$_EQUEST\\\\|$_ERVER\" \"D:\\\\phpserver\\\\www\\\\JodTod\\\\app\" --include=\"*.php\")",
+      "Bash(grep -rn \"password_reset_tokens\\\\|email_verification_token\" D:phpserverwwwJodToddatabasemigrations --include=*.php)",
+      "Bash(find \"D:\\\\phpserver\\\\www\\\\JodTod\\\\app\\\\Http\\\\Controllers\\\\Api\\\\V1\" -name \"*.php\" -exec wc -l {} +)",
+      "Bash(npm ls:*)"
     ]
   }
 }

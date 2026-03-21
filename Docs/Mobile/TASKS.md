@@ -5,9 +5,8 @@
 
 ## Current Tasks
 
-- [] **Task 5**
-- [] **Task 6**
-- [] **Task 7**
+- [] **Task 10**
+
 
 ## PENDING
 
@@ -163,6 +162,21 @@
 
 ## Completed Current Tasks
 
+- [x] **Task 9** Todo category form keyboard closing bug fixed. Root cause: TextInput was inside FlatList's ListHeaderComponent - typing triggered re-render which unmounted/remounted the TextInput, dismissing keyboard. Fix: moved form outside FlatList as a separate View. (2026-03-21)
+- [x] **Task 8** (2026-03-21)
+    A. Income tab restored as 6th footer icon (was hidden).
+    B. Groups/Profile headings fixed - show "Groups"/"Profile" instead of "Index".
+    C. Sub-page footer nav hiding is standard mobile UX (Instagram/WhatsApp behavior) - kept as is.
+    D. Web 507/508 changes applied: stats summary bar on group detail, Member Shares purple section (all-time), "Settlement" button text, "All Settled" badge with tick on groups list, Member Shares hidden after settled on settlement page, isAllSettled flag added to API.
+    E. CollapsibleSection component rewritten with smooth animated height transition (no more jerky LayoutAnimation).
+- [x] **Task 7C** Smart 4-step settle flow implemented on both mobile and web: (1) "Settle Up" when unsettled expenses exist, (2) "Mark All as Paid" when pending settlements exist, (3) "All Settled!" green message when everything is done. Button auto-changes based on state. (2026-03-20)
+- [x] **Task 7** (A) Standardized image upload to 1 image across both personal and group expense add. Personal expense reduced from 2 to 1. Group expense add now supports image upload via FormData. (B) Group delete now checks unsettled expenses upfront - shows "Cannot Delete" message directly in confirm dialog instead of making API call first. ConfirmDialog updated to support single-button mode. (2026-03-20)
+- [x] **Task 6** "Add Expense" button moved out of Recent Expenses collapsible section. Now in a row with "Settle Up" button - both always visible regardless of section collapse state. (2026-03-20)
+- [x] **Task 5** (2026-03-20)
+    A. Calendar date picker added to ALL date fields (expenses, incomes, todos, group expenses - both add and edit). Uses @react-native-community/datetimepicker with native calendar UI.
+    B. Group expense "Split Between" section now collapsible, default closed. Users expand when needed.
+    C. All listing sections made collapsible with reusable CollapsibleSection component. Applied to Dashboard (6 sections), Group Detail (3 sections), Settlements (3 sections). Animated arrow, clickable headers, defaultOpen=true. Component supports custom colors/icons.
+    D. Member Shares section added to settlements screen (was missing from mobile). Shows total unsettled amount + each member's share in compact list format (not cards). API updated with calculateMemberShares method.
 - [x] **Task 4** Group photo upload added to both Create Group and Edit Group screens. Photo shows in group list and group detail. Backend supports upload/change/remove on both web and API. (2026-03-20)
 - [x] **Task 3** Added header with hamburger menu (left) + user avatar (right) on dashboard. Hamburger drawer has all web navigation links. Footer nav: replaced Income tab with Tasks tab. Income accessible from drawer menu. (2026-03-20)
 - [x] **Task 2** Group join by invite code now requires admin approval. Join creates pending request, admin gets notification, can approve/reject from group detail. Implemented on both web and mobile. (2026-03-20)

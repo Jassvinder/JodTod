@@ -28,13 +28,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    // Public routes (no auth required)
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-    Route::post('/otp/send', [OtpController::class, 'send']);
-    Route::post('/otp/verify', [OtpController::class, 'verify']);
+    // Public routes (no auth required, rate limited)
+    Route::middleware('throttle:5,1')->group(function () {
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    });
+    Route::middleware('throttle:3,1')->group(function () {
+        Route::post('/otp/send', [OtpController::class, 'send']);
+        Route::post('/otp/verify', [OtpController::class, 'verify']);
+    });
 
     // Protected routes (Sanctum token auth + banned check)
     Route::middleware(['auth:sanctum', \App\Http\Middleware\CheckBanned::class])->group(function () {
