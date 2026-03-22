@@ -65,6 +65,11 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withPivot('role', 'joined_at');
     }
 
+    public function deviceTokens(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+
     /**
      * Check if the user has app-level admin role.
      * Named isAppAdmin() to avoid conflict with group-level isAdmin() checks.

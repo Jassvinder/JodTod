@@ -5,9 +5,15 @@
 
 ## Current Tasks
 
-- [] **Task 10**
+- [] **Task 11**
+    Kai baar terminal me ye show hota hai.
+    Logs for your project will appear below. Press Ctrl+C to exit.
+    Android Bundled 5416ms node_modules\expo-router\entry.js (1385 modules)
+    LOG  Push notifications not available (Expo Go or missing package)
+    Android Bundled 42ms node_modules\expo-router\entry.js (1 module)
+    LOG  Push notifications not available (Expo Go or missing package)
 
-
+    
 ## PENDING
 
 ### Phase 1: Project Setup & Auth (API: Partially Done)
@@ -162,6 +168,12 @@
 
 ## Completed Current Tasks
 
+- [x] **Task 10** (2026-03-21)
+    A. Reminder field now uses DatePickerField with datetime mode (date picker → time picker flow). No more manual typing.
+    B. Clear filter button styled as red pill button with close icon (was plain text).
+    C. Created reusable BottomNav component - added to ALL 16 sub-pages (contacts, todos, groups, settlements, notifications). Footer nav now visible everywhere.
+    D. DatePickerField updated: chevron-down → calendar icon. Added maxDate to expense/income pickers (no future dates). Reminder/due date allow future dates.
+    E. My contacts also has footer nav (included in the 16 pages).
 - [x] **Task 9** Todo category form keyboard closing bug fixed. Root cause: TextInput was inside FlatList's ListHeaderComponent - typing triggered re-render which unmounted/remounted the TextInput, dismissing keyboard. Fix: moved form outside FlatList as a separate View. (2026-03-21)
 - [x] **Task 8** (2026-03-21)
     A. Income tab restored as 6th footer icon (was hidden).

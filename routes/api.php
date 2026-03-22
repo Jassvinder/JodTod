@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ContactController;
+use App\Http\Controllers\Api\V1\DeviceTokenController;
 use App\Http\Controllers\Api\V1\ExpenseController;
 use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\GroupExpenseController;
@@ -124,5 +125,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/notifications/recent', [NotificationController::class, 'recent']);
         Route::put('/notifications/{id}/read', [NotificationController::class, 'markRead']);
         Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+
+        // Device Tokens (Push Notifications)
+        Route::post('/device-token', [DeviceTokenController::class, 'store']);
+        Route::delete('/device-token', [DeviceTokenController::class, 'destroy']);
     });
 });

@@ -70,7 +70,8 @@
       "Bash(grep -rn \"$_ET\\\\|$_OST\\\\|$_EQUEST\\\\|$_ERVER\" \"D:\\\\phpserver\\\\www\\\\JodTod\\\\app\" --include=\"*.php\")",
       "Bash(grep -rn \"password_reset_tokens\\\\|email_verification_token\" D:phpserverwwwJodToddatabasemigrations --include=*.php)",
       "Bash(find \"D:\\\\phpserver\\\\www\\\\JodTod\\\\app\\\\Http\\\\Controllers\\\\Api\\\\V1\" -name \"*.php\" -exec wc -l {} +)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(npx eas-cli:*)"
     ]
   }
 }

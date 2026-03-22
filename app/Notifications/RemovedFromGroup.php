@@ -6,6 +6,7 @@ use App\Models\Group;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
+use App\Notifications\Channels\ExpoPushChannel;
 
 class RemovedFromGroup extends Notification implements ShouldQueue
 {
@@ -19,7 +20,7 @@ class RemovedFromGroup extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', ExpoPushChannel::class];
     }
 
     public function toArray(object $notifiable): array
