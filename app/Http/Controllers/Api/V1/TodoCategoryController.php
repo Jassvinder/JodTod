@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Todo;
 use App\Models\TodoCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,19 @@ class TodoCategoryController extends Controller
 {
     public function index(): JsonResponse
     {
-        $categories = TodoCategory::where('user_id', Auth::id())
+        // Get user's own categories
+        $ownCategoryIds = TodoCategory::where('user_id', Auth::id())->pluck('id');
+
+        // Get category IDs from tasks assigned to the user (by others)
+        $assignedCategoryIds = Todo::where('assigned_to', Auth::id())
+            ->where('user_id', '!=', Auth::id())
+            ->whereNotNull('category_id')
+            ->pluck('category_id')
+            ->unique();
+
+        $allCategoryIds = $ownCategoryIds->merge($assignedCategoryIds)->unique();
+
+        $categories = TodoCategory::whereIn('id', $allCategoryIds)
             ->withCount('todos')
             ->orderBy('name')
             ->get();

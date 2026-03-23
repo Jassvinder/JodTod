@@ -12,7 +12,10 @@ class ExpoPushChannel
      */
     public function send(object $notifiable, Notification $notification): void
     {
+        \Log::info('ExpoPushChannel: sending to user ' . $notifiable->id . ' notification: ' . get_class($notification));
+
         if (!method_exists($notification, 'toArray')) {
+            \Log::warning('ExpoPushChannel: no toArray method');
             return;
         }
 
@@ -21,6 +24,7 @@ class ExpoPushChannel
         $body = $data['message'] ?? '';
 
         if (empty($body)) {
+            \Log::warning('ExpoPushChannel: empty body, skipping');
             return;
         }
 
@@ -34,6 +38,7 @@ class ExpoPushChannel
             'todo_reminder' => 'Task Reminder',
             'group_join_request' => 'Join Request',
             'removed_from_group' => 'Group Update',
+            'reactivated_in_group' => 'Welcome Back',
             'join_request_rejected' => 'Join Request Update',
         ];
 

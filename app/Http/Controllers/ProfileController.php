@@ -68,12 +68,20 @@ class ProfileController extends Controller
         $decoded = base64_decode($base64, true);
 
         if ($decoded === false) {
-            return back()->withErrors(['avatar' => 'Invalid image data.']);
+            $error = ['avatar' => ['Invalid image data.']];
+            if ($this->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Invalid image data.', 'errors' => $error], 422);
+            }
+            return back()->withErrors($error);
         }
 
         // Max 5MB check on decoded image
         if (strlen($decoded) > 5 * 1024 * 1024) {
-            return back()->withErrors(['avatar' => 'Image must be less than 5MB.']);
+            $error = ['avatar' => ['Image must be less than 5MB.']];
+            if ($this->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Image must be less than 5MB.', 'errors' => $error], 422);
+            }
+            return back()->withErrors($error);
         }
 
         // Convert to webp for smaller file size
@@ -82,7 +90,11 @@ class ProfileController extends Controller
 
         $image = imagecreatefromstring($decoded);
         if ($image === false) {
-            return back()->withErrors(['avatar' => 'Could not process image.']);
+            $error = ['avatar' => ['Could not process image.']];
+            if ($this->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Could not process image.', 'errors' => $error], 422);
+            }
+            return back()->withErrors($error);
         }
 
         ob_start();

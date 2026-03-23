@@ -480,6 +480,11 @@ class GroupController extends Controller
 
         $membership->update(['is_active' => true]);
 
+        $reactivatedUser = \App\Models\User::find($userId);
+        if ($reactivatedUser) {
+            $reactivatedUser->notify(new \App\Notifications\ReactivatedInGroup($group, $request->user()->name));
+        }
+
         return $this->success(null, 'Member has been reactivated.');
     }
 }

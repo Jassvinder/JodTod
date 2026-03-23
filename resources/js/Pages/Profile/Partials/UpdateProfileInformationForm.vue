@@ -306,11 +306,11 @@ const cancelPhoneEdit = () => {
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
                 Profile Information
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 Update your account's profile information and email address.
             </p>
         </header>
@@ -321,7 +321,7 @@ const cancelPhoneEdit = () => {
                 <!-- Avatar display -->
                 <div
                     v-if="avatarUrl"
-                    class="h-20 w-20 rounded-full overflow-hidden ring-2 ring-gray-200"
+                    class="h-20 w-20 rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-700"
                 >
                     <img
                         :src="avatarUrl"
@@ -341,7 +341,7 @@ const cancelPhoneEdit = () => {
                     <button
                         type="button"
                         @click="triggerFileInput"
-                        class="px-4 py-2 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 transition-colors"
+                        class="px-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 border border-primary-300 dark:border-primary-600 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
                     >
                         {{ avatarUrl ? 'Change Photo' : 'Upload Photo' }}
                     </button>
@@ -350,7 +350,7 @@ const cancelPhoneEdit = () => {
                         type="button"
                         @click="removeAvatar"
                         :disabled="avatarUploading"
-                        class="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                        class="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-300 dark:border-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
                     >
                         Remove
                     </button>
@@ -484,7 +484,7 @@ const cancelPhoneEdit = () => {
                 >
                     <p
                         v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
+                        class="text-sm text-gray-600 dark:text-gray-400"
                     >
                         Saved.
                     </p>
@@ -493,18 +493,18 @@ const cancelPhoneEdit = () => {
         </form>
 
         <!-- Phone Number Section (separate from main form, verified via OTP) -->
-        <div class="mt-8 pt-6 border-t border-gray-200">
-            <h3 class="text-base font-medium text-gray-900">Phone Number</h3>
-            <p class="mt-1 text-sm text-gray-600">
+        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 class="text-base font-medium text-gray-900 dark:text-gray-100">Phone Number</h3>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 A verified phone number is required to create or join groups. Phone will be verified via OTP.
             </p>
 
             <!-- Current phone display -->
             <div v-if="hasVerifiedPhone && phoneStep === 'idle'" class="mt-4">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg">
-                        <span class="text-gray-900 font-medium">+91 {{ user.phone }}</span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                    <div class="flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+                        <span class="text-gray-900 dark:text-gray-100 font-medium">+91 {{ user.phone }}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400">
                             Verified
                         </span>
                     </div>
@@ -531,7 +531,7 @@ const cancelPhoneEdit = () => {
                 <button
                     type="button"
                     @click="phoneStep = 'input'; phoneError = ''; phoneSuccess = '';"
-                    class="px-4 py-2 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 transition-colors"
+                    class="px-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 border border-primary-300 dark:border-primary-600 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
                 >
                     Add Phone Number
                 </button>
@@ -542,13 +542,13 @@ const cancelPhoneEdit = () => {
                 <div>
                     <InputLabel for="phone_new" value="Mobile Number" />
                     <div class="mt-1 flex">
-                        <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                        <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm">
                             +91
                         </span>
                         <input
                             id="phone_new"
                             type="tel"
-                            class="flex-1 rounded-r-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                            class="flex-1 rounded-r-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500"
                             v-model="phoneInput"
                             placeholder="9876543210"
                             maxlength="10"
@@ -580,14 +580,14 @@ const cancelPhoneEdit = () => {
             <!-- Step 2: Verify OTP -->
             <div v-if="phoneStep === 'verify'" class="mt-4 space-y-3">
                 <p class="text-sm text-gray-600">
-                    OTP sent to <span class="font-medium text-gray-900">+91 {{ phoneInput }}</span>
+                    OTP sent to <span class="font-medium text-gray-900 dark:text-gray-100">+91 {{ phoneInput }}</span>
                     <button type="button" @click="phoneStep = 'input'; otpCode = ''; phoneError = '';" class="ml-2 text-primary-600 hover:text-primary-700 text-sm font-medium">
                         Change
                     </button>
                 </p>
 
-                <div v-if="otpDebug" class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p class="text-sm text-yellow-800">
+                <div v-if="otpDebug" class="p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+                    <p class="text-sm text-yellow-800 dark:text-yellow-300">
                         <span class="font-medium">Dev Mode OTP:</span> {{ otpDebug }}
                     </p>
                 </div>
@@ -598,7 +598,7 @@ const cancelPhoneEdit = () => {
                         id="phone_otp"
                         type="text"
                         inputmode="numeric"
-                        class="mt-1 block w-48 rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500 text-center text-lg tracking-widest"
+                        class="mt-1 block w-48 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 text-center text-lg tracking-widest"
                         v-model="otpCode"
                         placeholder="------"
                         maxlength="6"
@@ -635,9 +635,9 @@ const cancelPhoneEdit = () => {
         </div>
 
         <!-- Notification Preferences Section -->
-        <div class="mt-8 pt-6 border-t border-gray-200">
-            <h3 class="text-base font-medium text-gray-900">Notification Preferences</h3>
-            <p class="mt-1 text-sm text-gray-600">
+        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 class="text-base font-medium text-gray-900 dark:text-gray-100">Notification Preferences</h3>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 Choose how you want to receive notifications.
             </p>
 
@@ -650,7 +650,7 @@ const cancelPhoneEdit = () => {
                         class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                     />
                     <div>
-                        <span class="text-sm font-medium text-gray-900">Email Notifications</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Email Notifications</span>
                         <p class="text-xs text-gray-500">Receive notifications via email (group expenses, settlements, etc.)</p>
                     </div>
                 </label>
@@ -663,7 +663,7 @@ const cancelPhoneEdit = () => {
                         class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                     />
                     <div>
-                        <span class="text-sm font-medium text-gray-900">Push Notifications</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Push Notifications</span>
                         <p class="text-xs text-gray-500">Receive push notifications in browser (coming soon)</p>
                     </div>
                 </label>
@@ -671,16 +671,16 @@ const cancelPhoneEdit = () => {
         </div>
 
         <!-- Email Verification Section -->
-        <div class="mt-8 pt-6 border-t border-gray-200">
-            <h3 class="text-base font-medium text-gray-900">Email Verification</h3>
-            <p class="mt-1 text-sm text-gray-600">
+        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 class="text-base font-medium text-gray-900 dark:text-gray-100">Email Verification</h3>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 Verify your email address to ensure account security.
             </p>
 
             <div class="mt-4">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg">
-                        <span class="text-gray-900 font-medium">{{ user.email }}</span>
+                    <div class="flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+                        <span class="text-gray-900 dark:text-gray-100 font-medium">{{ user.email }}</span>
                         <span
                             v-if="user.email_verified_at"
                             class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700"

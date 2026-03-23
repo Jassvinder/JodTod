@@ -5,15 +5,8 @@
 
 ## Current Tasks
 
-- [] **Task 11**
-    Kai baar terminal me ye show hota hai.
-    Logs for your project will appear below. Press Ctrl+C to exit.
-    Android Bundled 5416ms node_modules\expo-router\entry.js (1385 modules)
-    LOG  Push notifications not available (Expo Go or missing package)
-    Android Bundled 42ms node_modules\expo-router\entry.js (1 module)
-    LOG  Push notifications not available (Expo Go or missing package)
+- [] **Task 18**
 
-    
 ## PENDING
 
 ### Phase 1: Project Setup & Auth (API: Partially Done)
@@ -65,7 +58,7 @@
 - [x] **M-307** - Edit expense screen (same form, pre-filled) (2026-03-19)
 - [x] **M-308** - Delete expense (long press → confirm) (2026-03-19)
 - [x] **M-309** - Image upload for expense (2 max, camera + gallery, preview, remove) (2026-03-19)
-- [ ] **M-310** - Expense summary/charts (category breakdown pie chart, monthly trends)
+- [x] **M-310** - Expense summary/charts (category breakdown pie chart, monthly trends) (2026-03-23)
 
 ### Phase 4: Income Tracking
 > API Controller: DONE
@@ -76,7 +69,7 @@
 - [x] **M-404** - Add/Edit income (amount, source with autocomplete, description, date) (2026-03-19)
 - [x] **M-405** - Delete income (long press → confirm) (2026-03-19)
 - [x] **M-406** - Income summary cards (this month income, savings/loss) (2026-03-19)
-- [ ] **M-407** - Income vs Expense chart (6-month trend)
+- [x] **M-407** - Income vs Expense chart (6-month trend) (2026-03-23)
 
 ### Phase 5: Todos/Tasks
 > API Controller: DONE
@@ -141,21 +134,21 @@
 - [x] **M-1002** - Notifications list screen (paginated, pull-to-refresh, type-based icons) (2026-03-19)
 - [x] **M-1003** - Mark as read (tap) / Mark all as read button (2026-03-19)
 - [x] **M-1004** - Unread count badge on dashboard bell icon (2026-03-19)
-- [ ] **M-1005** - Push notifications setup (expo-notifications, device token registration)
-- [ ] **M-1006** - **[API]** Device token storage endpoint (POST /api/v1/device-token)
-- [ ] **M-1007** - Notification tap → deep link to relevant screen (group, settlement, todo etc.)
+- [x] **M-1005** - Push notifications setup (expo-notifications, device token registration) (2026-03-23)
+- [x] **M-1006** - **[API]** Device token storage endpoint (POST /api/v1/device-token) (2026-03-23)
+- [x] **M-1007** - Notification tap → deep link to relevant screen (group, settlement, todo etc.) (2026-03-20)
 
 ### Phase 11: Polish & UX
-- [ ] **M-1101** - Dark mode support (system preference + manual toggle, persist in AsyncStorage)
-- [ ] **M-1102** - Pull-to-refresh on all list screens
-- [ ] **M-1103** - Empty states with helpful messages on all screens
-- [ ] **M-1104** - Loading skeletons/spinners
-- [ ] **M-1105** - Confirm dialogs for all destructive actions (delete, leave, ban etc.)
-- [ ] **M-1106** - Toast/snackbar for success/error messages (use API response messages, never hardcode)
-- [ ] **M-1107** - Offline indicator banner
-- [ ] **M-1108** - Deep linking setup (expo-linking: /join/{code}, notification taps)
-- [ ] **M-1109** - App icon + splash screen (JodTod branding)
-- [ ] **M-1110** - Currency formatting (INR with ₹ symbol, Indian number format)
+- [x] **M-1101** - Dark mode support (system preference + manual toggle, persist in AsyncStorage) (2026-03-23)
+- [x] **M-1102** - Pull-to-refresh on all list screens (2026-03-23)
+- [x] **M-1103** - Empty states with helpful messages on all screens (2026-03-23)
+- [x] **M-1104** - Loading skeletons/spinners (2026-03-23)
+- [x] **M-1105** - Confirm dialogs for all destructive actions (delete, leave, ban etc.) (2026-03-23)
+- [x] **M-1106** - Toast/snackbar for success/error messages (use API response messages, never hardcode) (2026-03-23)
+- [x] **M-1107** - Offline indicator banner (2026-03-23)
+- [x] **M-1108** - Deep linking setup (expo-linking: /join/{code}, notification taps) (2026-03-23)
+- [x] **M-1109** - App icon + splash screen (JodTod branding) (2026-03-23)
+- [x] **M-1110** - Currency formatting (INR with ₹ symbol, Indian number format) (2026-03-23)
 
 ### Release
 - [ ] Manual testing of all features
@@ -168,6 +161,32 @@
 
 ## Completed Current Tasks
 
+- [x] **Task 17** (2026-03-23)
+    A. Group expense edit: Split section wrapped in CollapsibleSection (defaultOpen=false) matching add page. Title "Split Between" with branch icon, same as add page.
+    B. Notifications dark mode: Unread notification background changed from hardcoded #f0f0ff to dark-aware color (#1e1b4b in dark, #f0f0ff in light). Unread items now clearly visible in dark mode.
+- [x] **Task 16** (2026-03-23)
+    A. Password error message fixed - backend now returns "Current password is incorrect" instead of generic message.
+    B. Eye icon toggle added to all 3 password fields (current/new/confirm) for show/hide password.
+    C. Avatar: photo not tappable anymore. "Change Photo" is a separate link below. Red cross button (X) on top-right corner of avatar for remove.
+    D. Notification section: removed "Coming soon" from Push Notifications, now shows On/Off status. Added note about production build requirement.
+- [x] **Task 15** (2026-03-23)
+    A. Avatar upload - tap profile photo to pick from gallery (1:1 crop), base64 upload to API, remove option. Backend routes added for POST/DELETE /profile/avatar.
+    B. Change Password - expandable section with current/new/confirm fields. Backend PasswordController updated with wantsJson() support for API.
+    C. Phone Verification - OTP flow: enter 10-digit number → Send OTP → enter 6-digit code → Verify. Debug OTP shown in dev. Remove phone option. Backend routes added for phone send-otp/verify/remove.
+- [x] **Task 14** (2026-03-23)
+    A. CollapsibleSection rewritten - replaced flaky animated height measurement with LayoutAnimation + simple show/hide. Dashboard tasks section no longer disappears on collapse/expand.
+    B. Ownership badges on todo items: blue "To me" badge (arrow-down) for tasks assigned to current user by others, amber "By me" badge (arrow-up) for tasks assigned by current user to others. Applied to both tab and standalone todo screens.
+    C. Category filter now includes categories from assigned tasks too. Backend API updated to merge user's own categories with categories from tasks assigned to user by others.
+- [x] **Task 13** (2026-03-23)
+    A. Dark mode implemented - Zustand themeStore with 3 modes (Light/Dark/System), AsyncStorage persistence, system preference detection. useColors() hook added to all 43 files. Toggle on Profile page + DrawerMenu.
+    B. Category breakdown pie chart added to Expenses screen (react-native-chart-kit PieChart, top 6 categories). Charts wrapped in CollapsibleSection, default closed for simpler UX.
+    C. Income vs Expense 6-month bar chart added to Income screen (BarChart with green/red, legend, ₹ labels). Also collapsible, default closed.
+    D. Offline indicator banner - amber "No Internet" banner slides in/out using NetInfo listener.
+    E. Deep linking - jodtod://join/{code} opens Join Group screen with code pre-filled. intentFilters added to app.json for Android.
+    F. App icon + splash screen already configured. Updated userInterfaceStyle to "automatic" for dark mode support.
+    G. Phase 11 Polish tasks (M-1102 to M-1110) all verified/completed - pull-to-refresh, empty states, loading spinners, confirm dialogs, toasts, currency formatting were already implemented.
+- [x] **Task 12** Push notification log silenced - removed console.log for expected Expo Go limitation. (2026-03-23)
+- [x] **Task 11** Push notification log silenced (same as 12, was duplicate entry). (2026-03-23)
 - [x] **Task 10** (2026-03-21)
     A. Reminder field now uses DatePickerField with datetime mode (date picker → time picker flow). No more manual typing.
     B. Clear filter button styled as red pill button with close icon (was plain text).

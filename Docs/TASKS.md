@@ -1,6 +1,9 @@
 # JodTod - Task Tracker
 - [] **0000**
 
+- [] **510**
+    A.  jab user ko gruop me add kiya to push notification nahi aaya in-app aaya only.
+    B.  group expense add par task assing par chal raha hai. to group me member add par deactivate, remove par aise sabhi actions par push notification aani chahiye.
 
 **Admin** Section tasks. starts from 500 =======================================
 
@@ -22,6 +25,7 @@
 
 ## COMPLETED
 ## Completed Current Tasks
+- [x] **Task 509** - Profile page dark mode fix: Added dark: classes to all sections - Profile Info header/subtitle, avatar ring/buttons, Phone Number (border, headings, input, verified badge, OTP debug), Notification Preferences (border, headings, labels), Email Verification (border, heading, email display). (2026-03-23)
 - [x] **Task 508** - (A) Tick icon added to "All Settled" badge on groups listing. (B) Settlement page: Member Shares hides after all settled (reverted). (C) Group detail page: new "Member Shares" section between Members and Expenses - purple themed, shows all-time total share per member, collapsible. (D) "Settle Up" → "Settlement" button text. (E) All 4 settlement page sections (Balance Overview, Member Shares, Suggested Settlements, Settlement History) made collapsible with smooth CSS grid transitions. (2026-03-21)
 - [x] **Task 507** - (A) Member Shares section now always visible even after all settled. (B) Added stats summary bar (Expenses count, Total Spent highlighted, Members count) on group detail page. (C) "All Settled" green badge on groups listing when all expenses settled. (D) Members and Pending Requests sections collapsible with smooth CSS grid transition + animated chevron. (E) Group expense list: Edit/Delete text replaced with pencil/trash icons, expand/collapse uses Vue Transition with smooth max-height animation. (2026-03-21)
 - [x] **Task 506** - (A) Description field moved after Category in group expense Create and Edit forms. New order: Amount → Category → Description → Date → Paid By. (B) Split Between section made collapsible with animated arrow, default closed. Shows current split type label. Applied to both Create and Edit. (C) Custom/Percentage split explained to user. (2026-03-20)
