@@ -494,9 +494,12 @@ const cancelPhoneEdit = () => {
 
         <!-- Phone Number Section (separate from main form, verified via OTP) -->
         <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <h3 class="text-base font-medium text-gray-900 dark:text-gray-100">Phone Number</h3>
+            <div class="flex items-center gap-2">
+                <h3 class="text-base font-medium text-gray-900 dark:text-gray-100">Phone Number</h3>
+                <span class="text-[10px] bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full font-semibold">Coming Soon</span>
+            </div>
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                A verified phone number is required to create or join groups. Phone will be verified via OTP.
+                Phone verification via OTP will be available soon.
             </p>
 
             <!-- Current phone display -->
@@ -526,12 +529,12 @@ const cancelPhoneEdit = () => {
                 </div>
             </div>
 
-            <!-- No phone yet -->
+            <!-- No phone yet - disabled until SMS provider configured -->
             <div v-if="!hasVerifiedPhone && phoneStep === 'idle'" class="mt-4">
                 <button
                     type="button"
-                    @click="phoneStep = 'input'; phoneError = ''; phoneSuccess = '';"
-                    class="px-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 border border-primary-300 dark:border-primary-600 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
+                    disabled
+                    class="px-4 py-2 text-sm font-medium text-gray-400 dark:text-gray-500 border border-gray-300 dark:border-gray-600 rounded-lg cursor-not-allowed"
                 >
                     Add Phone Number
                 </button>

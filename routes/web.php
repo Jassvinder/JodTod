@@ -98,8 +98,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/notifications/preferences', [NotificationController::class, 'updatePreferences'])->name('notifications.preferences');
 });
 
-// Groups (require phone verification)
-Route::middleware(['auth', 'verified', 'phone.verified'])->group(function () {
+// Groups (phone.verified temporarily disabled - enable when SMS provider configured)
+Route::middleware(['auth', 'verified'/*, 'phone.verified'*/])->group(function () {
     Route::resource('groups', GroupController::class);
     Route::post('/groups/{group}/invite', [GroupController::class, 'refreshInviteCode'])->name('groups.invite');
     Route::post('/groups/join', [GroupController::class, 'join'])->name('groups.join');

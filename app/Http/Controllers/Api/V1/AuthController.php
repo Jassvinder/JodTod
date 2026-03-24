@@ -37,6 +37,8 @@ class AuthController extends Controller
 
     public function register(Request $request): JsonResponse
     {
+        // API registration uses rate limiting (5/min) instead of CAPTCHA
+        // CAPTCHA is for web registration only (reCAPTCHA v3 needs browser)
         $validated = $request->validate([
             'name' => 'required|string|min:2|max:100',
             'email' => 'required|email|unique:users,email',

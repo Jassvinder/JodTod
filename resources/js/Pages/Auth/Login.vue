@@ -121,15 +121,11 @@ const changePhone = () => {
             </button>
             <button
                 type="button"
-                @click="activeTab = 'otp'"
-                :class="[
-                    'flex-1 py-2.5 text-sm font-medium transition-colors',
-                    activeTab === 'otp'
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
-                ]"
+                disabled
+                class="flex-1 py-2.5 text-sm font-medium bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed relative"
             >
                 OTP Login
+                <span class="ml-1 text-[10px] bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-full font-semibold">Soon</span>
             </button>
         </div>
 

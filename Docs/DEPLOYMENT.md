@@ -152,6 +152,16 @@ MAIL_FROM_NAME="JodTod"
 
 SESSION_DRIVER=database
 CACHE_STORE=file
+
+# reCAPTCHA v3 - Bot protection on registration
+# Get keys from: https://www.google.com/recaptcha/admin
+# Select "reCAPTCHA v3", add your domain
+RECAPTCHA_SITE_KEY=your_site_key_here
+RECAPTCHA_SECRET_KEY=your_secret_key_here
+
+# Firebase FCM - Push notifications
+# Service account file should be at: storage/app/firebase-service-account.json
+# Download from: Firebase Console → Project Settings → Service Accounts → Generate New Private Key
 ```
 
 ### Step 6: Run Migrations & Setup
@@ -443,6 +453,77 @@ eas submit --platform android
 - **Queue worker logs:** `/var/www/jodtod/storage/logs/worker.log`
 - **Nginx logs:** `/var/log/nginx/error.log`
 - **Supervisor:** `sudo supervisorctl status`
+
+---
+
+## Temporarily Disabled Features (Enable When Ready)
+
+These features are disabled for initial launch because they require an SMS provider (paid service). They can be enabled in ~5 minutes when you're ready.
+
+### What's Disabled:
+| Feature | Platform | Status |
+|---------|----------|--------|
+| OTP Login (phone login) | Web + Mobile | Disabled with "Coming Soon" badge |
+| Phone Verification (profile) | Web + Mobile | Disabled with "Coming Soon" badge |
+| Phone required for groups | Web | `phone.verified` middleware commented out |
+
+### How to Enable (When SMS Provider Ready):
+
+#### Step 1: Choose & Configure SMS Provider
+Add to `.env`:
+```env
+# MSG91 (recommended for India, ~₹0.15/SMS)
+MSG91_AUTH_KEY=your_auth_key
+MSG91_SENDER_ID=JODTOD
+MSG91_TEMPLATE_ID=your_template_id
+
+# OR Twilio (international, ~₹0.50/SMS)
+TWILIO_SID=your_sid
+TWILIO_TOKEN=your_token
+TWILIO_FROM=+1234567890
+```
+
+#### Step 2: Enable Phone Verification Middleware
+File: `routes/web.php` (line ~102)
+```php
+// Change this:
+Route::middleware(['auth', 'verified'/*, 'phone.verified'*/])->group(function () {
+
+// To this:
+Route::middleware(['auth', 'verified', 'phone.verified'])->group(function () {
+```
+
+#### Step 3: Enable OTP Login Tab (Web)
+File: `resources/js/Pages/Auth/Login.vue`
+- Find the disabled OTP button and restore the `@click="activeTab = 'otp'"` handler
+- Remove `disabled` attribute and "Soon" badge
+
+#### Step 4: Enable OTP Login Tab (Mobile)
+File: `JodTodApp/app/(auth)/login.tsx`
+- Restore the original tab code with both `email` and `otp` tabs clickable
+- Remove the "SOON" badge View
+
+#### Step 5: Enable Phone Section (Web Profile)
+File: `resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.vue`
+- Remove "Coming Soon" badge from Phone Number heading
+- Restore original description text
+- Enable the "Add Phone Number" button (remove `disabled` + restore `@click`)
+
+#### Step 6: Enable Phone Section (Mobile Profile)
+File: `JodTodApp/app/(tabs)/profile/index.tsx`
+- Add the phone verification OTP flow (sendOtp, verifyOtp handlers)
+- Already implemented in a previous session, just needs to be re-added
+
+#### Step 7: Restart & Test
+```bash
+# Rebuild frontend
+npm run build
+
+# Restart queue worker
+sudo supervisorctl restart jodtod-worker:*
+
+# Test OTP flow end-to-end
+```
 
 ---
 
