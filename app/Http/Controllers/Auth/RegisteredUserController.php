@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use App\Rules\Recaptcha;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,7 +21,9 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Auth/Register', [
+            'recaptchaSiteKey' => config('services.recaptcha.site_key'),
+        ]);
     }
 
     /**
@@ -30,11 +33,17 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email:rfc,dns|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ];
+
+        if (config('services.recaptcha.secret_key')) {
+            $rules['recaptcha_token'] = ['required', new Recaptcha()];
+        }
+
+        $request->validate($rules);
 
         $user = User::create([
             'name' => $request->name,

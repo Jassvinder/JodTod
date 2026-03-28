@@ -12,11 +12,27 @@ const form = useForm({
     amount: props.expense.amount,
     category_id: props.expense.category_id,
     description: props.expense.description || '',
-    expense_date: props.expense.expense_date ? props.expense.expense_date.slice(0, 16) : '',
+    expense_date: props.expense.expense_date
+        ? props.expense.expense_date.replace(' ', 'T').slice(0, 16)
+        : '',
+    image_1: null,
+    image_2: null,
+    remove_image_1: false,
+    remove_image_2: false,
 });
 
+const existingImages = {
+    image_1: props.expense.image_1,
+    image_2: props.expense.image_2,
+};
+
 function submit() {
-    form.put(route('expenses.update', props.expense.id));
+    form.transform((data) => ({
+        ...data,
+        _method: 'PUT',
+    })).post(route('expenses.update', props.expense.id), {
+        forceFormData: true,
+    });
 }
 </script>
 
@@ -32,6 +48,7 @@ function submit() {
                 <ExpenseForm
                     :form="form"
                     :categories="categories"
+                    :existing-images="existingImages"
                     :processing="form.processing"
                     submit-label="Update Expense"
                     @submit="submit"

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class GroupExpenseController extends Controller
@@ -68,10 +69,14 @@ class GroupExpenseController extends Controller
     {
         $this->ensureMember($group);
 
+        $group->load(['activeMembers' => function ($query) {
+            $query->select('users.id', 'users.name', 'users.avatar', 'users.phone');
+        }]);
+        // Map activeMembers to members key so Vue components work without changes
+        $group->setRelation('members', $group->activeMembers);
+
         return Inertia::render('Groups/Expenses/Create', [
-            'group' => $group->load(['members' => function ($query) {
-                $query->select('users.id', 'users.name', 'users.avatar', 'users.phone');
-            }]),
+            'group' => $group,
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
@@ -83,7 +88,7 @@ class GroupExpenseController extends Controller
     {
         $this->ensureMember($group);
 
-        $memberIds = $group->members()->pluck('users.id')->toArray();
+        $memberIds = $group->activeMembers()->pluck('users.id')->toArray();
         $memberIdList = implode(',', $memberIds);
 
         $validated = $request->validate([
@@ -95,13 +100,22 @@ class GroupExpenseController extends Controller
             'split_type' => 'required|in:equal,custom,percentage',
             'splits' => 'required|array|min:1',
             'splits.*.user_id' => ['required', 'integer', "in:{$memberIdList}"],
-            'splits.*.share_amount' => 'required|numeric|min:0',
+            'splits.*.share_amount' => 'required|numeric|min:0.01',
             'splits.*.percentage' => 'nullable|numeric|min:0|max:100',
+            'image_1' => 'nullable|image|max:5120',
+            'image_2' => 'nullable|image|max:5120',
         ]);
 
         $this->validateSplits($validated);
 
-        $expense = DB::transaction(function () use ($validated, $group) {
+        $imagePaths = [];
+        foreach (['image_1', 'image_2'] as $field) {
+            if ($request->hasFile($field)) {
+                $imagePaths[$field] = $this->storeImageAsWebp($request->file($field));
+            }
+        }
+
+        $expense = DB::transaction(function () use ($validated, $group, $imagePaths) {
             $expense = Expense::create([
                 'group_id' => $group->id,
                 'user_id' => Auth::id(),
@@ -111,6 +125,7 @@ class GroupExpenseController extends Controller
                 'description' => $validated['description'],
                 'expense_date' => $validated['expense_date'],
                 'split_type' => $validated['split_type'],
+                ...$imagePaths,
             ]);
 
             $splits = $this->prepareSplits($validated);
@@ -140,10 +155,13 @@ class GroupExpenseController extends Controller
         $this->ensureExpenseBelongsToGroup($expense, $group);
         $this->ensureCanModify($group, $expense);
 
+        $group->load(['activeMembers' => function ($query) {
+            $query->select('users.id', 'users.name', 'users.avatar', 'users.phone');
+        }]);
+        $group->setRelation('members', $group->activeMembers);
+
         return Inertia::render('Groups/Expenses/Edit', [
-            'group' => $group->load(['members' => function ($query) {
-                $query->select('users.id', 'users.name', 'users.avatar', 'users.phone');
-            }]),
+            'group' => $group,
             'expense' => $expense->load('splits'),
             'categories' => Category::orderBy('name')->get(),
         ]);
@@ -158,7 +176,7 @@ class GroupExpenseController extends Controller
         $this->ensureExpenseBelongsToGroup($expense, $group);
         $this->ensureCanModify($group, $expense);
 
-        $memberIds = $group->members()->pluck('users.id')->toArray();
+        $memberIds = $group->activeMembers()->pluck('users.id')->toArray();
         $memberIdList = implode(',', $memberIds);
 
         $validated = $request->validate([
@@ -170,13 +188,31 @@ class GroupExpenseController extends Controller
             'split_type' => 'required|in:equal,custom,percentage',
             'splits' => 'required|array|min:1',
             'splits.*.user_id' => ['required', 'integer', "in:{$memberIdList}"],
-            'splits.*.share_amount' => 'required|numeric|min:0',
+            'splits.*.share_amount' => 'required|numeric|min:0.01',
             'splits.*.percentage' => 'nullable|numeric|min:0|max:100',
+            'image_1' => 'nullable|image|max:5120',
+            'image_2' => 'nullable|image|max:5120',
+            'remove_image_1' => 'nullable|boolean',
+            'remove_image_2' => 'nullable|boolean',
         ]);
 
         $this->validateSplits($validated);
 
-        DB::transaction(function () use ($validated, $expense) {
+        $imageUpdates = [];
+        foreach (['image_1', 'image_2'] as $field) {
+            $removeKey = "remove_{$field}";
+            if ($request->boolean($removeKey) && $expense->{$field}) {
+                Storage::disk('public')->delete($expense->{$field});
+                $imageUpdates[$field] = null;
+            } elseif ($request->hasFile($field)) {
+                if ($expense->{$field}) {
+                    Storage::disk('public')->delete($expense->{$field});
+                }
+                $imageUpdates[$field] = $this->storeImageAsWebp($request->file($field));
+            }
+        }
+
+        DB::transaction(function () use ($validated, $expense, $imageUpdates) {
             $expense->update([
                 'paid_by' => $validated['paid_by'],
                 'amount' => $validated['amount'],
@@ -184,6 +220,7 @@ class GroupExpenseController extends Controller
                 'description' => $validated['description'],
                 'expense_date' => $validated['expense_date'],
                 'split_type' => $validated['split_type'],
+                ...$imageUpdates,
             ]);
 
             // Delete old splits and create new ones
@@ -331,6 +368,27 @@ class GroupExpenseController extends Controller
                 'percentage' => $split['percentage'] ?? null,
             ];
         }, $splits);
+    }
+
+    /**
+     * Convert uploaded image to webp and store it.
+     */
+    private function storeImageAsWebp($file): string
+    {
+        $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
+        if ($image === false) {
+            throw new \RuntimeException('Unable to process uploaded image.');
+        }
+
+        $filename = 'expenses/' . uniqid() . '.webp';
+        ob_start();
+        imagewebp($image, null, 80);
+        $webpData = ob_get_clean();
+        imagedestroy($image);
+
+        Storage::disk('public')->put($filename, $webpData);
+
+        return $filename;
     }
 
     /**

@@ -17,8 +17,12 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): Response
+    public function edit(Request $request): Response|\Illuminate\Http\JsonResponse
     {
+        if ($this->wantsJson()) {
+            return $this->success($request->user());
+        }
+
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
@@ -28,7 +32,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $request->user()->fill($request->validated());
 
@@ -37,6 +41,10 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        if ($this->wantsJson()) {
+            return $this->success($request->user(), 'Profile updated successfully.');
+        }
 
         return Redirect::route('profile.edit');
     }
@@ -60,12 +68,20 @@ class ProfileController extends Controller
         $decoded = base64_decode($base64, true);
 
         if ($decoded === false) {
-            return back()->withErrors(['avatar' => 'Invalid image data.']);
+            $error = ['avatar' => ['Invalid image data.']];
+            if ($this->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Invalid image data.', 'errors' => $error], 422);
+            }
+            return back()->withErrors($error);
         }
 
         // Max 5MB check on decoded image
         if (strlen($decoded) > 5 * 1024 * 1024) {
-            return back()->withErrors(['avatar' => 'Image must be less than 5MB.']);
+            $error = ['avatar' => ['Image must be less than 5MB.']];
+            if ($this->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Image must be less than 5MB.', 'errors' => $error], 422);
+            }
+            return back()->withErrors($error);
         }
 
         // Convert to webp for smaller file size
@@ -74,7 +90,11 @@ class ProfileController extends Controller
 
         $image = imagecreatefromstring($decoded);
         if ($image === false) {
-            return back()->withErrors(['avatar' => 'Could not process image.']);
+            $error = ['avatar' => ['Could not process image.']];
+            if ($this->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Could not process image.', 'errors' => $error], 422);
+            }
+            return back()->withErrors($error);
         }
 
         ob_start();
@@ -108,13 +128,20 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $request->validate([
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
+
+        if ($this->wantsJson()) {
+            $user->tokens()->delete();
+            $user->delete();
+
+            return $this->success(null, 'Account deleted successfully.');
+        }
 
         Auth::logout();
 

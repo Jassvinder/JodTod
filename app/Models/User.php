@@ -10,10 +10,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\QueuedResetPassword;
 use App\Notifications\QueuedVerifyEmail;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -27,7 +28,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'language',
         'notification_email',
         'notification_push',
-        'role',
     ];
 
     protected $hidden = [
@@ -35,6 +35,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
         'google_id',
     ];
+
+    protected $appends = ['avatar_url'];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (!$this->avatar) return null;
+        return url('/storage/' . $this->avatar);
+    }
 
     public function expenses(): HasMany
     {
@@ -46,10 +54,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(BlogPost::class, 'author_id');
     }
 
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(Contact::class);
+    }
+
     public function groups(): BelongsToMany
     {
         return $this->belongsToMany(Group::class, 'group_members')
             ->withPivot('role', 'joined_at');
+    }
+
+    public function deviceTokens(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
     }
 
     /**
@@ -59,6 +77,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAppAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->banned_at !== null;
     }
 
     public function sendEmailVerificationNotification(): void
@@ -79,6 +102,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'notification_email' => 'boolean',
             'notification_push' => 'boolean',
+            'banned_at' => 'datetime',
         ];
     }
 }

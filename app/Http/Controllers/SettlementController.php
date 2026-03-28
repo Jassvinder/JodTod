@@ -48,6 +48,9 @@ class SettlementController extends Controller
             ];
         }, $transactions);
 
+        // Calculate each member's total share from unsettled expenses
+        $memberShares = $this->calculateMemberShares($group);
+
         // Settlement history
         $settlements = Settlement::where('group_id', $group->id)
             ->with(['fromUser:id,name,avatar', 'toUser:id,name,avatar'])
@@ -60,6 +63,7 @@ class SettlementController extends Controller
             'balances' => $balances,
             'suggestedTransactions' => $suggestedTransactions,
             'settlements' => $settlements,
+            'memberShares' => $memberShares,
         ]);
     }
 
@@ -70,15 +74,30 @@ class SettlementController extends Controller
     {
         $this->ensureMember($group);
 
-        $transactions = $this->calculateOptimizedTransactions($group);
-
-        if (empty($transactions)) {
-            return redirect()->back()->with('info', 'No unsettled expenses found.');
+        // Only group admin can initiate settle up
+        if (!$group->isAdmin(Auth::user())) {
+            abort(403, 'Only group admin can initiate settlements.');
         }
 
-        $members = $group->members()->get()->keyBy('id');
+        $result = DB::transaction(function () use ($group) {
+            // Lock check: prevent duplicate pending settlements (race condition safe)
+            $pendingCount = Settlement::where('group_id', $group->id)
+                ->where('status', 'pending')
+                ->lockForUpdate()
+                ->count();
 
-        DB::transaction(function () use ($transactions, $group, $members) {
+            if ($pendingCount > 0) {
+                return 'pending_exists';
+            }
+
+            $transactions = $this->calculateOptimizedTransactions($group);
+
+            if (empty($transactions)) {
+                return 'no_expenses';
+            }
+
+            $members = $group->members()->get()->keyBy('id');
+
             foreach ($transactions as $transaction) {
                 Settlement::create([
                     'group_id' => $group->id,
@@ -88,14 +107,23 @@ class SettlementController extends Controller
                     'status' => 'pending',
                 ]);
 
-                // Notify the debtor (from_user) about the settlement request
                 $fromUser = $members->get($transaction['from']);
                 $toUser = $members->get($transaction['to']);
                 if ($fromUser && $toUser) {
                     $fromUser->notify(new SettlementRequested($group, $transaction['amount'], $toUser->name));
                 }
             }
+
+            return 'success';
         });
+
+        if ($result === 'pending_exists') {
+            return redirect()->back()->with('info', 'Pending settlements already exist. Complete or settle them first before creating new ones.');
+        }
+
+        if ($result === 'no_expenses') {
+            return redirect()->back()->with('info', 'No unsettled expenses found.');
+        }
 
         return redirect()->route('groups.settlements.index', $group)
             ->with('success', 'Settlement created successfully. Pending confirmation from members.');
@@ -111,6 +139,11 @@ class SettlementController extends Controller
         // Verify settlement belongs to this group
         if ($settlement->group_id !== $group->id) {
             abort(404);
+        }
+
+        // Prevent double completion
+        if ($settlement->status === 'completed') {
+            return redirect()->back()->with('info', 'Settlement is already completed.');
         }
 
         // Verify user is either from_user, to_user, or group admin
@@ -242,6 +275,45 @@ class SettlementController extends Controller
         }
 
         return $balances;
+    }
+
+    /**
+     * Calculate each member's total share from unsettled expenses.
+     */
+    private function calculateMemberShares(Group $group): array
+    {
+        $members = $group->members()->get();
+
+        $unsettledExpenseIds = $group->expenses()
+            ->where('is_settled', false)
+            ->whereNull('deleted_at')
+            ->pluck('id');
+
+        $totalExpenseAmount = $group->expenses()
+            ->where('is_settled', false)
+            ->whereNull('deleted_at')
+            ->sum('amount');
+
+        $shares = [];
+
+        foreach ($members as $member) {
+            $totalShare = ExpenseSplit::whereIn('expense_id', $unsettledExpenseIds)
+                ->where('user_id', $member->id)
+                ->where('is_settled', false)
+                ->sum('share_amount');
+
+            $shares[] = [
+                'user_id' => $member->id,
+                'name' => $member->name,
+                'avatar' => $member->avatar,
+                'total_share' => round((float) $totalShare, 2),
+            ];
+        }
+
+        return [
+            'total_expense' => round((float) $totalExpenseAmount, 2),
+            'members' => $shares,
+        ];
     }
 
     /**

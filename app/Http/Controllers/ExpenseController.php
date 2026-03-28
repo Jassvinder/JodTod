@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ExpenseController extends Controller
@@ -119,13 +120,21 @@ class ExpenseController extends Controller
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string|max:255',
             'expense_date' => 'required|date|before_or_equal:now',
+            'image_1' => 'nullable|image|max:5120',
+            'image_2' => 'nullable|image|max:5120',
         ]);
 
-        Expense::create([
-            ...$validated,
-            'user_id' => Auth::id(),
-            'paid_by' => Auth::id(),
-        ]);
+        $data = collect($validated)->except(['image_1', 'image_2'])->toArray();
+        $data['user_id'] = Auth::id();
+        $data['paid_by'] = Auth::id();
+
+        foreach (['image_1', 'image_2'] as $field) {
+            if ($request->hasFile($field)) {
+                $data[$field] = $this->storeImageAsWebp($request->file($field));
+            }
+        }
+
+        Expense::create($data);
 
         return redirect()->route('expenses.index')
             ->with('success', 'Expense added successfully.');
@@ -150,9 +159,28 @@ class ExpenseController extends Controller
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string|max:255',
             'expense_date' => 'required|date|before_or_equal:now',
+            'image_1' => 'nullable|image|max:5120',
+            'image_2' => 'nullable|image|max:5120',
+            'remove_image_1' => 'nullable|boolean',
+            'remove_image_2' => 'nullable|boolean',
         ]);
 
-        $expense->update($validated);
+        $data = collect($validated)->except(['image_1', 'image_2', 'remove_image_1', 'remove_image_2'])->toArray();
+
+        foreach (['image_1', 'image_2'] as $field) {
+            $removeKey = "remove_{$field}";
+            if ($request->boolean($removeKey) && $expense->{$field}) {
+                Storage::disk('public')->delete($expense->{$field});
+                $data[$field] = null;
+            } elseif ($request->hasFile($field)) {
+                if ($expense->{$field}) {
+                    Storage::disk('public')->delete($expense->{$field});
+                }
+                $data[$field] = $this->storeImageAsWebp($request->file($field));
+            }
+        }
+
+        $expense->update($data);
 
         return redirect()->route('expenses.index')
             ->with('success', 'Expense updated successfully.');
@@ -190,6 +218,27 @@ class ExpenseController extends Controller
         if ($expense->user_id !== Auth::id() || $expense->group_id !== null) {
             abort(403);
         }
+    }
+
+    /**
+     * Convert uploaded image to webp and store it.
+     */
+    private function storeImageAsWebp($file): string
+    {
+        $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
+        if ($image === false) {
+            throw new \RuntimeException('Unable to process uploaded image.');
+        }
+
+        $filename = 'expenses/' . uniqid() . '.webp';
+        ob_start();
+        imagewebp($image, null, 80);
+        $webpData = ob_get_clean();
+        imagedestroy($image);
+
+        Storage::disk('public')->put($filename, $webpData);
+
+        return $filename;
     }
 
     private function applyPeriodFilter($query, string $period)

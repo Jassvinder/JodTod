@@ -3,16 +3,39 @@ import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { onMounted } from 'vue';
+
+const props = defineProps({
+    recaptchaSiteKey: { type: String, default: '' },
+});
 
 const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
+    recaptcha_token: '',
 });
 
-const submit = () => {
+// Load reCAPTCHA v3 script
+onMounted(() => {
+    if (props.recaptchaSiteKey) {
+        const script = document.createElement('script');
+        script.src = `https://www.google.com/recaptcha/api.js?render=${props.recaptchaSiteKey}`;
+        document.head.appendChild(script);
+    }
+});
+
+const submit = async () => {
+    if (props.recaptchaSiteKey && window.grecaptcha) {
+        try {
+            form.recaptcha_token = await window.grecaptcha.execute(props.recaptchaSiteKey, { action: 'register' });
+        } catch {
+            // Continue without token - backend will handle
+        }
+    }
+
     form.post(route('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });

@@ -48,6 +48,7 @@
 | group_id | BIGINT UNSIGNED | FK -> groups.id, ON DELETE CASCADE | |
 | user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | |
 | role | ENUM('admin', 'member') | DEFAULT 'member' | |
+| is_active | BOOLEAN | DEFAULT true | Active members appear in new expense splits. Inactive members are excluded from new expenses but remain in settlement calculations for their existing balances. |
 | joined_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | |
 
 **Indexes:** (group_id, user_id) UNIQUE - ek user ek group me ek baar hi ho sakta hai

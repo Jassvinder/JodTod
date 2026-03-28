@@ -148,14 +148,14 @@ return [
     |--------------------------------------------------------------------------
     */
     'categories' => [
-        ['name' => 'Food', 'icon' => 'utensils'],
-        ['name' => 'Travel', 'icon' => 'car'],
-        ['name' => 'Shopping', 'icon' => 'shopping-bag'],
-        ['name' => 'Bills', 'icon' => 'file-text'],
-        ['name' => 'Entertainment', 'icon' => 'film'],
-        ['name' => 'Medical', 'icon' => 'heart-pulse'],
-        ['name' => 'Education', 'icon' => 'book-open'],
-        ['name' => 'Rent', 'icon' => 'home'],
-        ['name' => 'Other', 'icon' => 'more-horizontal'],
+        ['name' => 'Food', 'icon' => '🍽️'],
+        ['name' => 'Travel', 'icon' => '🚗'],
+        ['name' => 'Shopping', 'icon' => '🛍️'],
+        ['name' => 'Bills', 'icon' => '📄'],
+        ['name' => 'Entertainment', 'icon' => '🎬'],
+        ['name' => 'Medical', 'icon' => '🏥'],
+        ['name' => 'Education', 'icon' => '📚'],
+        ['name' => 'Rent', 'icon' => '🏠'],
+        ['name' => 'Other', 'icon' => '📦'],
     ],
 ];

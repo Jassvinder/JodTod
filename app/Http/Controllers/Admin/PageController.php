@@ -43,11 +43,13 @@ class PageController extends Controller
 
     public function uploadImage(Request $request)
     {
+        $fileKey = $request->hasFile('upload') ? 'upload' : 'image';
+
         $request->validate([
-            'image' => 'required|image|max:5120',
+            $fileKey => 'required|image|max:5120',
         ]);
 
-        $file = $request->file('image');
+        $file = $request->file($fileKey);
         $image = imagecreatefromstring(file_get_contents($file->getPathname()));
 
         if ($image === false) {

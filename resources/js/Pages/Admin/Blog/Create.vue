@@ -4,7 +4,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import RichTextEditor from '@/Components/Shared/RichTextEditor.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { watch } from 'vue';
+import { watch, ref } from 'vue';
 
 const form = useForm({
     title: '',
@@ -16,6 +16,38 @@ const form = useForm({
     featured_image: '',
     is_published: false,
 });
+
+const featuredImagePreview = ref(null);
+const uploadingFeaturedImage = ref(false);
+
+const onFeaturedImageSelected = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    uploadingFeaturedImage.value = true;
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        const response = await axios.post(route('admin.upload-image'), formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        if (response.data.url) {
+            form.featured_image = response.data.url;
+            featuredImagePreview.value = response.data.url;
+        }
+    } catch {
+        alert('Failed to upload image. Max size: 5MB.');
+    }
+
+    uploadingFeaturedImage.value = false;
+    event.target.value = '';
+};
+
+const removeFeaturedImage = () => {
+    form.featured_image = '';
+    featuredImagePreview.value = null;
+};
 
 // Auto-generate slug from title
 let slugManuallyEdited = false;
@@ -137,13 +169,29 @@ function submit() {
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Featured Image URL</label>
-                        <TextInput
-                            v-model="form.featured_image"
-                            type="text"
-                            class="w-full"
-                            placeholder="https://example.com/image.jpg"
-                        />
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Featured Image</label>
+                        <div v-if="featuredImagePreview" class="relative inline-block">
+                            <img :src="featuredImagePreview" alt="Featured" class="w-48 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700" />
+                            <button
+                                type="button"
+                                @click="removeFeaturedImage"
+                                class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 cursor-pointer"
+                            >
+                                &times;
+                            </button>
+                        </div>
+                        <div v-else>
+                            <label
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                                :class="{ 'opacity-50 pointer-events-none': uploadingFeaturedImage }"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                {{ uploadingFeaturedImage ? 'Uploading...' : 'Upload Featured Image' }}
+                                <input type="file" accept="image/*" class="hidden" @change="onFeaturedImageSelected" />
+                            </label>
+                        </div>
                         <p v-if="form.errors.featured_image" class="mt-1 text-sm text-red-600">{{ form.errors.featured_image }}</p>
                     </div>
                 </div>

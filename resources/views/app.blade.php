@@ -17,7 +17,7 @@
     <meta name="msapplication-TileColor" content="#6366f1">
 
     <!-- Favicon & PWA -->
-    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" href="/favicon.png?v=2">
     <link rel="manifest" href="/manifest.json">
 
     <!-- Fonts -->

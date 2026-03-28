@@ -164,6 +164,7 @@ const quickLinks = [
                             <tr class="border-b border-gray-100 dark:border-gray-700">
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">Phone</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Joined</th>
                             </tr>
                         </thead>
@@ -178,6 +179,7 @@ const quickLinks = [
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ recentUser.email }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">{{ recentUser.phone || '-' }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ formatDate(recentUser.created_at) }}</td>
                             </tr>
                         </tbody>

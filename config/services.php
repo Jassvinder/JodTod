@@ -41,4 +41,13 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY', ''),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY', ''),
+    ],
+
+    'fcm' => [
+        'service_account_path' => env('FCM_SERVICE_ACCOUNT_PATH', storage_path('app/firebase-service-account.json')),
+    ],
+
 ];

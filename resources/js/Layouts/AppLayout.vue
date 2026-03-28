@@ -4,6 +4,7 @@ import Sidebar from '@/Components/Shared/Sidebar.vue';
 import BottomNav from '@/Components/Shared/BottomNav.vue';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { startReminderAlarm, stopReminderAlarm } from '@/Utils/reminderAlarm.js';
 
 const sidebarOpen = ref(false);
 const sidebarCollapsed = ref(false);
@@ -14,6 +15,7 @@ onMounted(() => {
     sidebarCollapsed.value = localStorage.getItem('sidebar_collapsed') === 'true';
     window.addEventListener('online', onOnline);
     window.addEventListener('offline', onOffline);
+    startReminderAlarm();
 });
 
 function toggleCollapse() {
@@ -29,6 +31,7 @@ const onOffline = () => { isOffline.value = true; };
 onUnmounted(() => {
     window.removeEventListener('online', onOnline);
     window.removeEventListener('offline', onOffline);
+    stopReminderAlarm();
 });
 </script>
 

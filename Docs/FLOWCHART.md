@@ -199,7 +199,8 @@
     |
     +---> [Group Settings] (Admin only)
               - Edit group name/description
-              - Remove member
+              - Remove member (if no unsettled expenses) / Deactivate member (if unsettled expenses exist)
+              - Reactivate deactivated member
               - Delete group (confirm dialog)
 ```
 

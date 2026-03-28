@@ -259,9 +259,14 @@ STEP 5 - Optimize:
 - Extra paisa goes to the last person OR the person who paid
 - Always use DECIMAL(12,2) in database, never FLOAT
 
-### 6. Member left group with unsettled balance
-- BLOCK: Member cannot leave if they have non-zero balance
-- Must settle first, then leave
+### 6. Member leaves or is removed mid-trip with unsettled expenses
+- Member is **deactivated** (is_active = false) instead of removed from the group
+- Deactivated members are **excluded from new expense splits** (won't appear in Add Expense form)
+- Deactivated members **remain in settlement calculations** for their existing unsettled expenses
+- They still receive settlement notifications and can mark payments as done
+- Admin can **reactivate** a deactivated member if they return
+- Member can only be **fully removed** (deleted from group) when they have no unsettled expenses
+- This prevents any data integrity issues while allowing flexible group membership during trips
 
 ### 7. Expense deleted after some settlements
 - Recalculate balances

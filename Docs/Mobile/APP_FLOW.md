@@ -26,15 +26,26 @@
 ## 2. Authentication Flow
 
 ```
-[Login Screen]
+[Login Screen] (Tab-based: Email & Password | OTP Login)
     │
-    ├── [Email + Password Login]
+    ├── [Tab: Email + Password Login]
     │       │
     │       ▼
     │   [POST /api/v1/login]
     │       │
-    │       ├── Success → Store JWT → [Dashboard]
+    │       ├── Success → Store token → [Dashboard]
     │       └── Fail → Show error message
+    │
+    ├── [Tab: OTP Login]
+    │       │
+    │       ├── Step 1: Enter phone → [POST /api/v1/otp/send]
+    │       │       ├── Success → Show OTP input
+    │       │       └── Fail → Show error (no account / not verified)
+    │       │
+    │       └── Step 2: Enter OTP → [POST /api/v1/otp/verify]
+    │               ├── Success → Store token → [Dashboard]
+    │               └── Fail → Show error (invalid/expired OTP)
+    │               └── Resend OTP option
     │
     ├── [Google OAuth Login]
     │       │
@@ -42,7 +53,7 @@
     │   [Open Google Sign-In WebView]
     │       │
     │       ▼
-    │   [Callback with token] → Store JWT → [Dashboard]
+    │   [Callback with token] → Store token → [Dashboard]
     │
     ├── [Register] → Navigate to Register Screen
     │       │
@@ -74,14 +85,14 @@
 ```
 
 ### Login Screen UI Elements
-- App logo at top
-- Email input field
-- Password input field (with show/hide toggle)
-- "Login" button (primary)
-- "Forgot Password?" link
-- Divider with "OR"
+- App logo at top (same logo as web)
+- Tab switcher: "Email & Password" | "OTP Login"
+- **Email tab:** Email input, Password input (show/hide), "Forgot Password?" link, Login button
+- **OTP tab:** Phone input with +91 prefix (Step 1), 6-digit OTP input with resend option (Step 2)
 - "Continue with Google" button
 - "Don't have an account? Register" link at bottom
+
+> **IMPORTANT:** Mobile app features must mirror web app features. Any feature available on web should also be available on mobile.
 
 ### Register Screen UI Elements
 - App logo at top
