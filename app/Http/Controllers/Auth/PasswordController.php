@@ -15,10 +15,18 @@ class PasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
-        $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
+        $user = $request->user();
+
+        $rules = [
             'password' => ['required', Password::defaults(), 'confirmed'],
-        ], [
+        ];
+
+        if ($user->has_password) {
+            $rules['current_password'] = ['required', 'current_password'];
+        }
+
+        // 2. Run Validation
+        $validated = $request->validate($rules, [
             'current_password.current_password' => 'Current password is incorrect.',
         ]);
 
@@ -29,7 +37,9 @@ class PasswordController extends Controller
         if ($this->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Password updated successfully.',
+                'message' => $user->has_password
+                    ? 'Password updated successfully.'
+                    : 'Password set successfully.',
             ]);
         }
 

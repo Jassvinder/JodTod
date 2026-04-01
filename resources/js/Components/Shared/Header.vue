@@ -275,8 +275,8 @@ const markAllAsRead = async () => {
                     <template #trigger>
                         <button class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             <img
-                                v-if="user.avatar"
-                                :src="`/storage/${user.avatar}`"
+                                v-if="user.avatar_url"
+                                :src="`${user.avatar_url}`"
                                 :alt="user.name"
                                 class="w-8 h-8 rounded-full object-cover"
                             />

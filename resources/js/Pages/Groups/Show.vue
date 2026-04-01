@@ -475,8 +475,8 @@ const memberSharesOpen = ref(true);
                     >
                         <div class="flex items-center gap-3">
                             <img
-                                v-if="user.avatar"
-                                :src="`/storage/${user.avatar}`"
+                                v-if="user.avatar_url"
+                                :src="`${user.avatar_url}`"
                                 :alt="user.name"
                                 class="w-9 h-9 rounded-full object-cover"
                             />

@@ -424,7 +424,7 @@ const historyOpen = ref(true);
                                     <!-- From user avatar -->
                                     <img
                                         v-if="settlement.from_user?.avatar"
-                                        :src="`/storage/${settlement.from_user.avatar}`"
+                                        :src="`${settlement.from_user.avatar_url}`"
                                         :alt="settlement.from_user?.name"
                                         class="w-8 h-8 rounded-full object-cover shrink-0"
                                     />
@@ -440,7 +440,7 @@ const historyOpen = ref(true);
                                     <!-- To user avatar -->
                                     <img
                                         v-if="settlement.to_user?.avatar"
-                                        :src="`/storage/${settlement.to_user.avatar}`"
+                                        :src="`${settlement.to_user.avatar_url}`"
                                         :alt="settlement.to_user?.name"
                                         class="w-8 h-8 rounded-full object-cover shrink-0"
                                     />

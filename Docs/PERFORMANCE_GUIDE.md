@@ -617,7 +617,7 @@ watch(debouncedSearch, (val) => {
 ```html
 <!-- ✅ Browser native lazy loading — sab images pe lagao -->
 <img
-    :src="user.avatar"
+    :src="user.avatar_url"
     :alt="user.name"
     loading="lazy"
     width="80"
@@ -627,7 +627,7 @@ watch(debouncedSearch, (val) => {
 
 <!-- ✅ Above-fold (hero/profile) — eager load karo LCP ke liye -->
 <img
-    :src="user.avatar"
+    :src="user.avatar_url"
     :alt="user.name"
     loading="eager"
     fetchpriority="high"

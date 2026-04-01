@@ -168,7 +168,7 @@ function isActive(item) {
             <!-- Admin User Info at Bottom -->
             <div class="absolute bottom-0 left-0 right-0 border-t border-slate-700" :class="sidebarCollapsed ? 'p-2' : 'p-4'">
                 <div class="flex items-center" :class="sidebarCollapsed ? 'justify-center' : 'gap-3'">
-                    <img v-if="user?.avatar" :src="`/storage/${user.avatar}`" :alt="user?.name" class="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                    <img v-if="user?.avatar_url" :src="`${user.avatar_url}`" :alt="user?.name" class="w-8 h-8 rounded-full object-cover flex-shrink-0" />
                     <div v-else class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
                         {{ user?.name?.charAt(0)?.toUpperCase() }}
                     </div>
@@ -203,7 +203,7 @@ function isActive(item) {
                         <Dropdown v-if="user" align="right" width="48">
                             <template #trigger>
                                 <button class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                    <img v-if="user.avatar" :src="`/storage/${user.avatar}`" :alt="user.name" class="w-8 h-8 rounded-full object-cover" />
+                                    <img v-if="user.avatar_url" :src="`${user.avatar_url}`" :alt="user.name" class="w-8 h-8 rounded-full object-cover" />
                                     <div v-else class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-medium">
                                         {{ user.name?.charAt(0)?.toUpperCase() }}
                                     </div>

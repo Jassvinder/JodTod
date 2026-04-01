@@ -254,8 +254,8 @@ function formatCurrency(amount) {
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <img
-                                            v-if="contact.contact_user?.avatar"
-                                            :src="`/storage/${contact.contact_user.avatar}`"
+                                            v-if="contact.contact_user?.avatar_url"
+                                            :src="`${contact.contact_user.avatar_url}`"
                                             :alt="contact.contact_user?.name"
                                             class="w-8 h-8 rounded-full object-cover flex-shrink-0"
                                         />

@@ -20,6 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'phone',
+        'email_verified_at',
         'phone_verified_at',
         'password',
         'avatar',
@@ -36,12 +37,25 @@ class User extends Authenticatable implements MustVerifyEmail
         'google_id',
     ];
 
-    protected $appends = ['avatar_url'];
+    protected $appends = ['avatar_url', 'has_password'];
 
     public function getAvatarUrlAttribute(): ?string
     {
-        if (!$this->avatar) return null;
+        if (!$this->avatar) {
+            // Agar image hi nahi hai toh default placeholder de do
+            return url('/images/default-avatar.png');
+        }
+
+        // CHECK: Agar avatar "http" se shuru ho raha hai, toh wo Google ka URL hai
+        if (str_starts_with($this->avatar, 'http')) {
+            return $this->avatar; // Direct Google ka URL bhej do
+        }
+        // CHECK: Agar sirf naam hai, toh storage ka path lagao
         return url('/storage/' . $this->avatar);
+    }
+    public function getHasPasswordAttribute(): bool
+    {
+        return !is_null($this->password);
     }
 
     public function expenses(): HasMany

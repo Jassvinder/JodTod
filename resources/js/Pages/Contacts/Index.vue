@@ -58,7 +58,7 @@ async function removeContact(contact) {
 }
 
 function getAvatarUrl(user) {
-    return user.avatar ? `/storage/${user.avatar}` : null;
+    return user.avatar_url ? `${user.avatar_url}` : null;
 }
 
 function getInitial(name) {

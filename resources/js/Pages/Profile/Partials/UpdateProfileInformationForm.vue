@@ -34,8 +34,8 @@ const avatarOverride = ref(null); // instant preview after upload/remove
 const avatarUrl = computed(() => {
     if (avatarOverride.value === 'removed') return null;
     if (avatarOverride.value) return avatarOverride.value;
-    if (!user.avatar) return null;
-    return `/storage/${user.avatar}?t=${avatarTimestamp.value}`;
+    if (!user.avatar_url) return null;
+    return `${user.avatar_url}?t=${avatarTimestamp.value}`;
 });
 const avatarTimestamp = ref(Date.now());
 const userInitials = computed(() => {
@@ -326,7 +326,7 @@ const cancelPhoneEdit = () => {
                     <img
                         :src="avatarUrl"
                         :alt="user.name"
-                        class="h-full w-full object-cover"
+                        class="h-full w-full object-cover jv"
                     />
                 </div>
                 <div
