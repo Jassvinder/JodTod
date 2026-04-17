@@ -5,7 +5,12 @@
 
 ## Current Tasks
 
-- [] **Task 18**
+- [] **Task 18** profile
+    A. Photo upload option
+    B. Phone number add/update option
+
+- [] **Task 19** group
+    A. If group created by other person except current user. there should be group admin name in front of group name.
 
 ## PENDING
 
