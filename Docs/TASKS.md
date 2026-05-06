@@ -1,4 +1,4 @@
-# JodTod - Task Tracker
+# JodTod - Task Tracker JV
 - [] **0000**
 
 - [] **510**
@@ -56,7 +56,7 @@
 - [x] **Task 100** - check screenshot 11. profile image select karne ke baad jo crop ka popup aata hai wo sahi nahi hai. selected image he center me nahi aati. haan starting me aati thi. shayad kisi css se conflict na hua ho. or dusri baat agar user ne pehle koi image upload ki hai to use only delete karne ka option bhi hona chahiye, yaha sirf change ka option hai. (2026-03-17)
 
 - [x] **Task 100-A** -image remove ke baad turand image section ko refresh kardo. abhi kya hai ke refresh ke baad he image remove ho rahi hai.(2026-03-17)
-    or crop modal khali outer he set hua hai ander image abhi bhi utni he show ho rahi. screenshot 12 dekho full body image hai wo only head ka kuchh part he show ho raha hai. 
+    or crop modal khali outer he set hua hai ander image abhi bhi utni he show ho rahi. screenshot 12 dekho full body image hai wo only head ka kuchh part he show ho raha hai.
 - [x] **Task 100-B** -pure project me jaha bhi confirmation hogi waha ek achha sa alert pupup lagao. for example shayad sweet alert hota tha ek main kabhi use kiya tha.(2026-03-17)
 - [x] **Task 19** - Logo applied to all pages: Sidebar, Header (mobile only), GuestLayout, AdminLayout, Blade header/footer. Text "JodTod" removed where logo present (2026-03-16)
 - [x] **Task 20** - Logout fix: `redirect('/')` changed to `Inertia::location('/')` to prevent Blade page rendering inside Inertia modal (2026-03-16)
