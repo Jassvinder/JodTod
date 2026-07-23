@@ -29,6 +29,9 @@ export default defineConfig({
         },
     },
     build: {
+        // CKEditor is only pulled into lazy-loaded admin editor pages, but its
+        // minified editor chunk is intentionally larger than Vite's 500 kB default.
+        chunkSizeWarningLimit: 1300,
         rollupOptions: {
             output: {
                 manualChunks: {

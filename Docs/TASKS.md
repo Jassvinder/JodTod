@@ -1,30 +1,61 @@
 # JodTod - Task Tracker JV
-- [] **0000**
+
+**Task Movement Rules**
+
+- When a task is completed, move it to the Completed section.
+- Mark completed tasks with `[X]`.
+- Add completion date in `DD-MM-YYYY` format.
+- Keep completed tasks in descending task number order.
+- Example: `- [X] Task title (21-05-2026)`
+- If a task is completed from Current Tasks, add a new empty task with the next number in Current Tasks.
+
+## Current Tasks
+
+- [] **601**
 
 - [] **510**
-    A.  jab user ko gruop me add kiya to push notification nahi aaya in-app aaya only.
-    B.  group expense add par task assing par chal raha hai. to group me member add par deactivate, remove par aise sabhi actions par push notification aani chahiye.
+  A. jab user ko gruop me add kiya to push notification nahi aaya in-app aaya only.
+  B. group expense add par task assing par chal raha hai. to group me member add par deactivate, remove par aise sabhi actions par push notification aani chahiye.
+
+- [] **512**
+  home page ke content me tasks system bhi is project me manage hota hai ye dalna hai.
 
 **Admin** Section tasks. starts from 500 =======================================
-
-
 
 ## PENDING
 
 ### High Priority
+
 (No pending high priority tasks)
 
 ### Low Priority / Future
+
 - [ ] **Task 13** - Offline expense sync: Implement IndexedDB storage + background sync in service worker (currently empty placeholder)
 
 ### Release
+
 - [ ] Manual testing of all features (use `Docs/TEST.md`)
 - [ ] Production deployment
 
 ---
 
 ## COMPLETED
+
 ## Completed Current Tasks
+
+- [X] **Task 600** (23-07-2026)
+      A. Fixed the mobile Todo Categories API query to use the schema-defined `todos.todo_category_id` column instead of the nonexistent `todos.category_id` column. This resolves the Manage Categories SQL error.
+      B. Aligned the mobile Todo create/edit request contract and response type with the backend's `todo_category_id` field, so selected categories persist and load correctly.
+      C. Added API regression tests covering own and assigned-task categories plus Todo creation with a selected category. `php artisan test --filter=TodoCategoryTest` passes with 2 tests and 8 assertions.
+      D. Updated the database schema and API endpoint documentation. The web Todo Category UI was not changed.
+
+- [x] **511**
+      npm run build chalane par kuchh warning type show ho raha hai ise check karo ke ye kyu ho raha hai. message niche hai jo show ho raha hai.
+      "(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+  ✓ built in 13.28s" (2026-05-18)
 - [x] **Task 509** - Profile page dark mode fix: Added dark: classes to all sections - Profile Info header/subtitle, avatar ring/buttons, Phone Number (border, headings, input, verified badge, OTP debug), Notification Preferences (border, headings, labels), Email Verification (border, heading, email display). (2026-03-23)
 - [x] **Task 508** - (A) Tick icon added to "All Settled" badge on groups listing. (B) Settlement page: Member Shares hides after all settled (reverted). (C) Group detail page: new "Member Shares" section between Members and Expenses - purple themed, shows all-time total share per member, collapsible. (D) "Settle Up" → "Settlement" button text. (E) All 4 settlement page sections (Balance Overview, Member Shares, Suggested Settlements, Settlement History) made collapsible with smooth CSS grid transitions. (2026-03-21)
 - [x] **Task 507** - (A) Member Shares section now always visible even after all settled. (B) Added stats summary bar (Expenses count, Total Spent highlighted, Members count) on group detail page. (C) "All Settled" green badge on groups listing when all expenses settled. (D) Members and Pending Requests sections collapsible with smooth CSS grid transition + animated chevron. (E) Group expense list: Edit/Delete text replaced with pencil/trash icons, expand/collapse uses Vue Transition with smooth max-height animation. (2026-03-21)
@@ -56,7 +87,7 @@
 - [x] **Task 100** - check screenshot 11. profile image select karne ke baad jo crop ka popup aata hai wo sahi nahi hai. selected image he center me nahi aati. haan starting me aati thi. shayad kisi css se conflict na hua ho. or dusri baat agar user ne pehle koi image upload ki hai to use only delete karne ka option bhi hona chahiye, yaha sirf change ka option hai. (2026-03-17)
 
 - [x] **Task 100-A** -image remove ke baad turand image section ko refresh kardo. abhi kya hai ke refresh ke baad he image remove ho rahi hai.(2026-03-17)
-    or crop modal khali outer he set hua hai ander image abhi bhi utni he show ho rahi. screenshot 12 dekho full body image hai wo only head ka kuchh part he show ho raha hai.
+      or crop modal khali outer he set hua hai ander image abhi bhi utni he show ho rahi. screenshot 12 dekho full body image hai wo only head ka kuchh part he show ho raha hai.
 - [x] **Task 100-B** -pure project me jaha bhi confirmation hogi waha ek achha sa alert pupup lagao. for example shayad sweet alert hota tha ek main kabhi use kiya tha.(2026-03-17)
 - [x] **Task 19** - Logo applied to all pages: Sidebar, Header (mobile only), GuestLayout, AdminLayout, Blade header/footer. Text "JodTod" removed where logo present (2026-03-16)
 - [x] **Task 20** - Logout fix: `redirect('/')` changed to `Inertia::location('/')` to prevent Blade page rendering inside Inertia modal (2026-03-16)
@@ -81,6 +112,7 @@
 - [x] **Task 4** - CMS system: TipTap rich text editor, admin page management, DB-driven public pages, blog editor upgrade (2026-03-10)
 
 ### Phase 1: Project Setup
+
 - [x] Initialize Laravel project
 - [x] Configure MySQL database connection
 - [x] Install & configure Inertia.js + Vue.js
@@ -93,6 +125,7 @@
 - [x] Dashboard page placeholder
 
 ### Phase 3: Personal Expenses
+
 - [x] Create expenses migration & model
 - [x] Create categories migration & seeder
 - [x] Build "Add Expense" form (Vue component)
@@ -102,6 +135,7 @@
 - [x] Build expense summary/charts (Chart.js)
 
 ### Phase 2: Authentication
+
 - [x] Create users migration & model (with avatar, google_id, currency, language, notifications)
 - [x] Setup Laravel Breeze (Vue/Inertia stack)
 - [x] Build registration page (themed, Google OAuth button)
@@ -113,6 +147,7 @@
 - [x] Profile page (update info, change password, delete account)
 
 ### Phase 4: Group Management
+
 - [x] Create groups migration & model
 - [x] Create group_members migration & model
 - [x] Build "Create Group" form
@@ -124,6 +159,7 @@
 - [x] Group settings (edit/delete - admin only)
 
 ### Phase 5: Group Expenses
+
 - [x] Create expense_splits migration & model
 - [x] Build "Add Group Expense" form with split options (equal/custom/percentage)
 - [x] Implement Equal Split logic (with rounding)
@@ -134,6 +170,7 @@
 - [x] Edit/Delete group expense (creator or admin)
 
 ### Phase 6: Settlement System
+
 - [x] Create settlements migration & model
 - [x] Implement balance calculation logic (total_paid - total_share per member)
 - [x] Implement minimum transactions optimization algorithm (greedy min-transfers)
@@ -144,6 +181,7 @@
 - [x] Mark expenses as settled after all settlements completed
 
 ### Phase 7: Dashboard
+
 - [x] Build dashboard layout (Inertia + Vue)
 - [x] Personal expense summary widget (this month/last month + category breakdown)
 - [x] Groups overview with balances widget
@@ -152,6 +190,7 @@
 - [x] Pending settlements indicator (amber alert with Pay Now links)
 
 ### Phase 8: Admin Dashboard & Role System
+
 - [x] Add `role` column to users table (migration: enum admin/user)
 - [x] Update User model (role field, isAppAdmin helper)
 - [x] Create admin middleware (EnsureUserIsAdmin)
@@ -163,6 +202,7 @@
 - [x] Create UserSeeder (1 admin + 4 users with phones)
 
 ### Phase 9: SEO & Landing Pages
+
 - [x] Landing page already built (hero, features, CTA) - Phase 1
 - [x] Build features page (6 feature cards with details)
 - [x] Build about, contact, privacy, terms pages
@@ -173,6 +213,7 @@
 - [x] Add JSON-LD schema markup support (BlogPosting on blog posts)
 
 ### Phase 10: Notifications
+
 - [x] Setup Laravel Notifications (notifications table migration)
 - [x] In-app notification system (bell icon with count badge, dropdown, full page)
 - [x] Email notification templates (4 notification types with mail support)
@@ -180,6 +221,7 @@
 - [x] Notification triggers: group expense added, added to group, settlement requested, settlement completed
 
 ### Phase 11: PWA & Polish
+
 - [x] Complete PWA setup (manifest.json, icons 72-512px, apple-touch-icon, meta tags)
 - [x] Service worker with caching (Network First for pages/API, Cache First for static assets)
 - [x] Offline fallback page (/offline) with retry button

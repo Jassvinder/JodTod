@@ -178,6 +178,7 @@
 |--------|------|-------------|-------------|
 | id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
 | user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | |
+| todo_category_id | BIGINT UNSIGNED | FK -> todo_categories.id, NULLABLE, ON DELETE SET NULL | Optional user-defined task category |
 | title | VARCHAR(255) | NOT NULL | Task title |
 | priority | ENUM('low', 'medium', 'high') | DEFAULT 'medium' | |
 | due_date | DATE | NULLABLE | Optional deadline |
@@ -186,7 +187,22 @@
 | created_at | TIMESTAMP | | |
 | updated_at | TIMESTAMP | | |
 
-**Indexes:** (user_id, is_completed), due_date
+**Indexes:** (user_id, is_completed), todo_category_id, due_date
+
+---
+
+## Table: todo_categories
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | Category owner |
+| name | VARCHAR(50) | NOT NULL | Category name, unique per owner |
+| color | VARCHAR(7) | NOT NULL, DEFAULT '#6366f1' | Hex color value |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** (user_id, name) UNIQUE
 
 ---
 

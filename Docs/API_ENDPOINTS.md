@@ -206,6 +206,22 @@ These endpoints serve dual purpose:
 
 ---
 
+## Todos and Todo Categories (Mobile API)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/v1/todos` | List the authenticated user's own and assigned Todos | Yes |
+| POST | `/api/v1/todos` | Create a Todo | Yes |
+| PUT | `/api/v1/todos/{id}` | Update a Todo | Yes |
+| PATCH | `/api/v1/todos/{id}/toggle` | Toggle Todo completion | Yes |
+| DELETE | `/api/v1/todos/{id}` | Delete an owned Todo | Yes |
+| GET | `/api/v1/todo-categories` | List own and assigned-task categories | Yes |
+| POST | `/api/v1/todo-categories` | Create a Todo category | Yes |
+| PUT | `/api/v1/todo-categories/{id}` | Update an owned Todo category | Yes |
+| DELETE | `/api/v1/todo-categories/{id}` | Delete an owned Todo category | Yes |
+
+**Todo category contract:** use `todo_category_id` in Todo create and update request bodies. It references `todo_categories.id`; `category_id` is reserved for expense categories.
+
 ## User Profile
 
 | Method | Endpoint | Description | Auth |

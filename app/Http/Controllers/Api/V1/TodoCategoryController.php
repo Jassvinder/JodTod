@@ -19,8 +19,8 @@ class TodoCategoryController extends Controller
         // Get category IDs from tasks assigned to the user (by others)
         $assignedCategoryIds = Todo::where('assigned_to', Auth::id())
             ->where('user_id', '!=', Auth::id())
-            ->whereNotNull('category_id')
-            ->pluck('category_id')
+            ->whereNotNull('todo_category_id')
+            ->pluck('todo_category_id')
             ->unique();
 
         $allCategoryIds = $ownCategoryIds->merge($assignedCategoryIds)->unique();

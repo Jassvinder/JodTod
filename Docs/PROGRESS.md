@@ -20,6 +20,11 @@
 - Testing & bug fixes (use TEST.md)
 - Production deployment
 
+### 2026-07-23 - Task 600 Mobile Todo Categories (COMPLETED)
+- Root cause: the mobile Todo Categories API queried the nonexistent `todos.category_id` column even though the schema, migration, and `Todo` model use `todo_category_id`.
+- Corrected the API query and aligned mobile Todo create/edit payloads and types to `todo_category_id`.
+- Added API regression coverage for fetching owned and assigned-task categories and creating a Todo with a selected category. The web Todo Category UI remains intentionally unchanged.
+
 ### 2026-03-16 - Task 14 Variations: Favicon, Auth Fixes, Email Templates, Image WebP (COMPLETED)
 - **Task 14-A - Favicon:**
   - Generated proper favicon from logo.png using GD (32x32 .ico + 48x48 .png)

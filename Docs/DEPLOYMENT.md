@@ -1,6 +1,7 @@
 # JodTod - Deployment Guide (Web + Mobile)
 
 ## Table of Contents
+
 1. [Requirements](#requirements)
 2. [Web App Deployment (Laravel)](#web-app-deployment)
 3. [Mobile App Deployment (React Native)](#mobile-app-deployment)
@@ -11,10 +12,11 @@
 ## Requirements
 
 ### Server Requirements (for Web App)
+
 - **VPS/Cloud Server** (DigitalOcean, AWS, Hostinger VPS, etc.)
-  - Minimum: 1 vCPU, 1GB RAM, 25GB SSD
-  - Recommended: 2 vCPU, 2GB RAM, 50GB SSD
-  - Cost: ~$5-12/month
+    - Minimum: 1 vCPU, 1GB RAM, 25GB SSD
+    - Recommended: 2 vCPU, 2GB RAM, 50GB SSD
+    - Cost: ~$5-12/month
 - **OS:** Ubuntu 22.04 or 24.04 LTS
 - **PHP:** 8.2+ with extensions: mbstring, xml, curl, mysql, gd, zip, bcmath, openssl
 - **MySQL:** 8.0+
@@ -26,6 +28,7 @@
 - **SMTP Email Service** (Gmail SMTP free, or Resend/Mailgun for production)
 
 ### Mobile App Requirements
+
 - **Expo Account** (free - already have: jasscodetools)
 - **EAS CLI** (already installed)
 - **Google Play Developer Account** ($25 one-time fee) - for Play Store
@@ -33,16 +36,17 @@
 - **Firebase Project** (free - already have: jodtod-jv)
 
 ### Cost Summary
-| Item | Cost | Frequency |
-|------|------|-----------|
-| VPS Server | $5-12 | Monthly |
-| Domain (.com) | $10-15 | Yearly |
-| SSL Certificate | Free | Auto-renew |
-| Google Play Developer | $25 | One-time |
-| Apple Developer | $99 | Yearly (optional) |
-| Firebase | Free | Free tier enough |
-| Expo/EAS | Free | 30 builds/month free |
-| **Total (without iOS)** | **~$40 first month, ~$7/month after** | |
+
+| Item                    | Cost                                  | Frequency            |
+| ----------------------- | ------------------------------------- | -------------------- |
+| VPS Server              | $5-12                                 | Monthly              |
+| Domain (.com)           | $10-15                                | Yearly               |
+| SSL Certificate         | Free                                  | Auto-renew           |
+| Google Play Developer   | $25                                   | One-time             |
+| Apple Developer         | $99                                   | Yearly (optional)    |
+| Firebase                | Free                                  | Free tier enough     |
+| Expo/EAS                | Free                                  | 30 builds/month free |
+| **Total (without iOS)** | **~$40 first month, ~$7/month after** |                      |
 
 ---
 
@@ -91,6 +95,7 @@ sudo apt install -y supervisor
 ```bash
 sudo mysql
 ```
+
 ```sql
 CREATE DATABASE jodtod CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'jodtod'@'localhost' IDENTIFIED BY 'YOUR_STRONG_PASSWORD_HERE';
@@ -125,6 +130,7 @@ php artisan key:generate
 ### Step 5: Configure .env (Production)
 
 Edit `/var/www/jodtod/.env`:
+
 ```env
 APP_NAME=JodTod
 APP_ENV=production
@@ -191,6 +197,7 @@ sudo chmod -R 775 /var/www/jodtod/storage /var/www/jodtod/bootstrap/cache
 ### Step 7: Nginx Configuration
 
 Create `/etc/nginx/sites-available/jodtod`:
+
 ```nginx
 server {
     listen 80;
@@ -232,6 +239,7 @@ sudo certbot --nginx -d jodtod.com -d www.jodtod.com
 ### Step 8: Queue Worker (Supervisor)
 
 Create `/etc/supervisor/conf.d/jodtod-worker.conf`:
+
 ```ini
 [program:jodtod-worker]
 process_name=%(program_name)s_%(process_num)02d
@@ -258,7 +266,9 @@ sudo supervisorctl start jodtod-worker:*
 ```bash
 sudo crontab -e -u www-data
 ```
+
 Add:
+
 ```
 * * * * * cd /var/www/jodtod && php artisan schedule:run >> /dev/null 2>&1
 ```
@@ -279,68 +289,72 @@ scp storage/app/firebase-service-account.json user@server:/var/www/jodtod/storag
 
 ### Step 1: Update API URL
 
-In `D:\JodTodApp\.env`:
+In `D:\Development\Projects\JodTodApp.env`:
+
 ```env
 EXPO_PUBLIC_API_URL=https://jodtod.com
 ```
+
 (Change from local IP to production domain)
 
 ### Step 2: Update app.json for Production
 
-In `D:\JodTodApp\app.json`, verify:
+In `D:\Development\Projects\JodTodAppapp.json`, verify:
+
 ```json
 {
-  "expo": {
-    "name": "JodTod",
-    "version": "1.0.0",
-    "android": {
-      "package": "com.jodtod.app",
-      "versionCode": 1
-    },
-    "ios": {
-      "bundleIdentifier": "com.jodtod.app",
-      "buildNumber": "1"
+    "expo": {
+        "name": "JodTod",
+        "version": "1.0.0",
+        "android": {
+            "package": "com.jodtod.app",
+            "versionCode": 1
+        },
+        "ios": {
+            "bundleIdentifier": "com.jodtod.app",
+            "buildNumber": "1"
+        }
     }
-  }
 }
 ```
 
 ### Step 3: Create eas.json (Build Profiles)
 
-Create `D:\JodTodApp\eas.json`:
+Create `D:\Development\Projects\JodTodAppeas.json`:
+
 ```json
 {
-  "cli": {
-    "version": ">= 15.0.0"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
+    "cli": {
+        "version": ">= 15.0.0"
     },
-    "preview": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      }
+    "build": {
+        "development": {
+            "developmentClient": true,
+            "distribution": "internal"
+        },
+        "preview": {
+            "distribution": "internal",
+            "android": {
+                "buildType": "apk"
+            }
+        },
+        "production": {
+            "android": {
+                "buildType": "app-bundle"
+            },
+            "ios": {
+                "autoIncrement": true
+            }
+        }
     },
-    "production": {
-      "android": {
-        "buildType": "app-bundle"
-      },
-      "ios": {
-        "autoIncrement": true
-      }
+    "submit": {
+        "production": {
+            "android": {
+                "serviceAccountKeyPath": "./docs/google-play-service-account.json",
+                "track": "production"
+            }
+        }
     }
-  },
-  "submit": {
-    "production": {
-      "android": {
-        "serviceAccountKeyPath": "./docs/google-play-service-account.json",
-        "track": "production"
-      }
-    }
-  }
 }
 ```
 
@@ -360,12 +374,14 @@ Build happens on Expo cloud servers (~10-15 min). Download link provided when do
 ### Step 5: Google Play Store Submission
 
 #### One-time Setup:
+
 1. Go to [play.google.com/console](https://play.google.com/console)
 2. Pay $25 registration fee
 3. Complete developer profile (name, address, etc.)
 4. Create new app → "JodTod"
 
 #### App Listing:
+
 - **App name:** JodTod - Expense Tracker & Splitter
 - **Short description:** Track expenses, split bills with friends, settle debts easily
 - **Full description:** Write 200-300 words about features
@@ -377,6 +393,7 @@ Build happens on Expo cloud servers (~10-15 min). Download link provided when do
 - **Privacy policy URL:** https://jodtod.com/privacy (already exists)
 
 #### Upload & Release:
+
 1. Go to **Production** → **Create new release**
 2. Upload the `.aab` file (from EAS build)
 3. Add release notes: "Initial release - Track expenses, split bills, manage groups"
@@ -394,6 +411,7 @@ eas submit --platform ios
 ```
 
 #### App Store Connect:
+
 1. [appstoreconnect.apple.com](https://appstoreconnect.apple.com)
 2. Create new app
 3. Fill similar listing info as Play Store
@@ -405,6 +423,7 @@ eas submit --platform ios
 ## Post-Deployment Checklist
 
 ### Server (After Deploy)
+
 - [ ] SSL certificate working (https://)
 - [ ] .env APP_DEBUG=false
 - [ ] .env APP_ENV=production
@@ -418,6 +437,7 @@ eas submit --platform ios
 - [ ] CORS configured if needed for mobile API
 
 ### Mobile (After Build)
+
 - [ ] API URL points to production domain (https)
 - [ ] Push notifications working with production server
 - [ ] Login/Register working
@@ -428,6 +448,7 @@ eas submit --platform ios
 ### Updates (Future Deployments)
 
 #### Web Update:
+
 ```bash
 cd /var/www/jodtod
 git pull origin master
@@ -441,6 +462,7 @@ sudo supervisorctl restart jodtod-worker:*
 ```
 
 #### Mobile Update:
+
 ```powershell
 # Update version in app.json (bump version + versionCode)
 # Then build and submit
@@ -449,6 +471,7 @@ eas submit --platform android
 ```
 
 ### Monitoring
+
 - **Server logs:** `/var/www/jodtod/storage/logs/laravel.log`
 - **Queue worker logs:** `/var/www/jodtod/storage/logs/worker.log`
 - **Nginx logs:** `/var/log/nginx/error.log`
@@ -461,16 +484,19 @@ eas submit --platform android
 These features are disabled for initial launch because they require an SMS provider (paid service). They can be enabled in ~5 minutes when you're ready.
 
 ### What's Disabled:
-| Feature | Platform | Status |
-|---------|----------|--------|
-| OTP Login (phone login) | Web + Mobile | Disabled with "Coming Soon" badge |
-| Phone Verification (profile) | Web + Mobile | Disabled with "Coming Soon" badge |
-| Phone required for groups | Web | `phone.verified` middleware commented out |
+
+| Feature                      | Platform     | Status                                    |
+| ---------------------------- | ------------ | ----------------------------------------- |
+| OTP Login (phone login)      | Web + Mobile | Disabled with "Coming Soon" badge         |
+| Phone Verification (profile) | Web + Mobile | Disabled with "Coming Soon" badge         |
+| Phone required for groups    | Web          | `phone.verified` middleware commented out |
 
 ### How to Enable (When SMS Provider Ready):
 
 #### Step 1: Choose & Configure SMS Provider
+
 Add to `.env`:
+
 ```env
 # MSG91 (recommended for India, ~₹0.15/SMS)
 MSG91_AUTH_KEY=your_auth_key
@@ -484,7 +510,9 @@ TWILIO_FROM=+1234567890
 ```
 
 #### Step 2: Enable Phone Verification Middleware
+
 File: `routes/web.php` (line ~102)
+
 ```php
 // Change this:
 Route::middleware(['auth', 'verified'/*, 'phone.verified'*/])->group(function () {
@@ -494,27 +522,36 @@ Route::middleware(['auth', 'verified', 'phone.verified'])->group(function () {
 ```
 
 #### Step 3: Enable OTP Login Tab (Web)
+
 File: `resources/js/Pages/Auth/Login.vue`
+
 - Find the disabled OTP button and restore the `@click="activeTab = 'otp'"` handler
 - Remove `disabled` attribute and "Soon" badge
 
 #### Step 4: Enable OTP Login Tab (Mobile)
+
 File: `JodTodApp/app/(auth)/login.tsx`
+
 - Restore the original tab code with both `email` and `otp` tabs clickable
 - Remove the "SOON" badge View
 
 #### Step 5: Enable Phone Section (Web Profile)
+
 File: `resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.vue`
+
 - Remove "Coming Soon" badge from Phone Number heading
 - Restore original description text
 - Enable the "Add Phone Number" button (remove `disabled` + restore `@click`)
 
 #### Step 6: Enable Phone Section (Mobile Profile)
+
 File: `JodTodApp/app/(tabs)/profile/index.tsx`
+
 - Add the phone verification OTP flow (sendOtp, verifyOtp handlers)
 - Already implemented in a previous session, just needs to be re-added
 
 #### Step 7: Restart & Test
+
 ```bash
 # Rebuild frontend
 npm run build
@@ -532,17 +569,20 @@ sudo supervisorctl restart jodtod-worker:*
 When developing locally after production is live:
 
 ### .env (Local - Web)
+
 ```env
 APP_URL=http://localhost:8000
 DB_DATABASE=jodtod_local
 ```
 
 ### .env (Local - Mobile)
+
 ```env
 EXPO_PUBLIC_API_URL=http://YOUR_WIFI_IP:8000
 ```
 
 ### Commands (Local)
+
 ```bash
 # Web
 php artisan serve --host=0.0.0.0 --port=8000
@@ -553,6 +593,6 @@ cd D:\JodTodApp
 npx expo start
 
 # Mobile build (for push notification testing)
-cd D:\JodTodApp\android
+cd D:\Development\Projects\JodTodAppandroid
 .\gradlew assembleDebug
 ```
