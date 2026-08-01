@@ -72,6 +72,7 @@ Route::prefix('v1')->group(function () {
         // Incomes
         Route::get('/incomes', [IncomeController::class, 'index']);
         Route::post('/incomes', [IncomeController::class, 'store']);
+        Route::get('/incomes/{income}', [IncomeController::class, 'show']);
         Route::put('/incomes/{income}', [IncomeController::class, 'update']);
         Route::delete('/incomes/{income}', [IncomeController::class, 'destroy']);
         Route::get('/income-suggestions', [IncomeController::class, 'suggestions']);

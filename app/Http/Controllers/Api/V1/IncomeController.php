@@ -92,6 +92,13 @@ class IncomeController extends Controller
         return $this->created($income, 'Income added successfully.');
     }
 
+    public function show(Income $income): JsonResponse
+    {
+        $this->authorizeIncome($income);
+
+        return $this->success($income);
+    }
+
     public function update(Request $request, Income $income): JsonResponse
     {
         $this->authorizeIncome($income);

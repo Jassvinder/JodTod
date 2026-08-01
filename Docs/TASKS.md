@@ -12,6 +12,17 @@
 ## Current Tasks
 
 - [] **601**
+  Review screenshot 2.png, which shows the email sent after a new user registers via email. Redesign it to meet modern professional email standards.
+
+    Requirements
+    1. Improve the email copy to be clear, polished, and professional while preserving the existing functionality.
+    2. Add any missing content typically expected in a registration/verification email, only where appropriate.
+    3. Add a short explanatory sentence immediately before the verification/action button, clearly instructing the user to click the button.
+    4. Replace "Regards" with a more professional closing (e.g., "Best regards" or another appropriate alternative) and ensure the tone is consistent throughout.
+    5. Review and enhance the email layout, spacing, typography, branding, and CTA so it looks production-ready, trustworthy, and modern.
+    6. Do not modify any dynamic variables, placeholders, Syntax, translation keys, URLs, tokens, or business logic. All dynamic variables must remain exactly as they are, and functionality must remain 100% unchanged.
+    7. Once this template is approved, apply the same design, tone, formatting, and UX improvements consistently to all email templates in the project while preserving each template's purpose, content, dynamic variables, and functionality.
+    8. Ensure all email templates are responsive, accessible, email-client compatible, and visually consistent with the application's branding.
 
 - [] **510**
   A. jab user ko gruop me add kiya to push notification nahi aaya in-app aaya only.
@@ -43,7 +54,7 @@
 
 ## Completed Current Tasks
 
-- [X] **Task 600** (23-07-2026)
+- [x] **Task 600** (23-07-2026)
       A. Fixed the mobile Todo Categories API query to use the schema-defined `todos.todo_category_id` column instead of the nonexistent `todos.category_id` column. This resolves the Manage Categories SQL error.
       B. Aligned the mobile Todo create/edit request contract and response type with the backend's `todo_category_id` field, so selected categories persist and load correctly.
       C. Added API regression tests covering own and assigned-task categories plus Todo creation with a selected category. `php artisan test --filter=TodoCategoryTest` passes with 2 tests and 8 assertions.

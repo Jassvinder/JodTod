@@ -4,6 +4,10 @@
 
 ## Current Status: ALL PHASES COMPLETE (1-11)
 
+### 2026-07-27 - Income Mobile Edit API Fix (COMPLETED)
+- Added the missing `GET /api/v1/incomes/{income}` route and `IncomeController::show` action.
+- The endpoint enforces the same ownership authorization as update and delete, allowing the mobile edit form to retrieve only the authenticated user's selected income.
+
 ### What's Done:
 - Planning complete (flowchart, schema, API, settlement logic, SEO strategy)
 - Phase 1: Project setup complete (Laravel + Inertia + Vue + Tailwind + MySQL)

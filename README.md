@@ -3,6 +3,7 @@
 Dosto, roommates aur family ke saath kharcha split karo asaani se.
 
 ## Tech Stack
+
 - **Backend:** Laravel (PHP) + MySQL
 - **Frontend:** Blade (SEO pages) + Inertia.js + Vue.js (App pages)
 - **Styling:** Tailwind CSS
@@ -42,9 +43,9 @@ All colors are defined in **one file**: `resources/css/app.css`
 ```css
 @theme {
     /* Change these values to change the entire app theme */
-    --color-primary-500: #6366f1;   /* Main brand color (Indigo) */
-    --color-accent-500: #f43f5e;    /* Accent color (Rose) - also "dena hai" */
-    --color-success-500: #10b981;   /* Success color (Green) - also "milna hai" */
+    --color-primary-500: #6366f1; /* Main brand color (Indigo) */
+    --color-accent-500: #f43f5e; /* Accent color (Rose) - also "dena hai" */
+    --color-success-500: #10b981; /* Success color (Green) - also "milna hai" */
 }
 ```
 
@@ -58,18 +59,18 @@ All colors are defined in **one file**: `resources/css/app.css`
 
 All static content is in **one file**: `config/site.php`
 
-| Section | What it controls |
-|---------|-----------------|
-| `site.app` | App name, tagline, description, currency |
-| `site.landing.hero` | Landing page hero section text & buttons |
-| `site.landing.features` | Feature cards (title, description, icon) |
-| `site.landing.how_it_works` | "How it works" steps |
-| `site.landing.cta` | Call-to-action section text |
-| `site.nav.public` | Public page navigation links |
-| `site.nav.app` | App navigation links (sidebar, bottom nav) |
-| `site.footer` | Footer links and description |
-| `site.seo` | Default SEO title, description, OG image |
-| `site.categories` | Expense categories list |
+| Section                     | What it controls                           |
+| --------------------------- | ------------------------------------------ |
+| `site.app`                  | App name, tagline, description, currency   |
+| `site.landing.hero`         | Landing page hero section text & buttons   |
+| `site.landing.features`     | Feature cards (title, description, icon)   |
+| `site.landing.how_it_works` | "How it works" steps                       |
+| `site.landing.cta`          | Call-to-action section text                |
+| `site.nav.public`           | Public page navigation links               |
+| `site.nav.app`              | App navigation links (sidebar, bottom nav) |
+| `site.footer`               | Footer links and description               |
+| `site.seo`                  | Default SEO title, description, OG image   |
+| `site.categories`           | Expense categories list                    |
 
 **How to use in Blade:** `{{ config('site.app.name') }}`
 **How to use in PHP:** `config('site.landing.hero.title_line1')`
@@ -85,6 +86,7 @@ Edit `config/site.php` -> `nav.public` array for public pages, `nav.app` for app
 ### Database Configuration
 
 Edit `.env` file:
+
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -143,6 +145,7 @@ JodTod/
 ### Cron Job (Required)
 
 Laravel's task scheduler needs a cron entry on the server. This handles:
+
 - **Todo reminders** — checks every minute for due reminders and sends notifications (in-app + email)
 - **Weekly summary** — sends expense summary email to users every Monday at 8 AM
 
@@ -181,7 +184,9 @@ QUEUE_CONNECTION=database
 ## Documentation
 
 See `Docs/` folder for detailed documentation:
+
 - **FLOWCHART.md** - Complete app flow
 - **TASKS.md** - Development task tracker
 - **DATABASE_SCHEMA.md** - Full database schema
 - **SETTLEMENT_LOGIC.md** - Settlement calculation algorithm
+- **AGENTS.MD** - for deep documentation
