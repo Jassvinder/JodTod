@@ -56,6 +56,15 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'role' => 'user',
             ],
+            [
+                'name' => 'Nity',
+                'email' => 'nity@jodtod.co.in',
+                'phone' => '7015447850',
+                'phone_verified_at' => now(),
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'role' => 'user',
+            ],
         ];
 
         foreach ($users as $user) {
