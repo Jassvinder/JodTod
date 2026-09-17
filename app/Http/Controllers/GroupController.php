@@ -121,6 +121,7 @@ class GroupController extends Controller
         $memberIds = $group->members->pluck('id')->toArray();
         $contacts = \App\Models\Contact::with('contactUser:id,name,email,phone,avatar')
             ->where('user_id', $request->user()->id)
+            ->where('status', 'approved')
             ->whereNotIn('contact_user_id', $memberIds)
             ->get()
             ->map(fn ($c) => $c->contactUser);

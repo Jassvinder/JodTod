@@ -10,7 +10,6 @@
     $steps = config('site.landing.how_it_works');
     $cta = config('site.landing.cta');
 @endphp
-
 <!-- Hero Section -->
 <section class="relative bg-gradient-to-br from-primary-600 to-primary-800 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">

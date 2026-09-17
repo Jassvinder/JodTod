@@ -7,9 +7,9 @@ import { Link } from '@inertiajs/vue3';
         <div class="w-full max-w-md">
             <!-- Logo -->
             <div class="text-center mb-8">
-                <Link href="/">
-                    <img src="/images/Logo/logo.png" alt="JodTod" class="h-16 w-auto mx-auto" />
-                </Link>
+                <a href="/">
+                    <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" class="h-10 w-auto mx-auto" />
+                </a>
                 <p class="text-gray-500 dark:text-gray-400 mt-1">Split expenses, strengthen friendships</p>
             </div>
 

@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Expense;
 use App\Models\Group;
+use App\Notifications\Channels\ExpoPushChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Notifications\Channels\ExpoPushChannel;
 
 class GroupExpenseAdded extends Notification implements ShouldQueue
 {
@@ -22,26 +21,7 @@ class GroupExpenseAdded extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        $channels = ['database', ExpoPushChannel::class];
-
-        if ($notifiable->notification_email) {
-            $channels[] = 'mail';
-        }
-
-        return $channels;
-    }
-
-    public function toMail(object $notifiable): MailMessage
-    {
-        $url = url("/groups/{$this->group->id}/expenses");
-
-        return (new MailMessage)
-            ->subject("New expense in {$this->group->name}")
-            ->greeting("Hello {$notifiable->name}!")
-            ->line("{$this->payerName} added an expense of ₹{$this->expense->amount} in **{$this->group->name}**.")
-            ->line("**{$this->expense->description}**")
-            ->action('View Group Expenses', $url)
-            ->line('You can manage your notification preferences in your profile settings.');
+        return ['database', ExpoPushChannel::class];
     }
 
     public function toArray(object $notifiable): array

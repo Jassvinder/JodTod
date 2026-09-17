@@ -64,7 +64,7 @@ function isActive(item) {
         <!-- Logo + Collapse Toggle -->
         <div class="flex items-center justify-between h-16 border-b border-gray-200 dark:border-gray-700" :class="collapsed ? 'px-3' : 'px-6'">
             <Link :href="route('dashboard')" :class="collapsed ? 'mx-auto' : ''">
-                <img src="/images/Logo/logo.png" alt="JodTod" :class="collapsed ? 'h-7 w-auto' : 'h-9 w-auto'" class="transition-all duration-300" />
+                <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" :class="collapsed ? 'h-7 w-auto' : 'h-9 w-auto'" class="transition-all duration-300" />
             </Link>
             <button
                 @click="$emit('toggle-collapse')"

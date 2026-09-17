@@ -3,15 +3,16 @@
 namespace App\Notifications;
 
 use App\Models\Group;
+use App\Notifications\Channels\ExpoPushChannel;
+use App\Notifications\Concerns\HasBrandedMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Notifications\Channels\ExpoPushChannel;
 
 class SettlementCompleted extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use HasBrandedMail, Queueable;
 
     public function __construct(
         private Group $group,
@@ -32,14 +33,18 @@ class SettlementCompleted extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url("/groups/{$this->group->id}/settlements");
-
-        return (new MailMessage)
-            ->subject("Settlement completed in {$this->group->name}")
-            ->greeting("Hello {$notifiable->name}!")
-            ->line("**{$this->fromUserName}** has paid you **₹{$this->amount}** in **{$this->group->name}**.")
-            ->action('View Settlements', $url)
-            ->line('You can manage your notification preferences in your profile settings.');
+        return $this->brandedMailMessage(
+            "Settlement completed in {$this->group->name}",
+            "Hello {$notifiable->name}!",
+            [
+                "{$this->fromUserName} has paid you ₹{$this->amount} in {$this->group->name}.",
+                'Your group balance has been updated.',
+            ],
+            'View Settlements',
+            url("/groups/{$this->group->id}/settlements"),
+            'Click the button below to view the settlement details.',
+            'Best regards, JodTod'
+        );
     }
 
     public function toArray(object $notifiable): array

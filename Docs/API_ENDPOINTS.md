@@ -122,6 +122,22 @@ These endpoints serve dual purpose:
 
 ---
 
+## Contacts (Mobile API)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/v1/contacts` | List approved contacts | Yes |
+| GET | `/api/v1/contacts/search?q={name}` | Search users by name; returns public name and avatar only | Yes |
+| POST | `/api/v1/contacts` | Send a contact request | Yes |
+| GET | `/api/v1/contacts/requests` | List incoming contact requests | Yes |
+| POST | `/api/v1/contacts/{id}/approve` | Approve an incoming request | Yes |
+| DELETE | `/api/v1/contacts/{id}/reject` | Decline an incoming request | Yes |
+| DELETE | `/api/v1/contacts/{id}` | Remove an approved contact | Yes |
+
+Contact search requires at least three characters. Email and phone are only available after the recipient approves the request.
+
+---
+
 ## Group Expenses
 
 | Method | Endpoint | Description | Auth |
@@ -129,8 +145,8 @@ These endpoints serve dual purpose:
 | GET | `/groups/{id}/expenses` | List group expenses | Yes |
 | POST | `/groups/{id}/expenses` | Add group expense | Yes |
 | GET | `/groups/{id}/expenses/{eid}/edit` | Show edit form | Yes |
-| PUT | `/groups/{id}/expenses/{eid}` | Update group expense | Yes |
-| DELETE | `/groups/{id}/expenses/{eid}` | Delete group expense | Yes |
+| PUT | `/groups/{id}/expenses/{eid}` | Update group expense (group admin only) | Yes |
+| DELETE | `/groups/{id}/expenses/{eid}` | Delete group expense (group admin only) | Yes |
 | GET | `/groups/{id}/balances` | Get all member balances | Yes |
 
 **POST /groups/{id}/expenses Request Body:**
@@ -215,12 +231,14 @@ These endpoints serve dual purpose:
 | PUT | `/api/v1/todos/{id}` | Update a Todo | Yes |
 | PATCH | `/api/v1/todos/{id}/toggle` | Toggle Todo completion | Yes |
 | DELETE | `/api/v1/todos/{id}` | Delete an owned Todo | Yes |
-| GET | `/api/v1/todo-categories` | List own and assigned-task categories | Yes |
+| GET | `/api/v1/todo-categories` | List own and assigned-task categories; creates Home and Market defaults for the authenticated user | Yes |
 | POST | `/api/v1/todo-categories` | Create a Todo category | Yes |
 | PUT | `/api/v1/todo-categories/{id}` | Update an owned Todo category | Yes |
-| DELETE | `/api/v1/todo-categories/{id}` | Delete an owned Todo category | Yes |
+| DELETE | `/api/v1/todo-categories/{id}` | Delete an owned, non-default Todo category | Yes |
 
 **Todo category contract:** use `todo_category_id` in Todo create and update request bodies. It references `todo_categories.id`; `category_id` is reserved for expense categories.
+
+Default categories include `is_default: true` and cannot be deleted.
 
 ## User Profile
 

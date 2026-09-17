@@ -10,6 +10,7 @@ class Contact extends Model
     protected $fillable = [
         'user_id',
         'contact_user_id',
+        'status',
     ];
 
     public function user(): BelongsTo

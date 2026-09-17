@@ -67,7 +67,7 @@ function isActive(item) {
             <!-- Logo + Collapse Toggle -->
             <div class="flex items-center justify-between h-16 border-b border-slate-700" :class="sidebarCollapsed ? 'px-3' : 'px-6'">
                 <Link :href="route('admin.dashboard')" :class="sidebarCollapsed ? 'mx-auto' : ''">
-                    <img src="/images/Logo/logo.png" alt="JodTod" :class="sidebarCollapsed ? 'h-7 w-auto' : 'h-9 w-auto'" class="transition-all duration-300" />
+                    <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" :class="sidebarCollapsed ? 'h-7 w-auto' : 'h-9 w-auto'" class="transition-all duration-300" />
                 </Link>
                 <span v-if="!sidebarCollapsed" class="ml-2 px-2 py-0.5 text-xs font-medium bg-purple-500 text-white rounded-md">Admin</span>
                 <button

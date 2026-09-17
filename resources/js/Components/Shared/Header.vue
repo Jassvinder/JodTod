@@ -152,7 +152,7 @@ const markAllAsRead = async () => {
                     </svg>
                 </button>
                 <Link :href="route('dashboard')" class="lg:hidden">
-                    <img src="/images/Logo/logo.png" alt="JodTod" class="h-8 w-auto" />
+                    <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" class="h-8 w-auto" />
                 </Link>
             </div>
 

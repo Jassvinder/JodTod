@@ -8,24 +8,13 @@
 - Keep completed tasks in descending task number order.
 - Example: `- [X] Task title (21-05-2026)`
 - If a task is completed from Current Tasks, add a new empty task with the next number in Current Tasks.
+- If you're asked to check a screenshot for any task, look for it in the following directory:
+  D:\Development\Projects\JodTod\Docs\Screenshots
 
 ## Current Tasks
 
-- [] **601**
-  Review screenshot 2.png, which shows the email sent after a new user registers via email. Redesign it to meet modern professional email standards.
-
-    Requirements
-    1. Improve the email copy to be clear, polished, and professional while preserving the existing functionality.
-    2. Add any missing content typically expected in a registration/verification email, only where appropriate.
-    3. Add a short explanatory sentence immediately before the verification/action button, clearly instructing the user to click the button.
-    4. Replace "Regards" with a more professional closing (e.g., "Best regards" or another appropriate alternative) and ensure the tone is consistent throughout.
-    5. Review and enhance the email layout, spacing, typography, branding, and CTA so it looks production-ready, trustworthy, and modern.
-    6. Do not modify any dynamic variables, placeholders, Syntax, translation keys, URLs, tokens, or business logic. All dynamic variables must remain exactly as they are, and functionality must remain 100% unchanged.
-    7. Once this template is approved, apply the same design, tone, formatting, and UX improvements consistently to all email templates in the project while preserving each template's purpose, content, dynamic variables, and functionality.
-    8. Ensure all email templates are responsive, accessible, email-client compatible, and visually consistent with the application's branding.
-
 - [] **510**
-  A. jab user ko gruop me add kiya to push notification nahi aaya in-app aaya only.
+  A. jab user ko group me add kiya to push notification nahi aaya in-app aaya only.
   B. group expense add par task assing par chal raha hai. to group me member add par deactivate, remove par aise sabhi actions par push notification aani chahiye.
 
 - [] **512**
@@ -53,6 +42,19 @@
 ## COMPLETED
 
 ## Completed Current Tasks
+
+- [x] **Task 602** (03-08-2026)
+      A. Removed the Push Notifications option from web and mobile Profile notification settings.
+      B. Renamed the remaining preference to “Email Notifications (Weekly Summary & Settlements)” and aligned its web helper copy with the retained email types.
+      C. Fixed mobile email-verification logout: it now clears the access token, in-memory user state, and registered push token before redirecting to Login.
+      D. Added Change Email on the same screen. It uses the identical cleanup flow and redirects to Register so a different email can be used.
+      E. Updated the root authentication guard so an unauthenticated app restart cannot remain on the verification screen.
+
+- [x] **Task 601** (03-08-2026)
+      A. Added one reusable, responsive, email-client-compatible branded layout for registration verification, password reset, weekly summary, and settlement emails.
+      B. Reworked the retained email copy, CTA instructions, branding, spacing, typography, and professional closing while preserving dynamic URLs, tokens, and business logic.
+      C. Removed email delivery and obsolete mail builders for group, group expense, group join request, todo assignment, and todo reminder notifications. Those events continue to use database and Expo push notifications.
+      D. Verified notification PHP syntax, compiled Blade views, and updated password reset coverage for the queued branded notification.
 
 - [x] **Task 600** (23-07-2026)
       A. Fixed the mobile Todo Categories API query to use the schema-defined `todos.todo_category_id` column instead of the nonexistent `todos.category_id` column. This resolves the Manage Categories SQL error.

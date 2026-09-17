@@ -1,8 +1,33 @@
 # JodTod - Development Progress
 
+### 2026-08-21 - Contact Privacy and Approval (COMPLETED)
+- Contact search now returns only public name and avatar data, preventing email and phone disclosure through arbitrary searches.
+- Contact additions create pending requests; recipients can approve or decline them, and approved contacts are available mutually.
+- Group Add Member data now excludes unapproved contact requests.
+
+### 2026-08-21 - Group Expense Admin Authorization (COMPLETED)
+- Group-expense update and delete API actions now require the current user to be the group's admin, including expenses created by that member.
+- Non-admin API attempts receive a consistent 403 response explaining that only the group admin can edit or delete group expenses.
+
 ---
 
 ## Current Status: ALL PHASES COMPLETE (1-11)
+
+### 2026-08-19 - Task 1203 Todo Categories Support (COMPLETED)
+- Added an `is_default` flag to Todo categories and protected default categories from API deletion.
+- The Todo category endpoint now creates each authenticated user's Home and Market defaults on first load; existing Home and Market records are protected by the migration.
+- Extended Todo category API coverage for default-category creation and deletion protection.
+
+### 2026-08-03 - Task 602: Notification Preferences and Mobile Verification Flow (COMPLETED)
+- Removed the Push Notifications profile option from both web and mobile interfaces and clarified the email preference label for weekly summaries and settlements.
+- Fixed the mobile verification-screen logout and added Change Email. Both clear the current token, user state, and push registration before navigating to the intended authentication screen.
+- Updated the mobile root guard so unauthenticated users are redirected to Login instead of remaining on the email verification screen after an app restart.
+
+### 2026-08-03 - Task 601: Professional Email Notifications (COMPLETED)
+- Created one reusable, responsive Blade email layout with JodTod branding, accessible CTA markup, and email-client-compatible table structure.
+- Applied the shared layout to email verification, password reset, weekly summary, and settlement notifications without changing their dynamic URLs, tokens, or delivery logic.
+- Removed email channels and mail builders from group, expense, and todo notifications; they continue to create database notifications and send Expo push notifications.
+- Verified notification syntax and Blade compilation. Password reset coverage now checks the queued notification uses the shared template.
 
 ### 2026-07-27 - Income Mobile Edit API Fix (COMPLETED)
 - Added the missing `GET /api/v1/incomes/{income}` route and `IncomeController::show` action.

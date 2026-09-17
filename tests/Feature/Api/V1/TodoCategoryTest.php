@@ -42,9 +42,11 @@ class TodoCategoryTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJsonCount(2, 'data')
+            ->assertJsonCount(4, 'data')
             ->assertJsonFragment(['id' => $ownedCategory->id])
-            ->assertJsonFragment(['id' => $assignedCategory->id]);
+            ->assertJsonFragment(['id' => $assignedCategory->id])
+            ->assertJsonFragment(['name' => 'Home', 'is_default' => true])
+            ->assertJsonFragment(['name' => 'Market', 'is_default' => true]);
     }
 
     public function test_todo_can_be_created_with_a_selected_category(): void
@@ -71,5 +73,24 @@ class TodoCategoryTest extends TestCase
             'title' => 'Buy groceries',
             'todo_category_id' => $category->id,
         ]);
+    }
+
+    public function test_index_creates_non_deletable_default_categories(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/todo-categories');
+
+        $response->assertOk()
+            ->assertJsonFragment(['name' => 'Home', 'is_default' => true])
+            ->assertJsonFragment(['name' => 'Market', 'is_default' => true]);
+
+        $home = TodoCategory::where('user_id', $user->id)->where('name', 'Home')->firstOrFail();
+        $this->deleteJson("/api/v1/todo-categories/{$home->id}")
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Default categories cannot be deleted.');
+
+        $this->assertDatabaseHas('todo_categories', ['id' => $home->id]);
     }
 }

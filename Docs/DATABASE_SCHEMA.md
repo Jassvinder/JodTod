@@ -199,6 +199,7 @@
 | user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | Category owner |
 | name | VARCHAR(50) | NOT NULL | Category name, unique per owner |
 | color | VARCHAR(7) | NOT NULL, DEFAULT '#6366f1' | Hex color value |
+| is_default | BOOLEAN | NOT NULL, DEFAULT false | Home and Market defaults; protected from deletion |
 | created_at | TIMESTAMP | | |
 | updated_at | TIMESTAMP | | |
 

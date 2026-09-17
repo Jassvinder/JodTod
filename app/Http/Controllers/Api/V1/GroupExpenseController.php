@@ -131,13 +131,13 @@ class GroupExpenseController extends Controller
     }
 
     /**
-     * Update expense and recalculate splits. Creator or admin only.
+     * Update expense and recalculate splits. Group admin only.
      */
     public function update(Request $request, Group $group, Expense $expense): JsonResponse
     {
         $this->ensureMember($group);
         $this->ensureExpenseBelongsToGroup($expense, $group);
-        $this->ensureCanModify($group, $expense);
+        $this->ensureGroupAdmin($group);
 
         $memberIds = $group->activeMembers()->pluck('users.id')->toArray();
         $memberIdList = implode(',', $memberIds);
@@ -202,13 +202,13 @@ class GroupExpenseController extends Controller
     }
 
     /**
-     * Soft delete a group expense. Creator or admin only.
+     * Soft delete a group expense. Group admin only.
      */
     public function destroy(Group $group, Expense $expense): JsonResponse
     {
         $this->ensureMember($group);
         $this->ensureExpenseBelongsToGroup($expense, $group);
-        $this->ensureCanModify($group, $expense);
+        $this->ensureGroupAdmin($group);
 
         $expense->delete(); // soft delete
 
@@ -363,16 +363,16 @@ class GroupExpenseController extends Controller
     }
 
     /**
-     * Ensure the user can modify the expense (creator or group admin).
+     * Ensure the current user is the group admin.
      */
-    private function ensureCanModify(Group $group, Expense $expense): void
+    private function ensureGroupAdmin(Group $group): void
     {
         $user = Auth::user();
 
-        if ($expense->user_id !== $user->id && !$group->isAdmin($user)) {
+        if (!$group->isAdmin($user)) {
             abort(response()->json([
                 'success' => false,
-                'message' => 'Only the expense creator or group admin can modify this expense.',
+                'message' => 'Only the group admin can edit or delete group expenses.',
             ], 403));
         }
     }

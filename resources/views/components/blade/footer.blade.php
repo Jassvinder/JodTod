@@ -4,7 +4,7 @@
             <!-- Brand -->
             <div>
                 <a href="{{ url('/') }}">
-                    <img src="{{ asset('images/Logo/logo.png') }}" alt="{{ config('site.app.name') }}" class="h-9 w-auto" />
+                    <img src="{{ asset('images/Logo/logo.webp') }}?v={{ time() }}" alt="{{ config('site.app.name') }}" class="h-9 w-auto" />
                 </a>
                 <p class="mt-2 text-sm text-gray-400">{{ config('site.footer.description') }}</p>
             </div>

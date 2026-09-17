@@ -80,7 +80,10 @@ Route::prefix('v1')->group(function () {
         // Contacts
         Route::get('/contacts', [ContactController::class, 'index']);
         Route::get('/contacts/search', [ContactController::class, 'search']);
+        Route::get('/contacts/requests', [ContactController::class, 'requests']);
         Route::post('/contacts', [ContactController::class, 'store']);
+        Route::post('/contacts/{contact}/approve', [ContactController::class, 'approve']);
+        Route::delete('/contacts/{contact}/reject', [ContactController::class, 'reject']);
         Route::delete('/contacts/{contact}', [ContactController::class, 'destroy']);
 
         // Categories

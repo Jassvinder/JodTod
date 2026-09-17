@@ -653,21 +653,8 @@ const cancelPhoneEdit = () => {
                         class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                     />
                     <div>
-                        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Email Notifications</span>
-                        <p class="text-xs text-gray-500">Receive notifications via email (group expenses, settlements, etc.)</p>
-                    </div>
-                </label>
-
-                <label class="flex items-center gap-3">
-                    <input
-                        type="checkbox"
-                        :checked="user.notification_push"
-                        @change="updateNotificationPref('notification_push', $event.target.checked)"
-                        class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                    />
-                    <div>
-                        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Push Notifications</span>
-                        <p class="text-xs text-gray-500">Receive push notifications in browser (coming soon)</p>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Email Notifications (Weekly Summary &amp; Settlements)</span>
+                        <p class="text-xs text-gray-500">Receive weekly summaries and settlement updates via email.</p>
                     </div>
                 </label>
             </div>
