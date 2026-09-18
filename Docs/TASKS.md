@@ -20,6 +20,19 @@
 - [] **512**
   home page ke content me tasks system bhi is project me manage hota hai ye dalna hai.
 
+- [] **513 — Mobile/web parity gaps found while auditing both TASKS.md files (18-09-2026)**
+  Mobile app (`JodTodApp`) has pulled ahead of web on a few things. Found by reading both repos' actual controller code, not just the task logs:
+
+  A. **Default Todo categories never get created for web-only users.** The "Home"/"Market" auto-seed logic (`ensureDefaultCategories()`) lives only in `Api\V1\TodoCategoryController::index()` (mobile). Web's `TodoController::index()` never calls anything equivalent, so a user who has only ever used the website gets zero default categories.
+
+  B. **Web lets you delete the default Todo categories.** `Api\V1\TodoCategoryController::destroy()` blocks deleting a category where `is_default` is true ("Default categories cannot be deleted."). Web's `TodoController::destroy()` (Todo Categories, via `resources/js/Pages/Todos/Index.vue`'s delete button) has no such check — a web user can delete Home/Market entirely.
+
+  C. **Web's Todo category filter is missing assigned-task categories.** Mobile's `Api\V1\TodoCategoryController::index()` merges the user's own categories with categories from tasks assigned to them by someone else, so those categories still show up as filter options. Web's `TodoController::index()` only queries `TodoCategory::where('user_id', $userId)`, so a category on a task assigned to you (but owned by someone else) won't appear as a filter choice on web.
+
+  D. **Web is more permissive than mobile on who can edit/delete a group expense.** Mobile and the mobile API (`Api\V1\GroupExpenseController::update/destroy`) are admin-only, enforced by `ensureGroupAdmin()` — deliberately decided in mobile Task 1204 ("Edit and delete controls remain visible to all members, but only the Group Admin can use them; other members see an admin-only alert"). Web's `GroupExpenseController` instead allows `$expense->user_id === $user->id` (the member who originally added the expense) OR the admin. This is a real behavior difference, not just a UI gap — worth confirming intent before tightening it, since it would take away something existing web members can currently do.
+
+  Plan: fix A–C (straightforward, no behavior trade-off). For D, align web to the same admin-only rule as mobile/API unless told otherwise, since Task 1204 was a deliberate, recent policy decision and the two platforms should behave the same way for the same shared data.
+
 **Admin** Section tasks. starts from 500 =======================================
 
 ## PENDING
