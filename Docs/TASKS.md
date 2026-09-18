@@ -45,6 +45,25 @@
 
 ## Completed Current Tasks
 
+- [x] **Task 515 — Second round of mobile/web parity fixes** (18-09-2026)
+  Follow-up audit of Expense/Income/Settlement/Notification/Group controller pairs (backend logic only, not UI styling). Fixed the items that were clearly bugs; left the ones that looked like intentional platform differences alone:
+
+  A. **Settlement race condition (fixed)** — web's `settle()` already checked for existing pending settlements inside a `DB::transaction()` with `lockForUpdate()`; the mobile API's version did the same check as a plain `count()` outside any lock, so two concurrent "Settle Up" requests could both pass and create duplicate settlement batches. Mobile now matches web's locked pattern.
+
+  B. **Todo edit permission (aligned to mobile)** — mobile API already let a task's assignee edit it (`authorizeTodoOrAssignee`), not just the owner; web only allowed the owner. Aligned web's `update()` and the Edit button visibility in `Todos/Index.vue` to match (Delete stays owner-only on both).
+
+  C. **Expense image WebP conversion (aligned to web)** — web's `ExpenseController`/`GroupExpenseController` each had their own copy of `storeImageAsWebp()` (duplicated); the mobile API versions of both stored the raw upload with no conversion. Extracted the shared logic into a `StoresWebpImages` trait and applied it to all four controllers.
+
+  D. **Missing trend data on mobile (added)** — web's Expense summary includes `daily_trend` and Income summary includes `monthly_trend` (6-month) + `source_breakdown`; mobile's API versions were missing all three. Mirrored web's exact computation on both mobile endpoints.
+
+  E. **Notifications "recent" list (left alone)** — web returns unread-only ("for header dropdown", per its own docblock); mobile returns latest 10 regardless of read status (feeds the Home dashboard's activity feed). Different UI contexts, both look intentional — not changed.
+
+  F. **Dead `GroupController::searchUsers` (removed)** — phone-based member search, confirmed unreachable from any current Vue/Blade file. Web's own Task 103-A documented replacing this with contacts-based member addition, so this was leftover from before that migration.
+
+  G. **`GroupController::refreshInviteCode` (left alone, flagged)** — also currently unused, but with no "replaced by X" evidence like searchUsers had. Reads more like an unfinished feature than confirmed dead code, so left as-is rather than guessing.
+
+  Smoke-tested A–D via tinker fixtures (race-condition check, WebP output, trend data presence). `npm run build` clean throughout.
+
 - [x] **Task 513 — Mobile/web parity gaps found while auditing both TASKS.md files** (18-09-2026)
   Mobile app (`JodTodApp`) had pulled ahead of web on a few things. Found by reading both repos' actual controller code, not just the task logs, then fixed:
 
