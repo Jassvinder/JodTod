@@ -84,24 +84,24 @@ class SettlementController extends Controller
             return $this->forbidden('Only group admin can initiate settlements.');
         }
 
-        // Block if pending settlements already exist
-        $pendingCount = Settlement::where('group_id', $group->id)
-            ->where('status', 'pending')
-            ->count();
+        $result = DB::transaction(function () use ($group) {
+            // Lock check: prevent duplicate pending settlements from concurrent requests
+            $pendingCount = Settlement::where('group_id', $group->id)
+                ->where('status', 'pending')
+                ->lockForUpdate()
+                ->count();
 
-        if ($pendingCount > 0) {
-            return $this->error('Pending settlements already exist. Complete or settle them first before creating new ones.', 422);
-        }
+            if ($pendingCount > 0) {
+                return ['status' => 'pending_exists'];
+            }
 
-        $transactions = $this->calculateOptimizedTransactions($group);
+            $transactions = $this->calculateOptimizedTransactions($group);
 
-        if (empty($transactions)) {
-            return $this->error('No unsettled expenses found.', 422);
-        }
+            if (empty($transactions)) {
+                return ['status' => 'no_expenses'];
+            }
 
-        $members = $group->members()->get()->keyBy('id');
-
-        $settlements = DB::transaction(function () use ($transactions, $group, $members) {
+            $members = $group->members()->get()->keyBy('id');
             $created = [];
 
             foreach ($transactions as $transaction) {
@@ -123,8 +123,18 @@ class SettlementController extends Controller
                 }
             }
 
-            return $created;
+            return ['status' => 'success', 'settlements' => $created];
         });
+
+        if ($result['status'] === 'pending_exists') {
+            return $this->error('Pending settlements already exist. Complete or settle them first before creating new ones.', 422);
+        }
+
+        if ($result['status'] === 'no_expenses') {
+            return $this->error('No unsettled expenses found.', 422);
+        }
+
+        $settlements = $result['settlements'];
 
         // Load relationships for response
         foreach ($settlements as $settlement) {
