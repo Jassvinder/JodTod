@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Concerns\StoresWebpImages;
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Models\ExpenseSplit;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Notification;
 
 class GroupExpenseController extends Controller
 {
+    use StoresWebpImages;
+
     /**
      * List group expenses paginated with filters.
      */
@@ -81,7 +84,7 @@ class GroupExpenseController extends Controller
         $imagePaths = [];
         foreach (['image_1', 'image_2'] as $field) {
             if ($request->hasFile($field)) {
-                $imagePaths[$field] = $request->file($field)->store('expenses', 'public');
+                $imagePaths[$field] = $this->storeImageAsWebp($request->file($field));
             }
         }
 
@@ -171,7 +174,7 @@ class GroupExpenseController extends Controller
                 if ($expense->{$field}) {
                     \Storage::disk('public')->delete($expense->{$field});
                 }
-                $imageUpdates[$field] = $request->file($field)->store('expenses', 'public');
+                $imageUpdates[$field] = $this->storeImageAsWebp($request->file($field));
             }
         }
 

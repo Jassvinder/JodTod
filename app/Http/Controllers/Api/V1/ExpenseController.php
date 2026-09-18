@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Concerns\StoresWebpImages;
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ExpenseController extends Controller
 {
+    use StoresWebpImages;
+
     public function index(Request $request): JsonResponse
     {
         $query = Expense::personal()
@@ -81,6 +84,18 @@ class ExpenseController extends Controller
                 'total' => (float) $item->total,
             ]);
 
+        $dailyTrend = Expense::personal()
+            ->forUser($userId)
+            ->whereBetween('expense_date', [$monthStart, $monthEnd])
+            ->selectRaw('expense_date as date, SUM(amount) as total')
+            ->groupBy('expense_date')
+            ->orderBy('expense_date')
+            ->get()
+            ->map(fn ($item) => [
+                'date' => \Carbon\Carbon::parse($item->date)->toDateString(),
+                'total' => (float) $item->total,
+            ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Success',
@@ -95,6 +110,7 @@ class ExpenseController extends Controller
                 'monthly_total' => (float) $monthlyTotal,
                 'last_month_total' => (float) $lastMonthTotal,
                 'category_breakdown' => $categoryBreakdown,
+                'daily_trend' => $dailyTrend,
             ],
         ], 200);
     }
@@ -116,7 +132,7 @@ class ExpenseController extends Controller
 
         foreach (['image_1', 'image_2'] as $field) {
             if ($request->hasFile($field)) {
-                $data[$field] = $request->file($field)->store('expenses', 'public');
+                $data[$field] = $this->storeImageAsWebp($request->file($field));
             }
         }
 
@@ -161,7 +177,7 @@ class ExpenseController extends Controller
                 if ($expense->{$field}) {
                     Storage::disk('public')->delete($expense->{$field});
                 }
-                $data[$field] = $request->file($field)->store('expenses', 'public');
+                $data[$field] = $this->storeImageAsWebp($request->file($field));
             }
         }
 

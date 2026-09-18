@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\StoresWebpImages;
 use App\Models\Category;
 use App\Models\Expense;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use Inertia\Inertia;
 
 class ExpenseController extends Controller
 {
+    use StoresWebpImages;
+
     public function index(Request $request)
     {
         $query = Expense::personal()
@@ -223,24 +226,6 @@ class ExpenseController extends Controller
     /**
      * Convert uploaded image to webp and store it.
      */
-    private function storeImageAsWebp($file): string
-    {
-        $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
-        if ($image === false) {
-            throw new \RuntimeException('Unable to process uploaded image.');
-        }
-
-        $filename = 'expenses/' . uniqid() . '.webp';
-        ob_start();
-        imagewebp($image, null, 80);
-        $webpData = ob_get_clean();
-        imagedestroy($image);
-
-        Storage::disk('public')->put($filename, $webpData);
-
-        return $filename;
-    }
-
     private function applyPeriodFilter($query, string $period)
     {
         return match ($period) {
