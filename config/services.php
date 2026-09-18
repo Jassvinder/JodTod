@@ -39,6 +39,11 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URL', '/auth/google/callback'),
+        // Mobile app's native OAuth clients (Expo AuthSession). ID tokens minted for
+        // any of these audiences, plus the web client above, are accepted by the
+        // POST /api/v1/auth/google endpoint.
+        'android_client_id' => env('GOOGLE_ANDROID_CLIENT_ID'),
+        'ios_client_id' => env('GOOGLE_IOS_CLIENT_ID'),
     ],
 
     'recaptcha' => [

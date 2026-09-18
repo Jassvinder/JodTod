@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rules;
 
@@ -60,6 +61,75 @@ class AuthController extends Controller
             'token' => $token,
             'user' => $user,
         ], 'Registration successful. Please verify your email.');
+    }
+
+    public function googleLogin(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id_token' => 'required|string',
+            'device_name' => 'required|string|max:255',
+        ]);
+
+        $response = Http::timeout(10)->get('https://oauth2.googleapis.com/tokeninfo', [
+            'id_token' => $request->id_token,
+        ]);
+
+        if (! $response->ok()) {
+            return $this->unauthorized('Invalid Google token.');
+        }
+
+        $payload = $response->json();
+
+        $allowedAudiences = array_filter([
+            config('services.google.client_id'),
+            config('services.google.android_client_id'),
+            config('services.google.ios_client_id'),
+        ]);
+
+        $issuerIsGoogle = in_array($payload['iss'] ?? null, ['accounts.google.com', 'https://accounts.google.com'], true);
+        $audienceIsOurs = in_array($payload['aud'] ?? null, $allowedAudiences, true);
+        $emailIsVerified = filter_var($payload['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        if (! $issuerIsGoogle || ! $audienceIsOurs || ! $emailIsVerified || empty($payload['email'])) {
+            return $this->unauthorized('Invalid Google token.');
+        }
+
+        $googleId = $payload['sub'];
+        $email = $payload['email'];
+
+        $user = User::where('google_id', $googleId)->orWhere('email', $email)->first();
+
+        if ($user) {
+            $updates = [];
+
+            if (! $user->email_verified_at) {
+                $updates['email_verified_at'] = now();
+            }
+
+            if (! $user->google_id) {
+                $updates['google_id'] = $googleId;
+                $updates['avatar'] = $user->avatar ?? ($payload['picture'] ?? null);
+            }
+
+            if (! empty($updates)) {
+                $user->update($updates);
+            }
+        } else {
+            $user = User::create([
+                'name' => $payload['name'] ?? explode('@', $email)[0],
+                'email' => $email,
+                'google_id' => $googleId,
+                'avatar' => $payload['picture'] ?? null,
+                'email_verified_at' => now(),
+            ]);
+        }
+
+        $token = $user->createToken($request->device_name)->plainTextToken;
+
+        return $this->success([
+            'token' => $token,
+            'user' => $user,
+        ], 'Login successful.');
     }
 
     public function logout(Request $request): JsonResponse

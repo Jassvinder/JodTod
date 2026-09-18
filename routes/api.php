@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
         Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+        Route::post('/auth/google', [AuthController::class, 'googleLogin']);
     });
     Route::middleware('throttle:3,1')->group(function () {
         Route::post('/otp/send', [OtpController::class, 'send']);
