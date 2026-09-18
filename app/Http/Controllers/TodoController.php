@@ -136,7 +136,7 @@ class TodoController extends Controller
 
     public function update(Request $request, Todo $todo)
     {
-        $this->authorizeTodo($todo);
+        $this->authorizeTodoOrAssignee($todo);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
