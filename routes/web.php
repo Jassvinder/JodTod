@@ -111,7 +111,6 @@ Route::middleware(['auth', 'verified'/*, 'phone.verified'*/])->group(function ()
     Route::post('/groups/{group}/members/{userId}/reactivate', [GroupController::class, 'reactivateMember'])->name('groups.members.reactivate');
     Route::post('/groups/{group}/members/{userId}/approve', [GroupController::class, 'approveMember'])->name('groups.members.approve');
     Route::delete('/groups/{group}/members/{userId}/reject', [GroupController::class, 'rejectMember'])->name('groups.members.reject');
-    Route::get('/groups/{group}/search-users', [GroupController::class, 'searchUsers'])->name('groups.search-users');
     Route::post('/groups/{group}/add-member', [GroupController::class, 'addMember'])->name('groups.add-member');
 
     // Group Expenses

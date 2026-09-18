@@ -415,30 +415,6 @@ class GroupController extends Controller
         return back()->with('success', 'Member has been reactivated.');
     }
 
-    public function searchUsers(Request $request, Group $group): JsonResponse
-    {
-        if (!$group->isAdmin($request->user())) {
-            abort(403);
-        }
-
-        $phone = $request->input('phone', '');
-
-        if (strlen($phone) < 3) {
-            return response()->json([]);
-        }
-
-        $existingMemberIds = $group->groupMembers()->pluck('user_id');
-
-        $users = User::where('phone', 'LIKE', $phone . '%')
-            ->whereNotNull('phone_verified_at')
-            ->whereNotIn('id', $existingMemberIds)
-            ->select('id', 'name', 'phone', 'avatar')
-            ->limit(10)
-            ->get();
-
-        return response()->json($users);
-    }
-
     public function approveMember(Request $request, Group $group, int $userId): RedirectResponse
     {
         if (!$group->isAdmin($request->user())) {
