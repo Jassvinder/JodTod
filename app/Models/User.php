@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\QueuedResetPassword;
 use App\Notifications\QueuedVerifyEmail;
@@ -106,6 +108,47 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new QueuedResetPassword($token));
+    }
+
+    /**
+     * Generate a random friend code candidate, e.g. "KRM459".
+     */
+    public static function generateFriendCode(): string
+    {
+        $letters = '';
+        for ($i = 0; $i < 3; $i++) {
+            $letters .= chr(random_int(65, 90));
+        }
+
+        $numbers = str_pad((string) random_int(0, 999), 3, '0', STR_PAD_LEFT);
+
+        return $letters . $numbers;
+    }
+
+    /**
+     * Every user gets a unique friend_code on creation. Generation races under
+     * concurrent registrations, so retry on a unique-constraint collision
+     * instead of relying on the pre-insert existence check alone.
+     */
+    protected function performInsert(Builder $query)
+    {
+        if (empty($this->friend_code)) {
+            $this->friend_code = static::generateFriendCode();
+        }
+
+        $attempts = 0;
+
+        while (true) {
+            try {
+                return parent::performInsert($query);
+            } catch (QueryException $e) {
+                $attempts++;
+                if ($attempts >= 5 || !str_contains($e->getMessage(), 'friend_code')) {
+                    throw $e;
+                }
+                $this->friend_code = static::generateFriendCode();
+            }
+        }
     }
 
     protected function casts(): array

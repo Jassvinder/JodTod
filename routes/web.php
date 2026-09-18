@@ -87,7 +87,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Contacts
     Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::get('/contacts/search', [ContactController::class, 'search'])->name('contacts.search');
+    Route::get('/contacts/requests', [ContactController::class, 'requests'])->name('contacts.requests');
     Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
+    Route::post('/contacts/{contact}/approve', [ContactController::class, 'approve'])->name('contacts.approve');
+    Route::delete('/contacts/{contact}/reject', [ContactController::class, 'reject'])->name('contacts.reject');
     Route::delete('/contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
 
     // Notifications

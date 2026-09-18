@@ -40,6 +40,7 @@ class ExpoPushChannel
             'removed_from_group' => 'Group Update',
             'reactivated_in_group' => 'Welcome Back',
             'join_request_rejected' => 'Join Request Update',
+            'contact_request_received' => 'Contact Request',
         ];
 
         $pushTitle = $titleMap[$data['type'] ?? ''] ?? 'JodTod';
@@ -48,6 +49,7 @@ class ExpoPushChannel
             'type' => $data['type'] ?? null,
             'group_id' => $data['group_id'] ?? null,
             'todo_id' => $data['todo_id'] ?? null,
+            'contact_id' => $data['contact_id'] ?? null,
         ]);
     }
 }

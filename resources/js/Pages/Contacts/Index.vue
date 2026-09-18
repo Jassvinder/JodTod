@@ -1,12 +1,16 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { confirmAction } from '@/Utils/confirm.js';
 import axios from 'axios';
 
 const props = defineProps({
     contacts: Array,
+    requestCount: {
+        type: Number,
+        default: 0,
+    },
 });
 
 // Search
@@ -72,9 +76,14 @@ function getInitial(name) {
     <AppLayout>
         <div class="max-w-2xl mx-auto">
             <!-- Header -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Contacts</h2>
-                <p class="mt-1 text-gray-500 dark:text-gray-400">Add JodTod users to quickly add them to groups or assign tasks</p>
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Contacts</h2>
+                    <p class="mt-1 text-gray-500 dark:text-gray-400">Add JodTod users to quickly add them to groups or assign tasks</p>
+                </div>
+                <Link :href="route('contacts.requests')" class="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors">
+                    Requests<span v-if="requestCount">&nbsp;({{ requestCount }})</span>
+                </Link>
             </div>
 
             <!-- Search -->
@@ -109,8 +118,10 @@ function getInitial(name) {
                                 <span class="text-sm font-bold text-primary-600 dark:text-primary-400">{{ getInitial(user.name) }}</span>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ user.name }}</p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ user.email || user.phone }}</p>
+                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex items-center gap-1.5">
+                                    {{ user.name }}
+                                    <span class="text-[11px] font-semibold text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 rounded px-1.5 py-0.5">{{ user.friend_code }}</span>
+                                </p>
                             </div>
                             <button
                                 @click="addContact(user)"
@@ -154,8 +165,11 @@ function getInitial(name) {
                             <span class="text-sm font-bold text-primary-600 dark:text-primary-400">{{ getInitial(contact.user.name) }}</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ contact.user.name }}</p>
-                            <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ contact.user.email || contact.user.phone }}</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex items-center gap-1.5">
+                                {{ contact.user.name }}
+                                <span class="text-[11px] font-semibold text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 rounded px-1.5 py-0.5">{{ contact.user.friend_code }}</span>
+                            </p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ contact.user.email }}</p>
                         </div>
                         <button
                             @click="removeContact(contact)"

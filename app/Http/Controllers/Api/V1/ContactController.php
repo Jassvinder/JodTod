@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\User;
+use App\Notifications\ContactRequestReceived;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ class ContactController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Contact::with('contactUser:id,name,email,phone,avatar')
+        $query = Contact::with('contactUser:id,name,email,friend_code,avatar')
             ->where('user_id', Auth::id())
             ->where('status', 'approved')
             ->latest();
@@ -50,7 +51,7 @@ class ContactController extends Controller
                 $query->where('name', 'like', "%{$q}%");
             })
             ->whereNotIn('id', $existingContactIds)
-            ->select('id', 'name', 'avatar')
+            ->select('id', 'name', 'friend_code', 'avatar')
             ->limit(20)
             ->get();
 
@@ -85,14 +86,16 @@ class ContactController extends Controller
             'status' => 'pending',
         ]);
 
-        $contact->load('contactUser:id,name,avatar');
+        $contact->load('contactUser:id,name,friend_code,avatar');
+
+        $contact->contactUser->notify(new ContactRequestReceived($contact, Auth::user()));
 
         return $this->created($contact, 'Contact request sent for approval.');
     }
 
     public function requests(): JsonResponse
     {
-        $requests = Contact::with('user:id,name,avatar')
+        $requests = Contact::with('user:id,name,friend_code,avatar')
             ->where('contact_user_id', Auth::id())
             ->where('status', 'pending')
             ->latest()
