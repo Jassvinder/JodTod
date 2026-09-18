@@ -11,14 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class TodoCategoryController extends Controller
 {
-    private const DEFAULT_CATEGORIES = [
-        ['name' => 'Home', 'color' => '#6366f1'],
-        ['name' => 'Market', 'color' => '#22c55e'],
-    ];
-
     public function index(): JsonResponse
     {
-        $this->ensureDefaultCategories();
+        TodoCategory::ensureDefaultsForUser(Auth::id());
 
         // Get user's own categories
         $ownCategoryIds = TodoCategory::where('user_id', Auth::id())->pluck('id');
@@ -92,16 +87,6 @@ class TodoCategoryController extends Controller
                 'success' => false,
                 'message' => 'Forbidden',
             ], 403));
-        }
-    }
-
-    private function ensureDefaultCategories(): void
-    {
-        foreach (self::DEFAULT_CATEGORIES as $category) {
-            TodoCategory::firstOrCreate(
-                ['user_id' => Auth::id(), 'name' => $category['name']],
-                [...$category, 'user_id' => Auth::id(), 'is_default' => true],
-            );
         }
     }
 }

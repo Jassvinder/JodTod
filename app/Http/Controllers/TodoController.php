@@ -18,6 +18,8 @@ class TodoController extends Controller
     {
         $userId = Auth::id();
 
+        TodoCategory::ensureDefaultsForUser($userId);
+
         $query = Todo::with(['category', 'assignee:id,name,avatar', 'user:id,name,avatar'])
             ->where(function ($q) use ($userId) {
                 $q->where('user_id', $userId)
@@ -75,7 +77,15 @@ class TodoController extends Controller
                 ->count(),
         ];
 
-        $categories = TodoCategory::where('user_id', $userId)
+        $ownCategoryIds = TodoCategory::where('user_id', $userId)->pluck('id');
+
+        $assignedCategoryIds = Todo::where('assigned_to', $userId)
+            ->where('user_id', '!=', $userId)
+            ->whereNotNull('todo_category_id')
+            ->pluck('todo_category_id')
+            ->unique();
+
+        $categories = TodoCategory::whereIn('id', $ownCategoryIds->merge($assignedCategoryIds)->unique())
             ->withCount('todos')
             ->orderBy('name')
             ->get();

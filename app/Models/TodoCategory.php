@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TodoCategory extends Model
 {
+    private const DEFAULT_CATEGORIES = [
+        ['name' => 'Home', 'color' => '#6366f1'],
+        ['name' => 'Market', 'color' => '#22c55e'],
+    ];
+
     protected $fillable = [
         'user_id',
         'name',
@@ -20,6 +25,20 @@ class TodoCategory extends Model
         return [
             'is_default' => 'boolean',
         ];
+    }
+
+    /**
+     * Seed the shared default categories (Home, Market) for a user the first
+     * time they're needed. Safe to call on every listing request.
+     */
+    public static function ensureDefaultsForUser(int $userId): void
+    {
+        foreach (self::DEFAULT_CATEGORIES as $category) {
+            static::firstOrCreate(
+                ['user_id' => $userId, 'name' => $category['name']],
+                [...$category, 'user_id' => $userId, 'is_default' => true],
+            );
+        }
     }
 
     public function user(): BelongsTo

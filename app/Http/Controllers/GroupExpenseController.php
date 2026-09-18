@@ -416,10 +416,8 @@ class GroupExpenseController extends Controller
      */
     private function ensureCanModify(Group $group, Expense $expense): void
     {
-        $user = Auth::user();
-
-        if ($expense->user_id !== $user->id && !$group->isAdmin($user)) {
-            abort(403, 'Only the expense creator or group admin can modify this expense.');
+        if (! $group->isAdmin(Auth::user())) {
+            abort(403, 'Only the group admin can edit or delete group expenses.');
         }
     }
 }

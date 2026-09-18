@@ -41,6 +41,10 @@ class TodoCategoryController extends Controller
     {
         $this->authorize($todoCategory);
 
+        if ($todoCategory->is_default) {
+            return redirect()->back()->with('error', 'Default categories cannot be deleted.');
+        }
+
         $todoCategory->delete();
 
         return redirect()->back()->with('success', 'Category deleted.');

@@ -3,6 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
 import { confirmAction } from '@/Utils/confirm.js';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     group: Object,
@@ -68,11 +69,34 @@ function toggleExpand(expenseId) {
     expandedExpense.value = expandedExpense.value === expenseId ? null : expenseId;
 }
 
-function canDelete(expense) {
-    const isAdmin = props.group.members.find(
-        m => m.id === authUser.value.id && m.pivot?.role === 'admin'
-    );
-    return isAdmin || expense.paid_by === authUser.value.id;
+const isGroupAdmin = computed(() => !!props.group.members.find(
+    m => m.id === authUser.value.id && m.pivot?.role === 'admin'
+));
+
+function showAdminOnlyAlert() {
+    Swal.fire({
+        title: 'Admin Only',
+        text: 'Only the group admin can edit or delete group expenses.',
+        icon: 'info',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#6366f1',
+    });
+}
+
+function handleEditClick(expense) {
+    if (!isGroupAdmin.value) {
+        showAdminOnlyAlert();
+        return;
+    }
+    router.visit(route('groups.expenses.edit', [props.group.id, expense.id]));
+}
+
+function handleDeleteClick(expense) {
+    if (!isGroupAdmin.value) {
+        showAdminOnlyAlert();
+        return;
+    }
+    confirmDelete(expense);
 }
 
 function formatCurrency(amount) {
@@ -335,18 +359,17 @@ function splitTypeBadgeClass(type) {
 
                             <!-- Actions -->
                             <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex items-center gap-1 justify-end">
-                                <Link
-                                    :href="route('groups.expenses.edit', [group.id, expense.id])"
+                                <button
+                                    @click.stop="handleEditClick(expense)"
                                     class="p-2 rounded-lg text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
                                     title="Edit"
                                 >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
-                                </Link>
+                                </button>
                                 <button
-                                    v-if="canDelete(expense)"
-                                    @click.stop="confirmDelete(expense)"
+                                    @click.stop="handleDeleteClick(expense)"
                                     class="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                                     title="Delete"
                                 >
