@@ -8,6 +8,7 @@ use App\Models\Income;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class IncomeController extends Controller
 {
@@ -56,6 +57,41 @@ class IncomeController extends Controller
 
         $thisMonthSavings = (float) $thisMonthIncome - (float) $thisMonthExpense;
 
+        // Monthly trend (last 6 months)
+        $now = now();
+        $monthlyTrend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = $now->copy()->subMonths($i);
+            $mStart = $month->copy()->startOfMonth();
+            $mEnd = $month->copy()->endOfMonth();
+
+            $income = Income::forUser($userId)
+                ->whereBetween('income_date', [$mStart, $mEnd])
+                ->sum('amount');
+
+            $expense = Expense::where('user_id', $userId)
+                ->whereNull('group_id')
+                ->whereBetween('expense_date', [$mStart, $mEnd])
+                ->sum('amount');
+
+            $monthlyTrend[] = [
+                'month' => $month->format('M Y'),
+                'short_month' => $month->format('M'),
+                'income' => round((float) $income, 2),
+                'expense' => round((float) $expense, 2),
+                'savings' => round((float) $income - (float) $expense, 2),
+            ];
+        }
+
+        // Income sources breakdown (this month)
+        $sourceBreakdown = Income::forUser($userId)
+            ->whereBetween('income_date', [$monthStart, $monthEnd])
+            ->select('source', DB::raw('ROUND(SUM(amount), 2) as total'))
+            ->groupBy('source')
+            ->orderByDesc('total')
+            ->get()
+            ->toArray();
+
         return response()->json([
             'success' => true,
             'message' => 'Success',
@@ -71,6 +107,8 @@ class IncomeController extends Controller
                 'last_month_income' => round((float) $lastMonthIncome, 2),
                 'this_month_expense' => round((float) $thisMonthExpense, 2),
                 'this_month_savings' => round($thisMonthSavings, 2),
+                'source_breakdown' => $sourceBreakdown,
+                'monthly_trend' => $monthlyTrend,
             ],
         ], 200);
     }
