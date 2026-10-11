@@ -10,7 +10,7 @@ import { Link } from '@inertiajs/vue3';
                 <a href="/">
                     <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" class="h-10 w-auto mx-auto" />
                 </a>
-                <p class="text-gray-500 dark:text-gray-400 mt-1">Split expenses, strengthen friendships</p>
+                <p class="text-gray-500 dark:text-gray-400 mt-1">Track expenses, split bills, get things done</p>
             </div>
 
             <!-- Card -->

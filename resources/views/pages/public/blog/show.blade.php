@@ -90,7 +90,7 @@
         <!-- Share Section -->
         <div class="mt-12 pt-8 border-t border-gray-200">
             <p class="text-lg font-semibold text-gray-900">Share this article</p>
-            <p class="mt-2 text-gray-600">Found this helpful? Share it with your friends and help them manage expenses better.</p>
+            <p class="mt-2 text-gray-600">Found this helpful? Share it with your friends and help them manage expenses and plans better.</p>
         </div>
 
         <!-- Back to Blog -->

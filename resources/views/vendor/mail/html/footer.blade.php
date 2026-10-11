@@ -4,7 +4,7 @@
 <tr>
 <td class="content-cell" align="center">
 <p>&copy; {{ date('Y') }} JodTod. All rights reserved.</p>
-<p>Split expenses, strengthen friendships.</p>
+<p>{{ config('site.footer.description') }}</p>
 </td>
 </tr>
 </table>

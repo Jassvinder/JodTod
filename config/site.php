@@ -22,8 +22,8 @@ return [
     */
     'app' => [
         'name' => 'JodTod',
-        'tagline' => 'Split expenses, strengthen friendships',
-        'description' => 'Split expenses with friends, roommates and family easily. Personal expense tracking, group expense splitting, instant settlement.',
+        'tagline' => 'Track expenses, split bills, get things done',
+        'description' => 'Track personal expenses, split group bills, and plan every task with friends and family. Assign to-dos, set reminders, and settle up in one app.',
         'url' => env('APP_URL', 'http://localhost'),
         'currency' => '₹',
         'currency_code' => 'INR',
@@ -36,9 +36,9 @@ return [
     */
     'landing' => [
         'hero' => [
-            'title_line1' => 'Split expenses,',
-            'title_line2' => 'strengthen friendships',
-            'subtitle' => 'Whether it\'s a group trip or roommate bills — track, split, and settle with JodTod. Who owes whom, all crystal clear!',
+            'title_line1' => 'Track. Split. Plan.',
+            'title_line2' => 'Get things done together',
+            'subtitle' => 'From daily spending to a wedding months away — track expenses, split bills with your group, and plan every task with reminders. Assign work to family and friends, and never miss a thing.',
             'cta_primary' => 'Get started for free',
             'cta_secondary' => 'See features',
         ],
@@ -62,29 +62,65 @@ return [
                 'icon' => 'calculator',
                 'color' => 'accent',
             ],
+            [
+                'title' => 'Tasks & Reminders',
+                'description' => 'Manage daily and future to-dos with due dates, priorities, categories and timely reminders.',
+                'icon' => 'check',
+                'color' => 'primary',
+            ],
+            [
+                'title' => 'Assign Tasks to Others',
+                'description' => 'Hand off tasks to family, friends or teammates. They get notified and you see when it is done.',
+                'icon' => 'user-plus',
+                'color' => 'success',
+            ],
+            [
+                'title' => 'Plan Big Events Early',
+                'description' => 'Weddings, trips, house shifting — list every task months ahead and handle the costs in the same app.',
+                'icon' => 'calendar',
+                'color' => 'accent',
+            ],
+        ],
+
+        'event_planning' => [
+            'title' => 'Plan big events, months ahead',
+            'subtitle' => 'A wedding, a family trip or moving to a new home needs hundreds of small tasks. List them all early, share the work, and keep the budget in the same place.',
+            'points' => [
+                'Add tasks with due dates weeks or months in advance',
+                'Assign each task to the right person and get notified when it is done',
+                'Get reminders before deadlines so nothing is missed',
+                'Track and split every event expense with the same group',
+            ],
+            'sample_title' => 'Sister\'s Wedding',
+            'sample_tasks' => [
+                ['title' => 'Book the banquet hall', 'assignee' => 'You', 'due' => 'Done', 'done' => true],
+                ['title' => 'Finalise the caterer menu', 'assignee' => 'Rahul', 'due' => 'In 2 weeks', 'done' => false],
+                ['title' => 'Send invitation cards', 'assignee' => 'Priya', 'due' => 'In 1 month', 'done' => false],
+                ['title' => 'Arrange guest transport', 'assignee' => 'Amit', 'due' => 'In 2 months', 'done' => false],
+            ],
         ],
 
         'how_it_works' => [
             [
                 'step' => 1,
                 'title' => 'Create a Group',
-                'description' => 'Trip, flat, office lunch — create a group for anything and add your friends.',
+                'description' => 'Trip, flat, family event — create a group for anything and add the people involved.',
             ],
             [
                 'step' => 2,
-                'title' => 'Add Expenses',
-                'description' => 'Whoever paid adds the expense. Choose split type — equal, custom or percentage.',
+                'title' => 'Add Expenses & Tasks',
+                'description' => 'Log who paid and how to split it. Add the to-dos, set due dates and reminders, and assign them.',
             ],
             [
                 'step' => 3,
-                'title' => 'Settle Up',
-                'description' => 'JodTod automatically shows who owes whom. Minimum transactions, maximum clarity!',
+                'title' => 'Settle Up & Get It Done',
+                'description' => 'JodTod shows who owes whom and which tasks are still pending. Nothing slips through the cracks.',
             ],
         ],
 
         'cta' => [
-            'title' => 'No more money fights, start with JodTod!',
-            'subtitle' => 'Register for free and start tracking your expenses today.',
+            'title' => 'No more money fights or missed tasks — start with JodTod!',
+            'subtitle' => 'Register for free and start tracking expenses and planning tasks today.',
             'button' => 'Get started — It\'s free!',
         ],
     ],
@@ -105,6 +141,7 @@ return [
             ['label' => 'Dashboard', 'url' => '/dashboard', 'icon' => 'home'],
             ['label' => 'Expenses', 'url' => '/expenses', 'icon' => 'wallet'],
             ['label' => 'Groups', 'url' => '/groups', 'icon' => 'users'],
+            ['label' => 'Tasks', 'url' => '/todos', 'icon' => 'check'],
             ['label' => 'Profile', 'url' => '/profile', 'icon' => 'user'],
         ],
     ],
@@ -115,7 +152,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'footer' => [
-        'description' => 'Split expenses, strengthen friendships.',
+        'description' => 'Track expenses, split bills, and plan tasks together.',
         'quick_links' => [
             ['label' => 'Features', 'url' => '/features'],
             ['label' => 'Blog', 'url' => '/blog'],
@@ -137,8 +174,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'seo' => [
-        'default_title' => 'JodTod - Expense Tracker & Splitter | Split Expenses Easily',
-        'default_description' => 'JodTod - Split expenses with friends, roommates and family easily. Personal expense tracking, group expense splitting, instant settlement.',
+        'default_title' => 'JodTod - Expense Tracker, Bill Splitter & Task Planner',
+        'default_description' => 'JodTod - Track personal expenses, split group bills, and plan tasks with reminders. Assign to-dos to friends and family and manage big events months ahead.',
         'og_image' => '/images/og-image.png',
     ],
 

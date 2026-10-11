@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Features - JodTod | Expense Tracker & Splitter')
-@section('meta_description', 'Discover JodTod features: personal expense tracking, group expense splitting, smart settlement, real-time balances, and more.')
+@section('title', 'Features - JodTod | Expense Tracker, Splitter & Task Planner')
+@section('meta_description', 'Discover JodTod features: personal expense tracking, group expense splitting, smart settlement, to-do lists with reminders, task assignment, and event planning.')
 
 @section('content')
 <!-- Hero Section -->
@@ -9,10 +9,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         <div class="text-center max-w-3xl mx-auto">
             <h1 class="text-4xl sm:text-5xl font-bold leading-tight">
-                Powerful Features for <span class="text-primary-200">Smart Expense Management</span>
+                Powerful Features for <span class="text-primary-200">Money and Tasks</span>
             </h1>
             <p class="mt-6 text-lg sm:text-xl text-primary-100">
-                Everything you need to track personal spending and split group expenses — all in one simple app.
+                Track personal spending, split group expenses, and plan every task with reminders — all in one simple app.
             </p>
         </div>
     </div>
@@ -94,6 +94,81 @@
                     <li class="flex items-start gap-2 text-sm text-gray-600">
                         <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                         Track settlement history
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tasks & Reminders -->
+            <div class="bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-shadow">
+                <div class="w-14 h-14 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <h3 class="mt-5 text-xl font-bold text-gray-900">Tasks &amp; Reminders</h3>
+                <p class="mt-3 text-gray-600">Manage your daily and future to-dos in the same app you use for money. Never forget what needs to be done.</p>
+                <ul class="mt-4 space-y-2">
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Due dates and priorities for every task
+                    </li>
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Categories like Home, Market, or your own
+                    </li>
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Reminders before the deadline
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Assign Tasks to Others -->
+            <div class="bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-shadow">
+                <div class="w-14 h-14 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                </div>
+                <h3 class="mt-5 text-xl font-bold text-gray-900">Assign Tasks to Others</h3>
+                <p class="mt-3 text-gray-600">Share the workload with family, friends, or teammates. Everyone knows exactly what they are responsible for.</p>
+                <ul class="mt-4 space-y-2">
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Assign any task to your contacts
+                    </li>
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Assignees get notified instantly
+                    </li>
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        See which tasks are pending or done
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Event Planning -->
+            <div class="bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-shadow">
+                <div class="w-14 h-14 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h3 class="mt-5 text-xl font-bold text-gray-900">Plan Big Events Early</h3>
+                <p class="mt-3 text-gray-600">Weddings, trips, festivals, or house shifting — plan every detail weeks or months in advance.</p>
+                <ul class="mt-4 space-y-2">
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Schedule tasks months ahead
+                    </li>
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Split the work across the whole family
+                    </li>
+                    <li class="flex items-start gap-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Track and split event costs together
                     </li>
                 </ul>
             </div>
@@ -181,7 +256,7 @@
 <section class="py-16 sm:py-24 bg-primary-600 text-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl sm:text-4xl font-bold">Ready to get started?</h2>
-        <p class="mt-4 text-lg text-primary-100">Join thousands of users who have simplified their expense management with JodTod.</p>
+        <p class="mt-4 text-lg text-primary-100">Join thousands of users who manage their expenses and tasks with JodTod.</p>
         <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <a href="{{ url('/register') }}" class="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-white text-primary-700 font-semibold hover:bg-primary-50 transition-colors">
                 Get started for free

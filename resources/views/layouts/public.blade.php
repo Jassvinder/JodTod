@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'JodTod - Expense Tracker & Splitter')</title>
+    <title>@yield('title', config('site.seo.default_title'))</title>
     <meta name="description" content="@yield('meta_description', config('site.seo.default_description'))">
 
     @hasSection('meta_tags')
@@ -13,7 +13,7 @@
     @endif
 
     <!-- Open Graph -->
-    <meta property="og:title" content="@yield('title', 'JodTod - Expense Tracker & Splitter')">
+    <meta property="og:title" content="@yield('title', config('site.seo.default_title'))">
     <meta property="og:description" content="@yield('meta_description', config('site.seo.default_description'))">
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
@@ -22,7 +22,7 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'JodTod - Expense Tracker & Splitter')">
+    <meta name="twitter:title" content="@yield('title', config('site.seo.default_title'))">
     <meta name="twitter:description" content="@yield('meta_description', config('site.seo.default_description'))">
     <meta name="twitter:image" content="@yield('og_image', asset(config('site.seo.og_image')))">
 

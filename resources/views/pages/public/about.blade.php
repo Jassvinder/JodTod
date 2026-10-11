@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'About JodTod - Our Story & Mission')
-@section('meta_description', 'Learn about JodTod - born from the frustration of splitting bills after group trips. Our mission: make expense splitting transparent and fight-free.')
+@section('meta_description', 'Learn about JodTod - born from the frustration of splitting bills after group trips. Today it also helps you plan tasks, assign them to others, and organise big events.')
 
 @section('content')
 <!-- Hero Section -->
@@ -10,7 +10,7 @@
         <div class="text-center max-w-3xl mx-auto">
             <h1 class="text-4xl sm:text-5xl font-bold leading-tight">About JodTod</h1>
             <p class="mt-6 text-lg sm:text-xl text-primary-100">
-                Making expense splitting transparent and fight-free since 2026.
+                Making expenses fair and plans stress-free since 2026.
             </p>
         </div>
     </div>
@@ -37,6 +37,12 @@
                 What started as a simple tool for our own group trips has grown into a comprehensive expense management platform
                 that handles both personal and group expenses with ease.
             </p>
+            <p class="mt-4">
+                We soon noticed that money was only half the story. Every trip, wedding, or house move also comes with a long list
+                of things to do — and the same people sharing the bills are the ones sharing the work. So we added tasks to JodTod:
+                plan daily and future to-dos, set reminders, assign them to family and friends, and organise big events months
+                in advance, right next to the expenses.
+            </p>
         </div>
     </div>
 </section>
@@ -46,7 +52,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl sm:text-4xl font-bold text-gray-900">Our Mission</h2>
         <p class="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
-            Make expense splitting transparent and fight-free, so you can focus on the experiences and relationships that matter.
+            Make shared money transparent and shared plans easy to follow, so you can focus on the experiences and relationships that matter.
         </p>
     </div>
 </section>
@@ -83,7 +89,7 @@
                 </div>
                 <h3 class="mt-5 text-xl font-bold text-gray-900">Simplicity</h3>
                 <p class="mt-3 text-gray-600">
-                    Adding an expense should take seconds, not minutes. We obsess over making every interaction as simple as possible.
+                    Adding an expense or a task should take seconds, not minutes. We obsess over making every interaction as simple as possible.
                 </p>
             </div>
 
@@ -128,7 +134,7 @@
 <section class="py-16 sm:py-24 bg-primary-600 text-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl sm:text-4xl font-bold">Join the JodTod Community</h2>
-        <p class="mt-4 text-lg text-primary-100">Start tracking and splitting expenses today — completely free.</p>
+        <p class="mt-4 text-lg text-primary-100">Start tracking expenses and planning tasks today — completely free.</p>
         <a href="{{ url('/register') }}" class="mt-8 inline-flex items-center justify-center px-8 py-3 rounded-lg bg-white text-primary-700 font-semibold hover:bg-primary-50 transition-colors">
             Get started for free
         </a>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Expense;
 use App\Models\ExpenseSplit;
 use App\Models\Income;
+use App\Models\RememberItem;
 use App\Models\Settlement;
 use App\Models\Todo;
 use App\Models\User;
@@ -30,6 +31,9 @@ class DashboardController extends Controller
             'recentActivity' => $this->getRecentActivity($user),
             'pendingSettlements' => $this->getPendingSettlements($user),
             'todoStats' => $this->getTodoStats($user),
+            'rememberStats' => [
+                'total' => RememberItem::where('user_id', $user->id)->count(),
+            ],
         ];
 
         if ($this->wantsJson()) {

@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Terms of Service - JodTod')
-@section('meta_description', 'JodTod Terms of Service - Read our terms and conditions for using the JodTod expense tracking and splitting application.')
+@section('meta_description', 'JodTod Terms of Service - Read our terms and conditions for using the JodTod expense tracking, splitting, and task planning application.')
 
 @section('content')
 <!-- Hero Section -->
@@ -53,7 +53,7 @@
 
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">4. User Content</h2>
             <p>
-                You retain ownership of the data you enter into JodTod (expenses, group names, descriptions, etc.).
+                You retain ownership of the data you enter into JodTod (expenses, group names, tasks, descriptions, etc.).
                 By using our application, you grant us a limited license to store, process, and display your data
                 as necessary to provide our services.
             </p>

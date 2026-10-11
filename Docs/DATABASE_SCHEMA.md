@@ -224,6 +224,36 @@
 
 ---
 
+## Table: remember_items
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | Item owner |
+| name | VARCHAR(100) | NOT NULL | What to remember, e.g. "Gas Cylinder" |
+| note | VARCHAR(255) | NULLABLE | Optional item details |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** (user_id, name)
+
+---
+
+## Table: remember_entries
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| remember_item_id | BIGINT UNSIGNED | FK -> remember_items.id, ON DELETE CASCADE | Parent item |
+| done_on | DATE | NOT NULL | When it was done; cannot be in the future |
+| note | VARCHAR(255) | NULLABLE | Optional entry details |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** (remember_item_id, done_on)
+
+---
+
 ## Entity Relationship Diagram (Text)
 
 ```
@@ -242,6 +272,7 @@ users (1) ----< (M) group_members (M) >---- (1) groups
   +----< blog_posts (author)
   +----< todos
   +----< incomes
+  +----< remember_items ----< remember_entries
 
 categories (1) ----< (M) expenses
 ```

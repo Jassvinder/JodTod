@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Blog - JodTod | Tips on Expense Management & Splitting')
-@section('meta_description', 'Read the JodTod blog for tips on expense tracking, group expense splitting, budgeting, and personal finance management.')
+@section('title', 'Blog - JodTod | Tips on Expenses, Splitting & Planning')
+@section('meta_description', 'Read the JodTod blog for tips on expense tracking, group expense splitting, budgeting, task planning, and organising events.')
 
 @section('content')
 <!-- Hero Section -->
@@ -9,7 +9,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div class="text-center max-w-3xl mx-auto">
             <h1 class="text-3xl sm:text-4xl font-bold">JodTod Blog</h1>
-            <p class="mt-4 text-lg text-primary-100">Tips, guides, and insights on expense management, splitting, and personal finance.</p>
+            <p class="mt-4 text-lg text-primary-100">Tips, guides, and insights on expense management, splitting, personal finance, and planning.</p>
         </div>
     </div>
 </section>

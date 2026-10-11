@@ -19,7 +19,7 @@
 
             <p>
                 At JodTod, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose,
-                and safeguard your information when you use our expense tracking and splitting application.
+                and safeguard your information when you use our expense tracking, splitting, and task planning application.
             </p>
 
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">1. Information We Collect</h2>
@@ -38,6 +38,7 @@
             <ul class="list-disc pl-6 space-y-1 mt-2">
                 <li>Expense data you enter (amounts, categories, descriptions)</li>
                 <li>Group membership and expense sharing information</li>
+                <li>Tasks you create or assign (titles, categories, due dates, reminders, and assignees)</li>
                 <li>Device information and browser type</li>
                 <li>Usage patterns and feature interactions</li>
             </ul>
@@ -47,6 +48,7 @@
             <ul class="list-disc pl-6 space-y-1 mt-2">
                 <li>Provide, operate, and maintain the JodTod application</li>
                 <li>Process and track your expenses and group settlements</li>
+                <li>Manage your tasks, deliver task reminders, and notify people you assign tasks to</li>
                 <li>Send you notifications related to your account and group activities</li>
                 <li>Improve our application and develop new features</li>
                 <li>Communicate with you about updates, support, and promotions</li>
@@ -57,6 +59,7 @@
             <p>We do not sell your personal information. We may share your information only in the following cases:</p>
             <ul class="list-disc pl-6 space-y-1 mt-2">
                 <li><strong>With group members:</strong> Your name and shared expense data is visible to members of groups you join.</li>
+                <li><strong>With task assignees:</strong> When you assign a task to someone, they can see the task details and your name.</li>
                 <li><strong>Service providers:</strong> We may share data with trusted third-party service providers who help us operate our application (hosting, analytics).</li>
                 <li><strong>Legal requirements:</strong> We may disclose information if required by law or to protect our rights.</li>
             </ul>

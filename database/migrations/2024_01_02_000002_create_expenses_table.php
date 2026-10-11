@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('group_id')->nullable()->constrained()->onDelete('cascade');
+            // FK to groups is added in 2026_03_09_132057 because the groups table is created later.
+            $table->foreignId('group_id')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('paid_by')->constrained('users')->onDelete('cascade');
             $table->decimal('amount', 12, 2);

@@ -127,14 +127,19 @@ These endpoints serve dual purpose:
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | GET | `/api/v1/contacts` | List approved contacts | Yes |
-| GET | `/api/v1/contacts/search?q={name}` | Search users by name; returns public name and avatar only | Yes |
+| GET | `/api/v1/contacts/search?q={name or friend code}` | Search users by name or exact friend code (case-insensitive); returns public name, friend code, avatar, and `request_status` | Yes |
 | POST | `/api/v1/contacts` | Send a contact request | Yes |
 | GET | `/api/v1/contacts/requests` | List incoming contact requests | Yes |
+| GET | `/api/v1/contacts/requests/sent` | List outgoing pending requests (with `contact_user`) | Yes |
 | POST | `/api/v1/contacts/{id}/approve` | Approve an incoming request | Yes |
 | DELETE | `/api/v1/contacts/{id}/reject` | Decline an incoming request | Yes |
-| DELETE | `/api/v1/contacts/{id}` | Remove an approved contact | Yes |
+| DELETE | `/api/v1/contacts/{id}` | Remove an approved contact, or cancel an outgoing pending request | Yes |
 
 Contact search requires at least three characters. Email and phone are only available after the recipient approves the request.
+
+Search hides the current user and approved contacts. Users with a pending request stay in the results with `request_status`: `sent` (you requested them), `received` (they requested you), or `null`.
+
+Every user has a unique 6-character `friend_code` (3 letters + 3 digits). It tells apart users with the same name, and a friend can share it so you can find them directly.
 
 ---
 
@@ -239,6 +244,24 @@ Contact search requires at least three characters. Email and phone are only avai
 **Todo category contract:** use `todo_category_id` in Todo create and update request bodies. It references `todo_categories.id`; `category_id` is reserved for expense categories.
 
 Default categories include `is_default: true` and cannot be deleted.
+
+## Remember Items (Mobile API)
+
+Personal log of recurring things, such as when the gas cylinder was replaced or remote batteries were changed. Each item keeps a history of dates.
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/v1/remember-items` | List own items with summary fields, ordered by name | Yes |
+| POST | `/api/v1/remember-items` | Create an item: `name` (required, max 100), `note` (optional), `done_on` (optional first entry date, not in the future) | Yes |
+| GET | `/api/v1/remember-items/{id}` | Item summary plus `entries`, newest first | Yes |
+| PUT | `/api/v1/remember-items/{id}` | Update `name` and `note` | Yes |
+| DELETE | `/api/v1/remember-items/{id}` | Delete the item and all its entries | Yes |
+| POST | `/api/v1/remember-items/{id}/entries` | Add an entry: `done_on` (required, not in the future), `note` (optional) | Yes |
+| DELETE | `/api/v1/remember-items/{id}/entries/{entryId}` | Delete one entry of the item | Yes |
+
+**Item summary fields:** `entries_count`, `last_done_on` (latest `done_on` or `null`), and `avg_gap_days` (average days between first and last entry, `null` with fewer than two entries). Item, entry create/delete, and update responses return the summary plus `entries`. Items owned by another user return 403.
+
+The dashboard response includes `rememberStats.total`, the number of items the user has saved.
 
 ## User Profile
 

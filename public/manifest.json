@@ -1,7 +1,7 @@
 {
-    "name": "JodTod - Expense Tracker & Splitter",
+    "name": "JodTod - Expense Tracker, Splitter & Task Planner",
     "short_name": "JodTod",
-    "description": "Track personal expenses and split group expenses with friends. Smart settlement calculation included.",
+    "description": "Track personal expenses, split group expenses with friends, and plan tasks with reminders. Assign to-dos and manage big events ahead of time.",
     "start_url": "/dashboard",
     "scope": "/",
     "display": "standalone",
@@ -63,6 +63,11 @@
         {
             "name": "My Groups",
             "url": "/groups",
+            "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "My Tasks",
+            "url": "/todos",
             "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
         }
     ]

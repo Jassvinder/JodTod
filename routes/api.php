@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\GroupExpenseController;
 use App\Http\Controllers\Api\V1\IncomeController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OtpController;
+use App\Http\Controllers\Api\V1\RememberItemController;
 use App\Http\Controllers\Api\V1\SettlementController;
 use App\Http\Controllers\Api\V1\TodoCategoryController;
 use App\Http\Controllers\Api\V1\TodoController;
@@ -82,6 +83,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/contacts', [ContactController::class, 'index']);
         Route::get('/contacts/search', [ContactController::class, 'search']);
         Route::get('/contacts/requests', [ContactController::class, 'requests']);
+        Route::get('/contacts/requests/sent', [ContactController::class, 'sentRequests']);
         Route::post('/contacts', [ContactController::class, 'store']);
         Route::post('/contacts/{contact}/approve', [ContactController::class, 'approve']);
         Route::delete('/contacts/{contact}/reject', [ContactController::class, 'reject']);
@@ -102,6 +104,15 @@ Route::prefix('v1')->group(function () {
         Route::post('/todo-categories', [TodoCategoryController::class, 'store']);
         Route::put('/todo-categories/{todoCategory}', [TodoCategoryController::class, 'update']);
         Route::delete('/todo-categories/{todoCategory}', [TodoCategoryController::class, 'destroy']);
+
+        // Remember items
+        Route::get('/remember-items', [RememberItemController::class, 'index']);
+        Route::post('/remember-items', [RememberItemController::class, 'store']);
+        Route::get('/remember-items/{rememberItem}', [RememberItemController::class, 'show']);
+        Route::put('/remember-items/{rememberItem}', [RememberItemController::class, 'update']);
+        Route::delete('/remember-items/{rememberItem}', [RememberItemController::class, 'destroy']);
+        Route::post('/remember-items/{rememberItem}/entries', [RememberItemController::class, 'storeEntry']);
+        Route::delete('/remember-items/{rememberItem}/entries/{rememberEntry}', [RememberItemController::class, 'destroyEntry']);
 
         // Groups
         Route::get('/groups', [GroupController::class, 'index']);

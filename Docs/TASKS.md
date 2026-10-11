@@ -22,9 +22,26 @@
 
 - [] **514**
 
+- [] **516** - Cloudflare tunnel `JodTod-Local`: remove the stale "Nidhi" connector (`736adb45-14c2-426c-aab9-358459548773`) that receives `jodtod.co.in` traffic and returns 502, so the worker shows the Coming Soon page. Rotate the tunnel token afterwards (it was printed in a local session log) and reinstall the service on TeqTop with the new token.
+
+- [] **519** - Install dev dependencies (`composer install`) so `php artisan test` works, then run `tests/Feature/Api/V1/RememberItemTest.php` (written but never run).
+
 **Admin** Section tasks. starts from 500 =======================================
 
 ## PENDING
+
+### Web Pending (built in the mobile app first)
+
+Features and fixes shipped in the mobile app that the web app does not have yet. Add every new mobile-only feature here.
+
+- [ ] **517** - Remember items web UI (Inertia + Vue): list with last date, days since and average gap; item detail with date history, Add Date, edit and delete; Remember card on the Dashboard showing `rememberStats.total`; sidebar link. API and tables exist (mobile: 11-10-2026).
+- [ ] **518** - Contact search and requests: keep users with a pending request in search with a "Requested" / "Respond" button instead of hiding them; search by friend code; add a Sent section with Cancel to `Contacts/Requests.vue`. The mobile API already does this (`request_status`, `GET /contacts/requests/sent`); the web `ContactController` does not (mobile: 12-10-2026).
+- [ ] **520** - Show the user's own friend code on the Profile page (tap to copy) and on the Add Contact search ("Your friend code"), and explain what it is for (mobile: 12-10-2026).
+- [ ] **521** - Contacts onboarding: when the user has no contacts, hide the contact search box and show an explanation with a "Find Friends" button. In Groups "Add member" and the task "Assign to" picker, show a note that friends must be added to the contact list first, with an Add Contact link (mobile: 12-10-2026).
+- [ ] **522** - Readable friend code badge: pale indigo background with dark indigo text (mobile `FriendCodeBadge`). Check the web badges in `Contacts/Index.vue` and `Contacts/Requests.vue` for the same low-contrast problem (mobile: 12-10-2026).
+- [ ] **524** - In-app onboarding for the web app: first-login welcome slides, one-time tip bubbles per page with a "?" button to replay them, and a Help & Tips page with every feature explained plus "Watch Intro" and "Show All Tips Again". Reuse the mobile copy in `JodTodApp/constants/tips.ts` (mobile: 12-10-2026).
+- [ ] **525** - Helpful empty states on web list pages (Expenses, Income, Groups, Tasks, Group Expenses, Contacts, Notifications, Remember): colored icon, title, 1-2 line explanation of the feature, and a first-action button (e.g. "Add Expense", "Create Group" + "Join a group"). Copy is in the mobile screens (mobile: 12-10-2026).
+- [ ] **523** - Dashboard summary cards: each card header (icon, title, arrow) links to its page (Expenses, Income, Groups for To Pay / To Receive, Remember); Savings has no link; amounts stay selectable. Check which web cards already link (mobile: 11-10-2026).
 
 ### High Priority
 
@@ -44,6 +61,18 @@
 ## COMPLETED
 
 ## Completed Current Tasks
+
+- [x] **Contact search shows pending requests; sent requests endpoint** (12-10-2026)
+  Mobile API search now keeps users with a pending request (with `request_status`), matches exact friend codes, and a new `GET /contacts/requests/sent` lists outgoing requests. Web contact search is unchanged.
+
+- [x] **Remember items API for the mobile app** (11-10-2026)
+  New `remember_items` and `remember_entries` tables with a `/api/v1/remember-items` CRUD API, entry add/delete, last date and average gap per item, and `rememberStats.total` on the dashboard. No web UI yet.
+
+- [x] **Highlight the Tasks module across public pages** (09-10-2026)
+  Home, Features, About, Privacy, Terms, Blog, SEO defaults, footer, auth tagline, mail footer, and PWA manifest now describe tasks, reminders, task assignment, and event planning alongside expenses. Also fixed home feature icon backgrounds that used dynamic Tailwind classes.
+
+- [x] **Fix fresh-install migration order for expenses.group_id FK** (09-10-2026)
+  The expenses migration referenced `groups` before the groups table existed, failing on InnoDB (errno 150). The FK now lives in `2026_03_09_132057_add_group_foreign_key_to_expenses_table`, which skips databases that already have it.
 
 - [x] **Task 515 — Second round of mobile/web parity fixes** (18-09-2026)
   Follow-up audit of Expense/Income/Settlement/Notification/Group controller pairs (backend logic only, not UI styling). Fixed the items that were clearly bugs; left the ones that looked like intentional platform differences alone:
