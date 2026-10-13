@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -21,5 +22,45 @@ class Contact extends Model
     public function contactUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'contact_user_id');
+    }
+
+    /**
+     * Find users to add by name or exact friend code. Approved contacts and the user are hidden;
+     * users with a pending request stay visible with its direction in `request_status`
+     * (`sent`, `received`, or null).
+     */
+    public static function searchUsersFor(int $userId, string $query, int $limit = 20): Collection
+    {
+        $approvedContactIds = static::where('user_id', $userId)
+            ->where('status', 'approved')
+            ->pluck('contact_user_id')
+            ->push($userId)
+            ->all();
+
+        $sentRequestIds = static::where('user_id', $userId)
+            ->where('status', 'pending')
+            ->pluck('contact_user_id')
+            ->all();
+
+        $receivedRequestIds = static::where('contact_user_id', $userId)
+            ->where('status', 'pending')
+            ->pluck('user_id')
+            ->all();
+
+        return User::where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('friend_code', strtoupper($query));
+            })
+            ->whereNotIn('id', $approvedContactIds)
+            ->select('id', 'name', 'friend_code', 'avatar')
+            ->limit($limit)
+            ->get()
+            ->each(function (User $user) use ($sentRequestIds, $receivedRequestIds) {
+                $user->request_status = match (true) {
+                    in_array($user->id, $sentRequestIds) => 'sent',
+                    in_array($user->id, $receivedRequestIds) => 'received',
+                    default => null,
+                };
+            });
     }
 }

@@ -178,8 +178,7 @@ cd /var/www/jodtod
 # Run database migrations
 php artisan migrate --force
 
-# Seed categories
-php artisan db:seed --class=CategorySeeder --force
+# Default expense categories are inserted by a migration (no seeder needed)
 
 # Create storage link
 php artisan storage:link

@@ -12,6 +12,12 @@ class CategoryController extends Controller
     {
         $categories = Category::orderBy('name')->get();
 
+        // Never hand the app an empty list: an empty table makes expenses impossible to add.
+        if ($categories->isEmpty()) {
+            Category::ensureDefaults();
+            $categories = Category::orderBy('name')->get();
+        }
+
         return $this->success($categories);
     }
 }

@@ -3,6 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
 import { confirmAction } from '@/Utils/confirm.js';
+import EmptyState from '@/Components/Shared/EmptyState.vue';
 import Swal from 'sweetalert2';
 
 const props = defineProps({
@@ -265,18 +266,26 @@ function splitTypeBadgeClass(type) {
             <!-- Expenses List -->
             <div class="mt-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <!-- Empty state -->
-                <div v-if="expenses.data.length === 0" class="px-5 py-12 text-center text-gray-400 dark:text-gray-500">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                    </svg>
-                    <p class="text-gray-500 dark:text-gray-400">No expenses yet. Add your first group expense!</p>
-                    <Link
-                        :href="route('groups.expenses.create', group.id)"
-                        class="inline-block mt-3 text-primary-600 hover:text-primary-700 font-medium text-sm"
-                    >
-                        Add Expense
-                    </Link>
-                </div>
+                <template v-if="expenses.data.length === 0">
+                    <EmptyState
+                        v-if="filters.search || filters.category || filters.date_from || filters.date_to"
+                        compact
+                        icon="search"
+                        tone="gray"
+                        title="No expenses match"
+                        text="Try changing your search, category or dates."
+                        secondary-label="Clear Filters"
+                        @secondary="clearFilters"
+                    />
+                    <EmptyState
+                        v-else
+                        icon="receipt"
+                        title="No shared expenses yet"
+                        text="Add the first expense, choose who paid and how to split it. JodTod keeps everyone's balance up to date."
+                        action-label="Add Expense"
+                        :action-href="route('groups.expenses.create', group.id)"
+                    />
+                </template>
 
                 <!-- Expense rows -->
                 <div v-for="expense in expenses.data" :key="expense.id" class="border-b border-gray-100 dark:border-gray-700 last:border-b-0">

@@ -15,11 +15,14 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PhoneVerificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RememberController;
 use App\Http\Controllers\SettlementController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TodoCategoryController;
 use App\Http\Controllers\TodoController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +102,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::put('/notifications/preferences', [NotificationController::class, 'updatePreferences'])->name('notifications.preferences');
+
+    // Remember (dated history of recurring things)
+    Route::get('/remember', [RememberController::class, 'index'])->name('remember.index');
+    Route::post('/remember', [RememberController::class, 'store'])->name('remember.store');
+    Route::get('/remember/{rememberItem}', [RememberController::class, 'show'])->name('remember.show');
+    Route::put('/remember/{rememberItem}', [RememberController::class, 'update'])->name('remember.update');
+    Route::delete('/remember/{rememberItem}', [RememberController::class, 'destroy'])->name('remember.destroy');
+    Route::post('/remember/{rememberItem}/entries', [RememberController::class, 'storeEntry'])->name('remember.entries.store');
+    Route::delete('/remember/{rememberItem}/entries/{rememberEntry}', [RememberController::class, 'destroyEntry'])->name('remember.entries.destroy');
+
+    // Help & Tips
+    Route::get('/help', fn () => Inertia::render('Help'))->name('help');
 });
 
 // Groups (phone.verified temporarily disabled - enable when SMS provider configured)
@@ -198,5 +213,33 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
     Route::put('/blog/{post}', [AdminBlogController::class, 'update'])->name('admin.blog.update');
     Route::delete('/blog/{post}', [AdminBlogController::class, 'destroy'])->name('admin.blog.destroy');
 });
+Route::get('/set-up-backend', function (\Illuminate\Http\Request $request) {
+    $setupKey = (string) config('app.setup_key');
 
-require __DIR__.'/auth.php';
+    if ($setupKey === '' || ! hash_equals($setupKey, (string) $request->query('key'))) {
+        abort(404);
+    }
+
+    try {
+        // Generate App Key (if not already set in .env)
+        // Artisan::call('key:generate', ['--force' => true]);
+
+        // Link storage directory so uploaded receipts and photos are publicly reachable
+        if (! file_exists(public_path('storage'))) {
+            Artisan::call('storage:link');
+        }
+
+        // Run database migrations (this also inserts the default expense categories)
+        Artisan::call('migrate', ['--force' => true]);
+        $migrateOutput = Artisan::output();
+
+        // Clear application cache
+        Artisan::call('optimize:clear');
+
+        return response('Backend setup successfully executed without SSH!' . "\n\n" . $migrateOutput)
+            ->header('Content-Type', 'text/plain');
+    } catch (\Throwable $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+require __DIR__ . '/auth.php';

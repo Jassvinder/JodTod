@@ -1,7 +1,9 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref, watch, defineAsyncComponent } from 'vue';
+import { ref, watch, computed, defineAsyncComponent } from 'vue';
+import EmptyState from '@/Components/Shared/EmptyState.vue';
+import HelpButton from '@/Components/Onboarding/HelpButton.vue';
 import { confirmAction } from '@/Utils/confirm.js';
 
 // Lazy-load chart components — chart.js is heavy, load only when charts section renders
@@ -90,6 +92,9 @@ function formatDate(date) {
 }
 
 const hasActiveFilters = () => search.value || category.value || period.value;
+
+// No expenses at all (not just none matching the filters): show the onboarding empty state.
+const isFirstTime = computed(() => props.expenses.total === 0 && !props.filters.search && !props.filters.category && !props.filters.period);
 </script>
 
 <template>
@@ -98,13 +103,16 @@ const hasActiveFilters = () => search.value || category.value || period.value;
     <AppLayout>
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex items-center justify-between gap-4">
+                <div class="min-w-0">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Expenses</h2>
                     <p class="mt-1 text-gray-500 dark:text-gray-400">Track your personal expenses</p>
                 </div>
+                <div class="flex flex-shrink-0 items-center gap-2">
+                <HelpButton page="expenses" />
                 <Link
                     :href="route('expenses.create')"
+                    data-tip="expenses.add"
                     class="inline-flex items-center px-4 py-2.5 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors"
                 >
                     <svg class="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,6 +120,7 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                     </svg>
                     Add Expense
                 </Link>
+                </div>
             </div>
 
             <!-- Summary Cards -->
@@ -150,8 +159,20 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                 </div>
             </div>
 
+            <!-- First-time empty state -->
+            <div v-if="isFirstTime" class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                <EmptyState
+                    icon="wallet"
+                    title="Track your first expense"
+                    text="Add what you spend, like groceries, rent or bills. Pick a category and JodTod shows where your money goes every month."
+                    action-label="Add Expense"
+                    :action-href="route('expenses.create')"
+                />
+            </div>
+
+            <template v-else>
             <!-- Filters -->
-            <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+            <div data-tip="expenses.filters" class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <!-- Search -->
                     <div class="relative">
@@ -220,13 +241,16 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                 </div>
 
                 <!-- Expense rows -->
-                <div v-if="expenses.data.length === 0" class="px-5 py-12 text-center text-gray-400 dark:text-gray-500">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    <p>No expenses found</p>
-                    <Link :href="route('expenses.create')" class="inline-block mt-2 text-primary-600 hover:text-primary-700 font-medium text-sm">Add your first expense</Link>
-                </div>
+                <EmptyState
+                    v-if="expenses.data.length === 0"
+                    compact
+                    icon="search"
+                    tone="gray"
+                    title="No expenses match"
+                    text="Try changing your search, category or period."
+                    secondary-label="Clear Filters"
+                    @secondary="clearFilters"
+                />
 
                 <div
                     v-for="expense in expenses.data"
@@ -279,6 +303,7 @@ const hasActiveFilters = () => search.value || category.value || period.value;
                     </div>
                 </div>
             </div>
+            </template>
         </div>
 
     </AppLayout>

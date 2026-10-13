@@ -2,6 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import EmptyState from '@/Components/Shared/EmptyState.vue';
 
 const props = defineProps({
     notifications: Object,
@@ -136,12 +137,12 @@ const hasUnread = computed(() => {
             </div>
 
             <!-- Empty State -->
-            <div v-else class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <h3 class="mt-3 text-sm font-medium text-gray-900 dark:text-gray-100">No notifications</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">You're all caught up! We'll notify you when something happens.</p>
+            <div v-else class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                <EmptyState
+                    icon="bell"
+                    title="You're all caught up"
+                    text="Contact requests, task reminders, and group expense and settlement updates will show up here."
+                />
             </div>
 
             <!-- Pagination -->

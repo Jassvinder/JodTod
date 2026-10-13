@@ -16,10 +16,11 @@ class RememberItemController extends Controller
 {
     public function index(): JsonResponse
     {
-        $items = $this->withEntryStats(RememberItem::where('user_id', Auth::id()))
+        $items = RememberItem::where('user_id', Auth::id())
+            ->withEntryStats()
             ->orderBy('name')
             ->get()
-            ->map(fn (RememberItem $item) => $this->present($item));
+            ->map(fn (RememberItem $item) => $item->toSummary());
 
         return $this->success($items);
     }
@@ -28,7 +29,7 @@ class RememberItemController extends Controller
     {
         $this->authorizeItem($rememberItem);
 
-        return $this->success($this->presentWithEntries($rememberItem));
+        return $this->success($rememberItem->toDetail());
     }
 
     public function store(Request $request): JsonResponse
@@ -53,7 +54,7 @@ class RememberItemController extends Controller
             return $item;
         });
 
-        return $this->created($this->presentWithEntries($item), 'Item created successfully.');
+        return $this->created($item->toDetail(), 'Item created successfully.');
     }
 
     public function update(Request $request, RememberItem $rememberItem): JsonResponse
@@ -67,7 +68,7 @@ class RememberItemController extends Controller
 
         $rememberItem->update($validated);
 
-        return $this->success($this->presentWithEntries($rememberItem), 'Item updated successfully.');
+        return $this->success($rememberItem->toDetail(), 'Item updated successfully.');
     }
 
     public function destroy(RememberItem $rememberItem): JsonResponse
@@ -90,7 +91,7 @@ class RememberItemController extends Controller
 
         $rememberItem->entries()->create($validated);
 
-        return $this->created($this->presentWithEntries($rememberItem), 'Entry added successfully.');
+        return $this->created($rememberItem->toDetail(), 'Entry added successfully.');
     }
 
     public function destroyEntry(RememberItem $rememberItem, RememberEntry $rememberEntry): JsonResponse
@@ -106,47 +107,7 @@ class RememberItemController extends Controller
 
         $rememberEntry->delete();
 
-        return $this->success($this->presentWithEntries($rememberItem), 'Entry deleted successfully.');
-    }
-
-    private function withEntryStats(Builder $query): Builder
-    {
-        return $query->withCount('entries')
-            ->withMin('entries', 'done_on')
-            ->withMax('entries', 'done_on');
-    }
-
-    /**
-     * Item summary: last done date and the average number of days between entries.
-     */
-    private function present(RememberItem $item): array
-    {
-        $count = (int) $item->entries_count;
-        $first = $item->entries_min_done_on ? Carbon::parse($item->entries_min_done_on) : null;
-        $last = $item->entries_max_done_on ? Carbon::parse($item->entries_max_done_on) : null;
-
-        return [
-            'id' => $item->id,
-            'name' => $item->name,
-            'note' => $item->note,
-            'entries_count' => $count,
-            'last_done_on' => $last?->toDateString(),
-            'avg_gap_days' => $count > 1 ? (int) round($first->diffInDays($last) / ($count - 1)) : null,
-            'created_at' => $item->created_at,
-        ];
-    }
-
-    private function presentWithEntries(RememberItem $item): array
-    {
-        $item = $this->withEntryStats(RememberItem::whereKey($item->id))->firstOrFail();
-
-        return [
-            ...$this->present($item),
-            'entries' => $item->entries()
-                ->orderByDesc('done_on')
-                ->orderByDesc('id')
-                ->get(['id', 'done_on', 'note']),
-        ];
+        return $this->success($rememberItem->toDetail(), 'Entry deleted successfully.');
     }
 
     private function authorizeItem(RememberItem $item): void

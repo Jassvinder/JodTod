@@ -2,6 +2,7 @@
 import { Link, usePage, router } from '@inertiajs/vue3';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+import BrandLogo from '@/Components/Shared/BrandLogo.vue';
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
@@ -152,7 +153,7 @@ const markAllAsRead = async () => {
                     </svg>
                 </button>
                 <Link :href="route('dashboard')" class="lg:hidden">
-                    <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" class="h-8 w-auto" />
+                    <BrandLogo class="h-8" />
                 </Link>
             </div>
 
@@ -175,7 +176,7 @@ const markAllAsRead = async () => {
                 </button>
 
                 <!-- Notification Bell -->
-                <div ref="dropdownRef" class="relative">
+                <div ref="dropdownRef" data-tip="header.notifications" class="relative">
                     <button
                         @click.stop="toggleNotifications"
                         class="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

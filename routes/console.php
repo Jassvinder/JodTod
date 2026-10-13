@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 Schedule::command('todos:send-reminders')->everyMinute();
 Schedule::command('summary:weekly')->weeklyOn(1, '08:00'); // Monday 8 AM
+
+// Shared hosting has no long-running worker, so the per-minute cron drains the queue (emails, push notifications).
+Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();

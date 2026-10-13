@@ -1,8 +1,10 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { confirmAction } from '@/Utils/confirm.js';
+import EmptyState from '@/Components/Shared/EmptyState.vue';
+import HelpButton from '@/Components/Onboarding/HelpButton.vue';
 
 const props = defineProps({
     incomes: Object,
@@ -12,6 +14,12 @@ const props = defineProps({
 });
 
 const showAddForm = ref(false);
+
+// Opens the add form and brings it into view (the empty state button sits below it).
+function openAddForm() {
+    showAddForm.value = true;
+    nextTick(() => document.getElementById('add-income-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+}
 const editingIncome = ref(null);
 
 const form = useForm({
@@ -128,12 +136,15 @@ const incomeChange = computed(() => {
     <AppLayout>
         <div class="max-w-5xl mx-auto">
             <!-- Header -->
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex items-center justify-between gap-4">
+                <div class="min-w-0">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Income</h2>
                     <p class="mt-1 text-gray-500 dark:text-gray-400">Track your earnings and see profit/loss</p>
                 </div>
+                <div class="flex flex-shrink-0 items-center gap-2">
+                <HelpButton page="incomes" />
                 <button
+                    data-tip="incomes.add"
                     @click="showAddForm = !showAddForm"
                     class="inline-flex items-center px-4 py-2.5 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors"
                 >
@@ -142,6 +153,7 @@ const incomeChange = computed(() => {
                     </svg>
                     Add Income
                 </button>
+                </div>
             </div>
 
             <!-- Summary Cards -->
@@ -258,7 +270,7 @@ const incomeChange = computed(() => {
             </div>
 
             <!-- Add Income Form -->
-            <div v-if="showAddForm" class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+            <div v-if="showAddForm" id="add-income-form" class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                 <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Add Income</h3>
                 <form @submit.prevent="addIncome" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -361,18 +373,23 @@ const incomeChange = computed(() => {
                     <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Income History</h3>
                 </div>
 
-                <div v-if="incomes.data.length === 0" class="p-12 text-center">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p class="text-gray-500 dark:text-gray-400">No income recorded yet</p>
-                    <button
-                        @click="showAddForm = true"
-                        class="inline-flex items-center mt-3 px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors"
-                    >
-                        Add your first income
-                    </button>
-                </div>
+                <EmptyState
+                    v-if="incomes.data.length === 0 && (filters?.search || filters?.date_from || filters?.date_to)"
+                    compact
+                    icon="search"
+                    tone="gray"
+                    title="No income matches"
+                    text="Try changing your search or dates."
+                />
+                <EmptyState
+                    v-else-if="incomes.data.length === 0"
+                    icon="income"
+                    tone="success"
+                    title="Add your income"
+                    text="Record your salary, freelance work or any other income. JodTod works out your monthly savings for you."
+                    action-label="Add Income"
+                    @action="openAddForm"
+                />
 
                 <div v-else class="divide-y divide-gray-100 dark:divide-gray-700">
                     <div

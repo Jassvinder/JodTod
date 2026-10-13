@@ -2,6 +2,9 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import Icon from '@/Components/Shared/Icon.vue';
+import SummaryCard from '@/Components/Dashboard/SummaryCard.vue';
+import HelpButton from '@/Components/Onboarding/HelpButton.vue';
 
 const props = defineProps({
     personalSummary: {
@@ -46,6 +49,10 @@ const props = defineProps({
     todoStats: {
         type: Object,
         default: () => ({ pending: 0, overdue: 0 }),
+    },
+    rememberStats: {
+        type: Object,
+        default: () => ({ total: 0 }),
     },
 });
 
@@ -114,136 +121,79 @@ function relativeDate(dateStr) {
     <AppLayout>
         <div class="max-w-7xl mx-auto">
             <!-- Header with Quick Actions -->
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="min-w-0">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Welcome, {{ user?.name }}!</h2>
-                    <p class="mt-1 text-gray-500 dark:text-gray-400">Your expense overview</p>
+                    <p class="mt-1 text-gray-500 dark:text-gray-400">Your expenses, groups and tasks at a glance</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <Link
-                        :href="route('groups.create')"
-                        class="inline-flex items-center px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                        <svg class="w-4 h-4 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span class="hidden sm:inline">New Group</span>
-                    </Link>
-                    <Link
-                        v-if="groupsSummary.groups.length > 0"
-                        :href="groupExpenseLink"
-                        class="inline-flex items-center px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-lg border border-blue-300 dark:border-blue-600 text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-                    >
-                        <svg class="w-4 h-4 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span class="hidden sm:inline">Group Expense</span>
-                    </Link>
-                    <Link
-                        :href="route('expenses.create')"
-                        class="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-primary-600 text-white text-xs sm:text-sm font-semibold hover:bg-primary-700 transition-colors"
-                    >
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span class="hidden sm:inline">Add Expense</span>
-                    </Link>
+                    <HelpButton page="dashboard" />
+                    <div data-tip="dashboard.actions" class="flex items-center gap-2">
+                        <Link
+                            :href="route('groups.create')"
+                            title="New Group"
+                            class="inline-flex items-center px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        >
+                            <Icon name="users" class="w-4 h-4 sm:mr-1.5" />
+                            <span class="hidden sm:inline">New Group</span>
+                        </Link>
+                        <Link
+                            v-if="groupsSummary.groups.length > 0"
+                            :href="groupExpenseLink"
+                            title="Group Expense"
+                            class="inline-flex items-center px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-lg border border-blue-300 dark:border-blue-600 text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                        >
+                            <Icon name="receipt" class="w-4 h-4 sm:mr-1.5" />
+                            <span class="hidden sm:inline">Group Expense</span>
+                        </Link>
+                        <Link
+                            :href="route('expenses.create')"
+                            title="Add Expense"
+                            class="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-primary-600 text-white text-xs sm:text-sm font-semibold hover:bg-primary-700 transition-colors"
+                        >
+                            <Icon name="plus" class="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1.5" />
+                            <span class="hidden sm:inline">Add Expense</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
 
-            <!-- Row 1: Summary Cards -->
-            <div class="mt-6 grid grid-cols-2 lg:grid-cols-5 gap-4">
-                <!-- This Month Expenses -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Expenses</p>
-                        <span class="p-1.5 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
-                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-                            </svg>
-                        </span>
-                    </div>
-                    <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ formatCurrency(personalSummary.this_month_total) }}</p>
-                    <div v-if="personalSummary.last_month_total > 0 || personalSummary.this_month_total > 0" class="mt-1.5 flex items-center">
+            <!-- Row 1: Summary Cards (the header of each card opens its page) -->
+            <div data-tip="dashboard.summary" class="mt-6 grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <SummaryCard title="Expenses" icon="arrow-down" tone="primary" :href="route('expenses.index')">
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ formatCurrency(personalSummary.this_month_total) }}</p>
+                    <div v-if="personalSummary.last_month_total > 0 || personalSummary.this_month_total > 0" class="mt-1.5 flex items-center gap-1.5">
                         <span
                             :class="monthChangeUp ? 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30' : 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/30'"
                             class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium"
                         >
                             {{ monthChangeUp ? '+' : '' }}{{ monthChange }}%
                         </span>
+                        <span class="text-[10px] text-gray-400 dark:text-gray-500">vs last month</span>
                     </div>
-                </div>
+                </SummaryCard>
 
-                <!-- This Month Income -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Income</p>
-                        <span class="p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg">
-                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
-                            </svg>
-                        </span>
-                    </div>
-                    <p class="mt-2 text-2xl font-bold text-green-600 dark:text-green-400">{{ formatCurrency(incomeSummary.this_month_income) }}</p>
-                    <Link :href="route('incomes.index')" class="mt-1.5 inline-block text-[10px] text-green-600 hover:text-green-700 font-medium">
-                        Manage &rarr;
-                    </Link>
-                </div>
+                <SummaryCard title="Income" icon="arrow-up" tone="green" :href="route('incomes.index')">
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ formatCurrency(incomeSummary.this_month_income) }}</p>
+                    <p class="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">This month</p>
+                </SummaryCard>
 
-                <!-- Savings/Loss -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ incomeSummary.this_month_savings >= 0 ? 'Savings' : 'Loss' }}</p>
-                        <span class="p-1.5 rounded-lg" :class="incomeSummary.this_month_savings >= 0 ? 'bg-green-50 dark:bg-green-900/30' : 'bg-red-50 dark:bg-red-900/30'">
-                            <svg class="w-4 h-4" :class="incomeSummary.this_month_savings >= 0 ? 'text-green-600' : 'text-red-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                        </span>
-                    </div>
-                    <p class="mt-2 text-2xl font-bold" :class="incomeSummary.this_month_savings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                <SummaryCard :title="incomeSummary.this_month_savings >= 0 ? 'Savings' : 'Loss'" icon="calculator" :tone="incomeSummary.this_month_savings >= 0 ? 'green' : 'red'">
+                    <p class="text-2xl font-bold" :class="incomeSummary.this_month_savings >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
                         {{ incomeSummary.this_month_savings >= 0 ? '+' : '' }}{{ formatCurrency(incomeSummary.this_month_savings) }}
                     </p>
-                </div>
+                    <p class="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">Income minus expenses</p>
+                </SummaryCard>
 
-                <!-- To Pay -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">To Pay</p>
-                        <span class="p-1.5 bg-red-50 dark:bg-red-900/30 rounded-lg">
-                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7" />
-                            </svg>
-                        </span>
-                    </div>
-                    <p class="mt-2 text-2xl font-bold text-red-600 dark:text-red-400">{{ formatCurrency(groupsSummary.total_you_owe) }}</p>
-                    <Link
-                        v-if="groupsSummary.groups.length > 0"
-                        :href="route('groups.index')"
-                        class="mt-1.5 inline-block text-[10px] text-red-600 hover:text-red-700 font-medium"
-                    >
-                        Groups &rarr;
-                    </Link>
-                </div>
+                <SummaryCard title="To Pay" icon="arrow-out" tone="red" :href="route('groups.index')">
+                    <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ formatCurrency(groupsSummary.total_you_owe) }}</p>
+                    <p class="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">Across your groups</p>
+                </SummaryCard>
 
-                <!-- To Receive -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">To Receive</p>
-                        <span class="p-1.5 bg-green-50 dark:bg-green-900/30 rounded-lg">
-                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h14" />
-                            </svg>
-                        </span>
-                    </div>
-                    <p class="mt-2 text-2xl font-bold text-green-600 dark:text-green-400">{{ formatCurrency(groupsSummary.total_owed_to_you) }}</p>
-                    <Link
-                        v-if="groupsSummary.groups.length > 0"
-                        :href="route('groups.index')"
-                        class="mt-1.5 inline-block text-[10px] text-green-600 hover:text-green-700 font-medium"
-                    >
-                        Groups &rarr;
-                    </Link>
-                </div>
+                <SummaryCard title="To Receive" icon="arrow-in" tone="green" :href="route('groups.index')" class="col-span-2 lg:col-span-1">
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ formatCurrency(groupsSummary.total_owed_to_you) }}</p>
+                    <p class="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">Across your groups</p>
+                </SummaryCard>
             </div>
 
             <!-- Monthly Trend Chart (Income vs Expense) -->
@@ -284,22 +234,43 @@ function relativeDate(dateStr) {
             <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Left Column -->
                 <div class="space-y-6">
-                    <!-- Tasks Widget -->
-                    <div v-if="todoStats.pending > 0 || todoStats.overdue > 0" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">My Tasks</h3>
-                            <Link :href="route('todos.index')" class="text-sm text-primary-600 hover:text-primary-700 font-medium">View All</Link>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl font-bold text-primary-600">{{ todoStats.pending }}</span>
-                                <span class="text-sm text-gray-500 dark:text-gray-400">pending</span>
+                    <!-- Tasks + Remember -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <Link
+                            :href="route('todos.index')"
+                            class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 transition-colors hover:border-primary-300 dark:hover:border-primary-700"
+                        >
+                            <div class="flex items-center justify-between">
+                                <h3 class="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-gray-100">
+                                    <Icon name="tasks" class="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                                    My Tasks
+                                </h3>
+                                <Icon name="chevron-right" class="w-4 h-4 text-gray-400 transition-transform group-hover:translate-x-0.5" />
                             </div>
-                            <div v-if="todoStats.overdue > 0" class="flex items-center gap-2">
-                                <span class="text-2xl font-bold text-red-600">{{ todoStats.overdue }}</span>
-                                <span class="text-sm text-red-500">overdue</span>
+                            <div v-if="todoStats.pending > 0" class="mt-3 flex items-baseline gap-4">
+                                <span><span class="text-2xl font-bold text-primary-600">{{ todoStats.pending }}</span> <span class="text-sm text-gray-500 dark:text-gray-400">pending</span></span>
+                                <span v-if="todoStats.overdue > 0"><span class="text-2xl font-bold text-red-600">{{ todoStats.overdue }}</span> <span class="text-sm text-red-500">overdue</span></span>
                             </div>
-                        </div>
+                            <p v-else class="mt-3 text-sm text-gray-500 dark:text-gray-400">No pending tasks. Plan something ahead!</p>
+                        </Link>
+
+                        <Link
+                            :href="route('remember.index')"
+                            class="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 transition-colors hover:border-amber-300 dark:hover:border-amber-700"
+                        >
+                            <div class="flex items-center justify-between">
+                                <h3 class="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-gray-100">
+                                    <Icon name="bookmark" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                                    Remember
+                                </h3>
+                                <Icon name="chevron-right" class="w-4 h-4 text-gray-400 transition-transform group-hover:translate-x-0.5" />
+                            </div>
+                            <p v-if="rememberStats.total > 0" class="mt-3">
+                                <span class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ rememberStats.total }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400"> saved {{ rememberStats.total === 1 ? 'item' : 'items' }}</span>
+                            </p>
+                            <p v-else class="mt-3 text-sm text-gray-500 dark:text-gray-400">Log when you last changed the gas cylinder, filter or batteries.</p>
+                        </Link>
                     </div>
 
                     <!-- Pending Settlements -->
@@ -334,7 +305,7 @@ function relativeDate(dateStr) {
                                     </div>
                                 </div>
                                 <Link
-                                    :href="route('groups.settlements.index', item.group_id || 0)"
+                                    :href="item.group_id ? route('groups.settlements.index', item.group_id) : route('groups.index')"
                                     class="text-xs font-semibold text-amber-700 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 whitespace-nowrap"
                                 >
                                     Pay Now &rarr;
@@ -496,12 +467,7 @@ function relativeDate(dateStr) {
                         <!-- Content -->
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                                <template v-if="item.type === 'settlement'">
-                                    {{ item.from_name }} &rarr; {{ item.to_name }}
-                                </template>
-                                <template v-else>
-                                    {{ item.description }}
-                                </template>
+                                {{ item.description || item.category || 'Expense' }}
                             </p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                 <span>{{ relativeDate(item.date) }}</span>

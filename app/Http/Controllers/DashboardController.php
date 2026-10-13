@@ -333,6 +333,7 @@ class DashboardController extends Controller
             ->map(function ($settlement) {
                 return [
                     'id' => $settlement->id,
+                    'group_id' => $settlement->group_id,
                     'group_name' => $settlement->group?->name,
                     'to_user_name' => $settlement->toUser->name,
                     'to_user_avatar' => $settlement->toUser->avatar,

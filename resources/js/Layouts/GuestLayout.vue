@@ -1,5 +1,6 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import BrandLogo from '@/Components/Shared/BrandLogo.vue';
 </script>
 
 <template>
@@ -8,7 +9,7 @@ import { Link } from '@inertiajs/vue3';
             <!-- Logo -->
             <div class="text-center mb-8">
                 <a href="/">
-                    <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" class="h-10 w-auto mx-auto" />
+                    <BrandLogo class="h-10 mx-auto" />
                 </a>
                 <p class="text-gray-500 dark:text-gray-400 mt-1">Track expenses, split bills, get things done</p>
             </div>

@@ -123,4 +123,10 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    | Secret for the /set-up-backend route (migrations without SSH). The route is disabled when empty.
+    */
+
+    'setup_key' => env('SETUP_KEY'),
+
 ];

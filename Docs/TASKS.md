@@ -24,6 +24,8 @@
 
 - [] **516** - Cloudflare tunnel `JodTod-Local`: remove the stale "Nidhi" connector (`736adb45-14c2-426c-aab9-358459548773`) that receives `jodtod.co.in` traffic and returns 502, so the worker shows the Coming Soon page. Rotate the tunnel token afterwards (it was printed in a local session log) and reinstall the service on TeqTop with the new token.
 
+- [] **526** - Hostinger live setup (no SSH): (1) hPanel → Advanced → Cron Jobs, every minute: `/usr/bin/php /home/<user>/domains/<subdomain>/public_html/artisan schedule:run` (runs task reminders, weekly summary and the queue); (2) live `.env`: `MAIL_MAILER=smtp` with the Hostinger mailbox settings, and `SETUP_KEY=<long random string>`; (3) deploy, then open `/set-up-backend?key=<SETUP_KEY>` once to run migrations (inserts the default expense categories and creates the storage link; check the printed output lists `insert_default_expense_categories`); (4) send a test email (password reset) and a contact request to confirm emails and push notifications arrive.
+
 - [] **519** - Install dev dependencies (`composer install`) so `php artisan test` works, then run `tests/Feature/Api/V1/RememberItemTest.php` (written but never run).
 
 **Admin** Section tasks. starts from 500 =======================================
@@ -34,14 +36,9 @@
 
 Features and fixes shipped in the mobile app that the web app does not have yet. Add every new mobile-only feature here.
 
-- [ ] **517** - Remember items web UI (Inertia + Vue): list with last date, days since and average gap; item detail with date history, Add Date, edit and delete; Remember card on the Dashboard showing `rememberStats.total`; sidebar link. API and tables exist (mobile: 11-10-2026).
-- [ ] **518** - Contact search and requests: keep users with a pending request in search with a "Requested" / "Respond" button instead of hiding them; search by friend code; add a Sent section with Cancel to `Contacts/Requests.vue`. The mobile API already does this (`request_status`, `GET /contacts/requests/sent`); the web `ContactController` does not (mobile: 12-10-2026).
-- [ ] **520** - Show the user's own friend code on the Profile page (tap to copy) and on the Add Contact search ("Your friend code"), and explain what it is for (mobile: 12-10-2026).
-- [ ] **521** - Contacts onboarding: when the user has no contacts, hide the contact search box and show an explanation with a "Find Friends" button. In Groups "Add member" and the task "Assign to" picker, show a note that friends must be added to the contact list first, with an Add Contact link (mobile: 12-10-2026).
-- [ ] **522** - Readable friend code badge: pale indigo background with dark indigo text (mobile `FriendCodeBadge`). Check the web badges in `Contacts/Index.vue` and `Contacts/Requests.vue` for the same low-contrast problem (mobile: 12-10-2026).
-- [ ] **524** - In-app onboarding for the web app: first-login welcome slides, one-time tip bubbles per page with a "?" button to replay them, and a Help & Tips page with every feature explained plus "Watch Intro" and "Show All Tips Again". Reuse the mobile copy in `JodTodApp/constants/tips.ts` (mobile: 12-10-2026).
-- [ ] **525** - Helpful empty states on web list pages (Expenses, Income, Groups, Tasks, Group Expenses, Contacts, Notifications, Remember): colored icon, title, 1-2 line explanation of the feature, and a first-action button (e.g. "Add Expense", "Create Group" + "Join a group"). Copy is in the mobile screens (mobile: 12-10-2026).
-- [ ] **523** - Dashboard summary cards: each card header (icon, title, arrow) links to its page (Expenses, Income, Groups for To Pay / To Receive, Remember); Savings has no link; amounts stay selectable. Check which web cards already link (mobile: 11-10-2026).
+- [ ] **528** - PWA icons in `public/icons/` (used by `manifest.json`) show an old, different logo, not the current JodTod mark. Regenerate all sizes from `favicon.png` (needs a decision on background/padding for maskable icons).
+
+- [ ] **527** - Test the 12-10-2026 web parity work on the live site after deploy: welcome slides on first login, tip bubbles and the ? button on Dashboard/Expenses/Income/Groups/Tasks/Contacts/Remember, Help & Tips actions, Remember (add item, add/delete date, edit, delete), contact search Requested/Respond, Requests Sent + Cancel, Join Group by code, friend code copy on Profile and Contacts, empty states on each list page.
 
 ### High Priority
 
@@ -61,6 +58,21 @@ Features and fixes shipped in the mobile app that the web app does not have yet.
 ## COMPLETED
 
 ## Completed Current Tasks
+
+- [x] **Icon-only logo in collapsed sidebars** (12-10-2026)
+  The collapsed web and admin sidebars squeezed the full wordmark, which was cut off. New `public/images/Logo/logo-icon.webp` (128px, made from `favicon.png`) and a shared `BrandLogo` component (`iconOnly` prop) used by Sidebar, AdminLayout, Header and GuestLayout. Also removed the Blade-style `?v={{ time() }}` that was sent literally in logo URLs, and fixed the collapse toggle size conflict that overlapped the logo.
+
+- [x] **Web parity with mobile: Tasks 517, 518, 520, 521, 522, 523, 524, 525** (12-10-2026)
+  Remember web page (list + detail side by side on wide screens), contact search with Requested/Respond and friend codes, Requests page with Received and Sent (Cancel), friend code on Profile and Contacts, no-contacts notes in Assign To and Add Member, readable friend code badges, dashboard card headers as links plus a Remember widget, first-login welcome slides, per-page tip bubbles with a ? button, Help & Tips page, and onboarding empty states on all list pages. Also added Join Group by invite code on the Groups page (web had only invite links).
+
+- [x] **Web fixes found during the parity audit** (12-10-2026)
+  `info` flash messages were never shown (e.g. "already a member"); dashboard "Pay Now" linked to group 0 because `pendingSettlements` had no `group_id` (also fixes the mobile type); settlement rows in Recent Activity showed an empty "→"; contact search placeholder promised email/phone search that does not exist; contact remove button was hidden until hover, so touch screens could not reach it.
+
+- [x] **Default expense categories on fresh production databases** (12-10-2026)
+  Live deploys run only `migrate`, so the `categories` table stayed empty and the app could not add expenses. New migration `2026_10_12_000000_insert_default_expense_categories` calls `Category::ensureDefaults()` (from `config('site.categories')`), and `GET /api/v1/categories` creates the defaults if the table is ever empty. `/set-up-backend` now also creates the storage link when missing and prints the migrate output.
+
+- [x] **Run the queue from the scheduler and lock /set-up-backend** (12-10-2026)
+  `routes/console.php` now runs `queue:work --stop-when-empty --max-time=50` every minute, so one Hostinger cron sends all queued emails and notifications. `/set-up-backend` returns 404 unless `?key=` matches `SETUP_KEY` (`config('app.setup_key')`); with no key set the route is disabled.
 
 - [x] **Contact search shows pending requests; sent requests endpoint** (12-10-2026)
   Mobile API search now keeps users with a pending request (with `request_status`), matches exact friend codes, and a new `GET /contacts/requests/sent` lists outgoing requests. Web contact search is unchanged.

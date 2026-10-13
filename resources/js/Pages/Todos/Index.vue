@@ -5,6 +5,9 @@ import { ref, computed } from 'vue';
 
 const authUserId = computed(() => usePage().props.auth?.user?.id);
 import { confirmAction } from '@/Utils/confirm.js';
+import EmptyState from '@/Components/Shared/EmptyState.vue';
+import NoContactsNote from '@/Components/Shared/NoContactsNote.vue';
+import HelpButton from '@/Components/Onboarding/HelpButton.vue';
 
 const props = defineProps({
     todos: Object,
@@ -196,6 +199,19 @@ function getCategoryById(id) {
     return props.categories.find(c => c.id === id);
 }
 
+// Empty state helpers
+const titleInput = ref(null);
+const hasActiveFilters = computed(() => !!(props.filters?.status || props.filters?.priority || props.filters?.scope || props.filters?.category));
+
+function focusNewTask() {
+    titleInput.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    titleInput.value?.focus({ preventScroll: true });
+}
+
+function clearFilters() {
+    router.get(route('todos.index'), {}, { preserveState: true, preserveScroll: true });
+}
+
 const priorityColors = {
     high: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30',
     medium: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30',
@@ -209,11 +225,13 @@ const priorityColors = {
     <AppLayout>
         <div class="max-w-3xl mx-auto">
             <!-- Header -->
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex items-center justify-between gap-4">
+                <div class="min-w-0">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">My Tasks</h2>
                     <p class="mt-1 text-gray-500 dark:text-gray-400">Keep track of things you need to do</p>
                 </div>
+                <div class="flex flex-shrink-0 items-center gap-2">
+                <HelpButton page="todos" />
                 <button
                     @click="showCategoryManager = !showCategoryManager"
                     class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -226,6 +244,7 @@ const priorityColors = {
                     </svg>
                     Categories
                 </button>
+                </div>
             </div>
 
             <!-- Category Manager -->
@@ -330,11 +349,12 @@ const priorityColors = {
             </div>
 
             <!-- Add Task Form -->
-            <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+            <div data-tip="todos.add" class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <form @submit.prevent="addTask" class="flex flex-col gap-3">
                     <div class="flex flex-col sm:flex-row gap-3">
                         <div class="flex-1">
                             <input
+                                ref="titleInput"
                                 v-model="form.title"
                                 type="text"
                                 placeholder="What do you need to do?"
@@ -408,6 +428,7 @@ const priorityColors = {
                                 <option v-for="c in contacts" :key="c.id" :value="c.id">{{ c.name }}</option>
                             </select>
                         </div>
+                        <NoContactsNote v-else purpose="assign tasks to friends" compact />
                         <!-- Reminder -->
                         <div v-if="showReminderAdd" class="flex items-center gap-2">
                             <svg class="w-4 h-4 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,7 +456,7 @@ const priorityColors = {
             </div>
 
             <!-- Filters -->
-            <div class="mt-4 flex flex-wrap items-center gap-2">
+            <div data-tip="todos.filters" class="mt-4 flex flex-wrap items-center gap-2">
                 <!-- Status -->
                 <select
                     :value="filters.status || ''"
@@ -488,7 +509,7 @@ const priorityColors = {
                 <!-- Reset -->
                 <button
                     v-if="filters.status || filters.priority || filters.scope || filters.category"
-                    @click="router.get(route('todos.index'), {}, { preserveState: true, preserveScroll: true })"
+                    @click="clearFilters"
                     class="py-1.5 px-3 rounded-lg text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                 >
                     Clear
@@ -497,12 +518,25 @@ const priorityColors = {
 
             <!-- Task List -->
             <div class="mt-4 space-y-2">
-                <div v-if="todos.data.length === 0" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                    </svg>
-                    <p class="text-gray-500 dark:text-gray-400">No tasks yet</p>
-                    <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Add your first task above!</p>
+                <div v-if="todos.data.length === 0" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <EmptyState
+                        v-if="hasActiveFilters"
+                        compact
+                        icon="search"
+                        tone="gray"
+                        title="No tasks match"
+                        text="Try changing your filters."
+                        secondary-label="Clear Filters"
+                        @secondary="clearFilters"
+                    />
+                    <EmptyState
+                        v-else
+                        icon="tasks"
+                        title="Plan your first task"
+                        text="Add tasks with due dates and reminders, sort them by category, and assign them to friends from your contacts."
+                        action-label="Add Task"
+                        @action="focusNewTask"
+                    />
                 </div>
 
                 <div

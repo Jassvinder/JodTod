@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
-use App\Models\User;
 use App\Notifications\ContactRequestReceived;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,40 +41,7 @@ class ContactController extends Controller
             return $this->success([]);
         }
 
-        // Approved contacts are hidden; users with a pending request stay visible with its direction.
-        $approvedContactIds = Contact::where('user_id', Auth::id())
-            ->where('status', 'approved')
-            ->pluck('contact_user_id')
-            ->push(Auth::id())
-            ->toArray();
-
-        $sentRequestIds = Contact::where('user_id', Auth::id())
-            ->where('status', 'pending')
-            ->pluck('contact_user_id')
-            ->all();
-
-        $receivedRequestIds = Contact::where('contact_user_id', Auth::id())
-            ->where('status', 'pending')
-            ->pluck('user_id')
-            ->all();
-
-        $users = User::where(function ($query) use ($q) {
-                $query->where('name', 'like', "%{$q}%")
-                    ->orWhere('friend_code', strtoupper($q));
-            })
-            ->whereNotIn('id', $approvedContactIds)
-            ->select('id', 'name', 'friend_code', 'avatar')
-            ->limit(20)
-            ->get()
-            ->each(function (User $user) use ($sentRequestIds, $receivedRequestIds) {
-                $user->request_status = match (true) {
-                    in_array($user->id, $sentRequestIds) => 'sent',
-                    in_array($user->id, $receivedRequestIds) => 'received',
-                    default => null,
-                };
-            });
-
-        return $this->success($users);
+        return $this->success(Contact::searchUsersFor(Auth::id(), $q));
     }
 
     public function sentRequests(): JsonResponse

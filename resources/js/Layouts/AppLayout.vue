@@ -2,13 +2,19 @@
 import Header from '@/Components/Shared/Header.vue';
 import Sidebar from '@/Components/Shared/Sidebar.vue';
 import BottomNav from '@/Components/Shared/BottomNav.vue';
+import WelcomeModal from '@/Components/Onboarding/WelcomeModal.vue';
+import TipsTour from '@/Components/Onboarding/TipsTour.vue';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { startReminderAlarm, stopReminderAlarm } from '@/Utils/reminderAlarm.js';
+import { initOnboarding } from '@/Utils/onboarding.js';
 
 const sidebarOpen = ref(false);
 const sidebarCollapsed = ref(false);
 const flash = computed(() => usePage().props.flash || {});
+
+// Runs during setup (not onMounted) so pages' help buttons, which mount first, already see the user.
+initOnboarding(usePage().props.auth?.user?.id);
 
 // Load collapsed state from localStorage
 onMounted(() => {
@@ -64,6 +70,11 @@ onUnmounted(() => {
                     {{ flash.error }}
                 </div>
             </div>
+            <div v-if="flash.info" class="mx-4 sm:mx-6 lg:mx-8 mt-4">
+                <div class="px-4 py-3 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-sm text-blue-700 dark:text-blue-300">
+                    {{ flash.info }}
+                </div>
+            </div>
 
             <!-- Page Content -->
             <main class="p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
@@ -73,5 +84,9 @@ onUnmounted(() => {
 
         <!-- Bottom Navigation (Mobile) -->
         <BottomNav class="lg:hidden" />
+
+        <!-- Onboarding: first-login welcome slides and per-page tip bubbles -->
+        <WelcomeModal />
+        <TipsTour />
     </div>
 </template>

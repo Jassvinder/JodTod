@@ -1,6 +1,8 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import Icon from '@/Components/Shared/Icon.vue';
+import BrandLogo from '@/Components/Shared/BrandLogo.vue';
 
 defineProps({
     open: Boolean,
@@ -20,9 +22,11 @@ const navigation = [
     { name: 'Income', route: 'incomes.index', icon: 'income', routePrefix: 'incomes' },
     { name: 'My Tasks', route: 'todos.index', icon: 'tasks', routePrefix: 'todos' },
     { name: 'Contacts', route: 'contacts.index', icon: 'contacts', routePrefix: 'contacts' },
+    { name: 'Remember', route: 'remember.index', icon: 'bookmark', routePrefix: 'remember' },
     { name: 'Groups', route: 'groups.index', icon: 'users', routePrefix: 'groups' },
     { name: 'Notifications', route: 'notifications.index', icon: 'bell', routePrefix: 'notifications' },
     { name: 'Profile', route: 'profile.edit', icon: 'user' },
+    { name: 'Help & Tips', route: 'help', icon: 'question' },
 ];
 
 function getHref(item) {
@@ -64,12 +68,12 @@ function isActive(item) {
         <!-- Logo + Collapse Toggle -->
         <div class="flex items-center justify-between h-16 border-b border-gray-200 dark:border-gray-700" :class="collapsed ? 'px-3' : 'px-6'">
             <Link :href="route('dashboard')" :class="collapsed ? 'mx-auto' : ''">
-                <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" :class="collapsed ? 'h-7 w-auto' : 'h-9 w-auto'" class="transition-all duration-300" />
+                <BrandLogo :icon-only="collapsed" :class="collapsed ? 'h-8' : 'h-9'" />
             </Link>
             <button
                 @click="$emit('toggle-collapse')"
-                class="hidden lg:flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                :class="collapsed ? 'absolute -right-3 top-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm z-10 rounded-full w-6 h-6' : ''"
+                class="hidden lg:flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                :class="collapsed ? 'absolute -right-3 top-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm z-10 rounded-full w-6 h-6' : 'w-7 h-7 rounded-md'"
                 :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
             >
                 <svg class="w-4 h-4 transition-transform duration-300" :class="collapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +83,7 @@ function isActive(item) {
         </div>
 
         <!-- Navigation -->
-        <nav class="p-2 space-y-1" :class="collapsed ? 'px-2' : 'p-4'">
+        <nav data-tip="sidebar.nav" class="p-2 space-y-1" :class="collapsed ? 'px-2' : 'p-4'">
             <Link
                 v-for="item in navigation"
                 :key="item.name"
@@ -126,6 +130,7 @@ function isActive(item) {
                 <svg v-else-if="item.icon === 'user'" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
+                <Icon v-else :name="item.icon" class="w-5 h-5 flex-shrink-0" />
                 <span v-if="!collapsed" class="flex-1 whitespace-nowrap">{{ item.name }}</span>
                 <!-- Notification badge -->
                 <span

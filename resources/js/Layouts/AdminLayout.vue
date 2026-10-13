@@ -2,6 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+import BrandLogo from '@/Components/Shared/BrandLogo.vue';
 import { ref, computed } from 'vue';
 
 const sidebarOpen = ref(false);
@@ -67,13 +68,13 @@ function isActive(item) {
             <!-- Logo + Collapse Toggle -->
             <div class="flex items-center justify-between h-16 border-b border-slate-700" :class="sidebarCollapsed ? 'px-3' : 'px-6'">
                 <Link :href="route('admin.dashboard')" :class="sidebarCollapsed ? 'mx-auto' : ''">
-                    <img src="/images/Logo/logo.webp?v={{ time() }}" alt="JodTod" :class="sidebarCollapsed ? 'h-7 w-auto' : 'h-9 w-auto'" class="transition-all duration-300" />
+                    <BrandLogo :icon-only="sidebarCollapsed" :class="sidebarCollapsed ? 'h-8' : 'h-9'" />
                 </Link>
                 <span v-if="!sidebarCollapsed" class="ml-2 px-2 py-0.5 text-xs font-medium bg-purple-500 text-white rounded-md">Admin</span>
                 <button
                     @click="toggleCollapse"
-                    class="hidden lg:flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
-                    :class="sidebarCollapsed ? 'absolute -right-3 top-5 bg-slate-800 border border-slate-600 shadow-sm z-10 rounded-full w-6 h-6' : ''"
+                    class="hidden lg:flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                    :class="sidebarCollapsed ? 'absolute -right-3 top-5 bg-slate-800 border border-slate-600 shadow-sm z-10 rounded-full w-6 h-6' : 'w-7 h-7 rounded-md'"
                     :title="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
                 >
                     <svg class="w-4 h-4 transition-transform duration-300" :class="sidebarCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">

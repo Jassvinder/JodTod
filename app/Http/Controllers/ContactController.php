@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contact;
-use App\Models\User;
 use App\Notifications\ContactRequestReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,18 +41,7 @@ class ContactController extends Controller
             return response()->json([]);
         }
 
-        $existingContactIds = Contact::where('user_id', Auth::id())
-            ->pluck('contact_user_id')
-            ->push(Auth::id()) // exclude self
-            ->toArray();
-
-        $users = User::where('name', 'LIKE', "%{$q}%")
-            ->whereNotIn('id', $existingContactIds)
-            ->select('id', 'name', 'friend_code', 'avatar')
-            ->limit(10)
-            ->get();
-
-        return response()->json($users);
+        return response()->json(Contact::searchUsersFor(Auth::id(), $q));
     }
 
     public function store(Request $request)
@@ -97,8 +85,15 @@ class ContactController extends Controller
             ->latest()
             ->get();
 
+        $sentRequests = Contact::with('contactUser:id,name,friend_code,avatar')
+            ->where('user_id', Auth::id())
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
         return Inertia::render('Contacts/Requests', [
             'requests' => $requests,
+            'sentRequests' => $sentRequests,
         ]);
     }
 
@@ -135,8 +130,10 @@ class ContactController extends Controller
             abort(403);
         }
 
+        $wasPending = $contact->status === 'pending';
+
         $contact->delete();
 
-        return redirect()->back()->with('success', 'Contact removed.');
+        return redirect()->back()->with('success', $wasPending ? 'Contact request cancelled.' : 'Contact removed.');
     }
 }

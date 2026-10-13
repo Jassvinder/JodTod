@@ -37,6 +37,7 @@ class HandleInertiaRequests extends Middleware
                     'name',
                     'email',
                     'phone',
+                    'friend_code',
                     'role',
                     'email_verified_at',
                     'phone_verified_at',
@@ -55,6 +56,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
+                'info' => fn() => $request->session()->get('info'),
             ],
         ];
     }

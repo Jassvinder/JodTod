@@ -1,5 +1,30 @@
 # JodTod - Development Progress
 
+### 2026-10-12 - Icon-Only Logo for Collapsed Sidebar (COMPLETED)
+- Collapsed sidebars (user and admin) now show only the round JodTod mark (`images/Logo/logo-icon.webp`, generated from `favicon.png` with GD) through the new `Components/Shared/BrandLogo.vue`. All Vue layouts use it; logo URLs use a `VERSION` query instead of the literal `{{ time() }}` text. Verified collapsed and expanded states in Chrome.
+
+### 2026-10-12 - Web Parity with the Mobile App (COMPLETED)
+- **Remember:** new `RememberController` (Inertia) and `/remember` routes. `Pages/Remember/Index.vue` shows the list and the selected item side by side on wide screens and one at a time on phones; New/Edit Item in modals, Add Date inline, history with delete. Summary/detail logic moved into `RememberItem::withEntryStats()/toSummary()/toDetail()`, shared with the mobile API controller.
+- **Contacts:** search logic moved to `Contact::searchUsersFor()` (used by web and API): name or exact friend code, pending users stay visible with `request_status`. Contacts page has a friend code card, Find Friends search with Add / Requested / Respond, and an onboarding empty state; desktop uses two columns. Requests page shows Received and Sent (Cancel). `friend_code` is now a shared Inertia prop and shows on Profile.
+- **Onboarding:** `Utils/onboarding.js` (copy kept in sync with mobile `constants/tips.ts`, per-user state in localStorage key `jodtod_tips_v1_<userId>`), `WelcomeModal`, `TipsTour` (spotlight + bubble on `data-tip` anchors, skips hidden anchors, keyboard support) and `HelpButton`. New `/help` page; sidebar gained Remember and Help & Tips.
+- **Shared components:** `Shared/Icon`, `EmptyState`, `FriendCodeBadge`, `NoContactsNote`, `Dashboard/SummaryCard`, `Utils/dates.js`. Empty states on Expenses, Income, Groups, Tasks, Group Expenses, Contacts, Notifications and Remember, with a separate "No ... match" state when filters are active.
+- **Dashboard:** card headers link to their pages (Savings has no link), Tasks and Remember widgets, ? button.
+- **Groups:** Join Group by invite code modal (web had no manual join).
+- **Fixes:** `info` flash now displayed; `pendingSettlements.group_id` added; settlement activity text; contact search placeholder; always-visible remove button.
+- Verified on a temporary SQLite database with `php artisan serve` in Chrome: welcome + tours, Remember create/add date, contact request flow, Requests approve, Join Group error, Tasks assign picker, Help page, phone width (390px) and dark mode; `vite build` passes; mobile API smoke-tested (contacts search, remember items + 403 for other users, dashboard). Intentional difference: on web the Contacts search box stays visible with no contacts, because it is the add-friend search (mobile has a separate Add Contact screen).
+
+### 2026-10-12 - Empty Expense Categories on Production (COMPLETED)
+- The mobile Add Expense screen showed no categories on the live server. Cause: Hostinger deploys only run `migrate` through `/set-up-backend`; `CategorySeeder` never ran, so the `categories` table was empty (settlement auto-expenses also lost their "Other" category).
+- Added `Category::ensureDefaults()` (idempotent, by name, from `config('site.categories')`), used by `CategorySeeder`, a new migration `2026_10_12_000000_insert_default_expense_categories`, and `ApiV1CategoryController::index()` as a fallback when the table is empty.
+- `/set-up-backend` now runs `storage:link` when `public/storage` is missing (receipt and photo URLs need it) and prints the migrate output.
+- Not seeded on production on purpose: `UserSeeder` (test accounts with a shared password). Public pages fall back to Blade views, so `PageSeeder` is optional. To make an admin on live, set `users.role = 'admin'` for that account in phpMyAdmin.
+- Verified on a temporary SQLite database: a fresh `migrate` creates all 9 categories, and the API recreates them after the table is emptied.
+
+### 2026-10-12 - Queue on Shared Hosting and Setup Route Lock (COMPLETED)
+- All notifications and auth emails implement `ShouldQueue` with `QUEUE_CONNECTION=database`, but Hostinger has no SSH or long-running worker, so nothing was being sent. The scheduler now runs `queue:work --stop-when-empty --max-time=50` every minute with `withoutOverlapping()`. A single hPanel cron for `schedule:run` covers reminders, the weekly summary and the queue (see Task 526).
+- `/set-up-backend` was public, so anyone could trigger migrations. It now requires `?key=` matching `SETUP_KEY` (new `config('app.setup_key')`, documented in `.env.example`) and returns 404 otherwise or when the key is not set.
+- Verified locally: `php artisan schedule:list` shows the queue job; the route returns 404 without or with a wrong key.
+
 ### 2026-10-12 - Contact Requests Visibility (COMPLETED)
 - `Api\V1\ContactController::search` previously hid everyone with any contact row, so users you had already requested vanished from search. It now hides only yourself and approved contacts, and returns `request_status` (`sent`, `received`, or `null`) for the rest.
 - Search also matches an exact friend code (case-insensitive) besides the name.

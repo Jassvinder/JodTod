@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import NoContactsNote from '@/Components/Shared/NoContactsNote.vue';
 import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
@@ -456,16 +457,7 @@ const memberSharesOpen = ref(true);
             <div class="p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add Member from Contacts</h2>
 
-                <div v-if="contacts.length === 0" class="text-center py-8">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">No contacts available to add</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Add users to your contacts first, then add them to groups.</p>
-                    <Link :href="route('contacts.index')" class="mt-3 inline-block px-4 py-2 text-sm font-medium text-primary-600 border border-primary-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors">
-                        Go to Contacts
-                    </Link>
-                </div>
+                <NoContactsNote v-if="contacts.length === 0" purpose="add more members" />
 
                 <ul v-else class="divide-y divide-gray-100 dark:divide-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg max-h-80 overflow-y-auto">
                     <li

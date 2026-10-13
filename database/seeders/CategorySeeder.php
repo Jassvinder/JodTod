@@ -9,13 +9,6 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = config('site.categories');
-
-        foreach ($categories as $category) {
-            Category::firstOrCreate(
-                ['name' => $category['name']],
-                ['icon' => $category['icon']]
-            );
-        }
+        Category::ensureDefaults();
     }
 }
