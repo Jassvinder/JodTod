@@ -27,6 +27,7 @@ const navigation = [
     { name: 'Notifications', route: 'notifications.index', icon: 'bell', routePrefix: 'notifications' },
     { name: 'Profile', route: 'profile.edit', icon: 'user' },
     { name: 'Help & Tips', route: 'help', icon: 'question' },
+    { name: 'Support JodTod', route: 'support', icon: 'heart' },
 ];
 
 function getHref(item) {

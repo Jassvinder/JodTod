@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OtpController;
 use App\Http\Controllers\Api\V1\RememberItemController;
 use App\Http\Controllers\Api\V1\SettlementController;
+use App\Http\Controllers\Api\V1\SupportController;
 use App\Http\Controllers\Api\V1\TodoCategoryController;
 use App\Http\Controllers\Api\V1\TodoController;
 use App\Http\Controllers\DashboardController;
@@ -91,6 +92,9 @@ Route::prefix('v1')->group(function () {
 
         // Categories
         Route::get('/categories', [CategoryController::class, 'index']);
+
+        // Support JodTod (free-for-now note + UPI details)
+        Route::get('/support', [SupportController::class, 'show']);
 
         // Todos
         Route::get('/todos', [TodoController::class, 'index']);

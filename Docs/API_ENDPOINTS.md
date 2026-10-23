@@ -263,6 +263,18 @@ Personal log of recurring things, such as when the gas cylinder was replaced or 
 
 The dashboard response includes `rememberStats.total`, the number of items the user has saved.
 
+## Support JodTod
+
+The app is free for now; this page explains that it may add an optional donation or subscription later and shows the UPI details for voluntary donations. The note text lives in `config('site.support')`; the UPI ID, payee name and QR image are set in Admin > Settings. Both use `App\Services\SupportService::details()`.
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/support` | Web Support JodTod page (Inertia) | Yes |
+| GET | `/api/v1/support` | Same content for the mobile app | Yes |
+| PUT | `/admin/settings` | Also accepts `support_upi_id` (`name@bank`), `support_payee_name`, `support_qr` (image, max 2 MB, multipart with `_method=put`) and `remove_support_qr` | Admin |
+
+**Response fields:** `title`, `paragraphs[]`, `early_users_note`, `pay_steps[]`, `upi_id` (`null` when not set), `payee_name`, `qr_url` (`null` when no QR is uploaded), `upi_link` (`upi://pay?pa=...&pn=...&cu=INR`, `null` without a UPI ID). The payment card is hidden when both `upi_id` and `qr_url` are `null`.
+
 ## User Profile
 
 | Method | Endpoint | Description | Auth |

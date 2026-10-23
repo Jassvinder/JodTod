@@ -32,6 +32,8 @@
 
 ## PENDING
 
+- [ ] **529** - After deploying the Support JodTod page: in Admin > Settings set the UPI ID and payee name and upload the UPI QR image, then open `/support` on web and the Support JodTod screen in the mobile app to check them. If the live database has a published CMS page with slug `terms`, it replaces the Blade Terms page, so add the new "Pricing & Payments" text there too.
+
 ### Web Pending (built in the mobile app first)
 
 Features and fixes shipped in the mobile app that the web app does not have yet. Add every new mobile-only feature here.
@@ -58,6 +60,9 @@ Features and fixes shipped in the mobile app that the web app does not have yet.
 ## COMPLETED
 
 ## Completed Current Tasks
+
+- [X] **Support JodTod page and free-for-now note** (14-10-2026)
+  Users now see that JodTod is free for now and may add an optional donation or subscription later (feature names are not listed; "some features will always stay free"). New `/support` page (sidebar "Support JodTod") with the note, the UPI QR (Save QR Code), the UPI ID (Copy) and a "Pay with UPI App" deep link on phones. The UPI ID, payee name and QR image are set in Admin > Settings. Same content on the landing page (note only), in Terms section 5 and through `GET /api/v1/support` for the mobile app.
 
 - [x] **Icon-only logo in collapsed sidebars** (12-10-2026)
   The collapsed web and admin sidebars squeezed the full wordmark, which was cut off. New `public/images/Logo/logo-icon.webp` (128px, made from `favicon.png`) and a shared `BrandLogo` component (`iconOnly` prop) used by Sidebar, AdminLayout, Header and GuestLayout. Also removed the Blade-style `?v={{ time() }}` that was sent literally in logo URLs, and fixed the collapse toggle size conflict that overlapped the logo.

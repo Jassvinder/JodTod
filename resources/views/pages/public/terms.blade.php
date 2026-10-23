@@ -64,9 +64,14 @@
 
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">5. Pricing & Payments</h2>
             <p>
-                JodTod is currently <strong>free to use</strong>. We may introduce premium features in the future.
-                If we do, we will provide advance notice and any paid features will be clearly marked. Free features
-                available at the time of your registration will remain free for your account.
+                JodTod is currently <strong>free to use</strong>. Running the service has ongoing costs, so in the
+                future we may introduce an optional donation or a paid subscription for some features, depending on
+                how the app grows. If we do, we will provide advance notice and any paid features will be clearly
+                marked. Some features will always remain free.
+            </p>
+            <p class="mt-3">
+                You can currently support JodTod with a voluntary UPI donation from the Support JodTod page in the app.
+                Donations are optional, do not unlock any features, and are non-refundable.
             </p>
 
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">6. Settlement Disclaimer</h2>

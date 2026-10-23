@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import Icon from '@/Components/Shared/Icon.vue';
+import { copyText } from '@/Utils/clipboard.js';
 
 // Readable friend code chip. With `copyable`, clicking copies the code and briefly shows "Copied".
 const props = defineProps({
@@ -14,20 +15,7 @@ let resetTimer = null;
 
 async function copy() {
     if (!props.copyable || !props.code) return;
-    try {
-        await navigator.clipboard.writeText(props.code);
-    } catch {
-        // Older browsers / insecure origins: fall back to a hidden textarea.
-        const area = document.createElement('textarea');
-        area.value = props.code;
-        area.setAttribute('readonly', '');
-        area.style.position = 'fixed';
-        area.style.opacity = '0';
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand('copy');
-        document.body.removeChild(area);
-    }
+    await copyText(props.code);
     copied.value = true;
     clearTimeout(resetTimer);
     resetTimer = setTimeout(() => { copied.value = false; }, 1800);

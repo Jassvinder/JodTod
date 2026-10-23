@@ -16,6 +16,7 @@
     $planning = config('site.landing.event_planning');
     $steps = config('site.landing.how_it_works');
     $cta = config('site.landing.cta');
+    $support = config('site.support');
 @endphp
 <!-- Hero Section -->
 <section class="relative bg-gradient-to-br from-primary-600 to-primary-800 text-white">
@@ -145,6 +146,23 @@
                 <p class="mt-2 text-gray-600">{{ $step['description'] }}</p>
             </div>
             @endforeach
+        </div>
+    </div>
+</section>
+
+<!-- Free for now (Support JodTod note) -->
+<section class="py-16 sm:py-20 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="rounded-2xl bg-white border border-gray-200 p-6 sm:p-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ $support['title'] }}</h2>
+            <div class="mt-4 space-y-3 text-gray-600">
+                @foreach($support['paragraphs'] as $paragraph)
+                <p>{{ $paragraph }}</p>
+                @endforeach
+            </div>
+            @if(!empty($support['early_users_note']))
+            <p class="mt-4 font-medium text-primary-700">{{ $support['early_users_note'] }}</p>
+            @endif
         </div>
     </div>
 </section>

@@ -20,6 +20,7 @@ use App\Http\Controllers\SettlementController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TodoCategoryController;
 use App\Http\Controllers\TodoController;
+use App\Services\SupportService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -114,6 +115,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Help & Tips
     Route::get('/help', fn () => Inertia::render('Help'))->name('help');
+
+    // Support JodTod (free-for-now note + UPI donation)
+    Route::get('/support', fn () => Inertia::render('Support', ['support' => SupportService::details()]))->name('support');
 });
 
 // Groups (phone.verified temporarily disabled - enable when SMS provider configured)

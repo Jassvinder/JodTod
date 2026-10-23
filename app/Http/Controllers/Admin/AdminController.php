@@ -8,6 +8,7 @@ use App\Models\Expense;
 use App\Models\Group;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\SupportService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -331,7 +332,10 @@ class AdminController extends Controller
                 'site_name' => Setting::get('site_name', config('site.app.name')),
                 'default_currency' => Setting::get('default_currency', 'INR'),
                 'maintenance_mode' => Setting::get('maintenance_mode', '0'),
+                'support_upi_id' => Setting::get('support_upi_id', ''),
+                'support_payee_name' => Setting::get('support_payee_name', config('site.app.name')),
             ],
+            'supportQrUrl' => SupportService::details()['qr_url'],
         ]);
     }
 
@@ -341,10 +345,24 @@ class AdminController extends Controller
             'site_name' => 'required|string|max:100',
             'default_currency' => 'required|string|max:5',
             'maintenance_mode' => 'required|in:0,1',
+            'support_upi_id' => ['nullable', 'string', 'max:100', 'regex:/^[\w.\-]+@[\w.\-]+$/'],
+            'support_payee_name' => 'nullable|string|max:100',
+            'support_qr' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
+            'remove_support_qr' => 'nullable|boolean',
+        ], [
+            'support_upi_id.regex' => 'Enter a valid UPI ID, for example name@bank.',
         ]);
 
+        if ($request->hasFile('support_qr')) {
+            SupportService::storeQr($request->file('support_qr'));
+        } elseif ($request->boolean('remove_support_qr')) {
+            SupportService::removeQr();
+        }
+
+        unset($validated['support_qr'], $validated['remove_support_qr']);
+
         foreach ($validated as $key => $value) {
-            Setting::set($key, $value);
+            Setting::set($key, $value ?? '');
         }
 
         return back()->with('success', 'Settings updated successfully.');

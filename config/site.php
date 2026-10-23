@@ -170,6 +170,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Support JodTod (free-for-now note + UPI donations)
+    |--------------------------------------------------------------------------
+    |
+    | Shown on the web Support page, the landing page and the mobile app
+    | (via GET /api/v1/support). The UPI ID, payee name and QR image are
+    | set from Admin > Settings, not here.
+    |
+    */
+    'support' => [
+        'title' => 'JodTod is free to use',
+        'paragraphs' => [
+            'Running JodTod has real costs: servers, notifications, emails and ongoing maintenance. Right now every feature is free for everyone.',
+            'In the future we may add an optional donation or a small subscription, depending on how the app grows. Some features will always stay free.',
+            'If you find JodTod useful, you can support it today with any amount through UPI. Every contribution helps keep the app running.',
+        ],
+        'early_users_note' => 'Early users will be rewarded when that happens.',
+        'pay_steps' => [
+            'Save the QR code to your gallery.',
+            'Open any UPI app (Google Pay, PhonePe, Paytm, BHIM).',
+            'Scan the QR from your gallery, or pay to the UPI ID below.',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | SEO Defaults
     |--------------------------------------------------------------------------
     */

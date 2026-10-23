@@ -1,5 +1,14 @@
 # JodTod - Development Progress
 
+### 2026-10-14 - Support JodTod Page and Free-for-Now Note (COMPLETED)
+- Goal: tell users that running JodTod costs money, that every feature is free right now, and that an optional donation or subscription may come later depending on growth. The copy does not name features; it says some features will always stay free. Monetization will be decided later from real usage.
+- Note text lives in `config('site.support')` (title, paragraphs, early users note, pay steps). `App\Services\SupportService::details()` adds the admin-set `support_upi_id`, `support_payee_name` and QR image (`support_qr_path` setting, stored on the public disk under `support/` with a new file name on each upload) and builds the `upi://pay` link (UPI ID left unencoded because some UPI apps do not decode `%40`).
+- Admin > Settings: new Support JodTod (UPI) section with UPI ID (validated as `name@bank`), payee name, QR upload with preview and Remove QR. The form now posts multipart with `_method=put`.
+- Web: `Pages/Support.vue` at `/support` (sidebar "Support JodTod", heart icon): note card, QR with Save QR Code (download), steps, UPI ID with Copy, and Pay with UPI App on phone widths. Payment card is hidden until a UPI ID or QR is set. Landing page shows the note; Terms section 5 now says pricing may change, some features always stay free, and donations are voluntary, unlock nothing and are non-refundable.
+- Shared: `Utils/clipboard.js` (copy with fallback, now also used by `FriendCodeBadge`), `heart` and `download` icons in `Shared/Icon`.
+- API: `GET /api/v1/support` for the mobile app (see `Docs/API_ENDPOINTS.md`).
+- Verified: PHP lint, `route:list`, `vite build`, home and terms views render the new text, and a tinker run of QR upload, `upi_link` and QR removal.
+
 ### 2026-10-12 - Icon-Only Logo for Collapsed Sidebar (COMPLETED)
 - Collapsed sidebars (user and admin) now show only the round JodTod mark (`images/Logo/logo-icon.webp`, generated from `favicon.png` with GD) through the new `Components/Shared/BrandLogo.vue`. All Vue layouts use it; logo URLs use a `VERSION` query instead of the literal `{{ time() }}` text. Verified collapsed and expanded states in Chrome.
 
