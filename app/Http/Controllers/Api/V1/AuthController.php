@@ -144,6 +144,20 @@ class AuthController extends Controller
         return $this->success($request->user());
     }
 
+    /**
+     * Personal app or Team Builder; the mobile app opens in the chosen mode.
+     */
+    public function updateAppMode(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'app_mode' => 'required|in:personal,team_builder',
+        ]);
+
+        $request->user()->update($validated);
+
+        return $this->success($request->user(), 'Mode updated.');
+    }
+
     public function resendVerification(Request $request): JsonResponse
     {
         if ($request->user()->hasVerifiedEmail()) {

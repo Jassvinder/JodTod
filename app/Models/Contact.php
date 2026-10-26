@@ -47,7 +47,7 @@ class Contact extends Model
             ->pluck('user_id')
             ->all();
 
-        return User::where(function ($q) use ($query) {
+        return User::registered()->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
                     ->orWhere('friend_code', strtoupper($query));
             })

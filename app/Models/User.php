@@ -31,6 +31,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'language',
         'notification_email',
         'notification_push',
+        'is_guest',
+        'guest_created_by',
+        'app_mode',
     ];
 
     protected $hidden = [
@@ -100,6 +103,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->banned_at !== null;
     }
 
+    /**
+     * Real accounts only (excludes guest group members who have no app).
+     */
+    public function scopeRegistered(Builder $query): Builder
+    {
+        return $query->where('is_guest', false);
+    }
+
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new QueuedVerifyEmail);
@@ -160,6 +171,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'notification_email' => 'boolean',
             'notification_push' => 'boolean',
             'banned_at' => 'datetime',
+            'is_guest' => 'boolean',
         ];
     }
 }

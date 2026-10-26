@@ -34,9 +34,25 @@
 
 - [ ] **529** - After deploying the Support JodTod page: in Admin > Settings set the UPI ID and payee name and upload the UPI QR image, then open `/support` on web and the Support JodTod screen in the mobile app to check them. If the live database has a published CMS page with slug `terms`, it replaces the Blade Terms page, so add the new "Pricing & Payments" text there too.
 
+- [ ] **534** - Deploy the 23-10-2026 changes and run migrations on live (`/set-up-backend?key=<SETUP_KEY>`): check the output lists `add_guest_fields_to_users_table` (makes `users.email` nullable, adds `is_guest`, `guest_created_by`) and `create_ledger_tables`. Then test with the mobile app (mobile Task 1526).
+
+- [ ] **535** - Guest member claim (future): when a guest member later installs JodTod, let the group admin link the guest to the real account (move splits, payer rows and settlements from the guest user id to the real user id, then delete the guest). Today the guest stays a separate name-only member.
+
+- [ ] **536** - Local database tables are MyISAM, so foreign keys and cascades are not enforced and transactions do not roll back. Check the live database engine; if it is also MyISAM, plan a switch to InnoDB (`ALTER TABLE ... ENGINE=InnoDB`) after a backup. Ledger person delete already removes entries explicitly.
+
+- [ ] **538** - Deploy Team Builder Phase 1 and run migrations on live: check the setup output lists `add_app_mode_to_users_table` and `create_team_builder_tables`. Then test with the mobile app (mobile Task 1537).
+
+- [ ] **539** - Team Builder Phase 2 API: upline view of the whole downline (tree with each member's weekly numbers, last active date, and their prospects' names, statuses and next follow-up dates; never phone numbers or notes). Flags: "Push needed" when a member logged no plan or follow-up in 7 days; "Training needed" when a member showed many plans but got few joinings. Auto-add the direct sponsor and direct downline as approved contacts on join.
+
+- [ ] **540** - Team Builder Phase 3: weekly targets (set by self or upline) with progress, team announcements / training material, push notifications (follow-up due, someone joined your downline, weekly team summary).
+
 ### Web Pending (built in the mobile app first)
 
 Features and fixes shipped in the mobile app that the web app does not have yet. Add every new mobile-only feature here.
+
+- [ ] **533** - Web parity for mobile Tasks 1521–1525: task details view with "Assigned by" before edit and no reassign option for assigned-to-me tasks; hide Delete on assigned-to-me tasks; group expense "Paid By" defaults to the current user; add guest members (no app) to a group; Lend & Borrow page.
+
+- [ ] **541** - Web parity for Team Builder (mobile Task 1536): mode choice, prospects, follow-ups, dashboard, teams (create, join with invite code, direct members).
 
 - [ ] **528** - PWA icons in `public/icons/` (used by `manifest.json`) show an old, different logo, not the current JodTod mark. Regenerate all sizes from `favicon.png` (needs a decision on background/padding for maskable icons).
 
@@ -60,6 +76,14 @@ Features and fixes shipped in the mobile app that the web app does not have yet.
 ## COMPLETED
 
 ## Completed Current Tasks
+
+- [X] **537** - Team Builder Phase 1 API: `users.app_mode` + `PUT /api/v1/user/app-mode`; `teams`, `team_members` (per-member invite code, sponsor, materialized path), `prospects`, `prospect_activities`; `Api\V1\TeamBuilder\TeamController` and `ProspectController` with dashboard and follow-ups (26-10-2026)
+
+- [X] **532** - Lend & Borrow API: `ledger_people` / `ledger_entries` tables, `LedgerPerson` / `LedgerEntry` models, `Api\V1\LedgerController` with person and entry CRUD, per-person balance with running `balance_after`, and overall "you will get / you will give" totals (23-10-2026)
+
+- [X] **531** - Guest group members (no app): `POST /api/v1/groups/{id}/guest-members` (admin, name only). Guests are `users` rows with `is_guest = true` and no email; a `NotificationSending` listener blocks all their notifications; `User::registered()` hides them from contact search, admin user list/counts and the weekly summary; they cannot be added as contacts or task assignees; settlements paid by a guest create no personal expense (API and web) (23-10-2026)
+
+- [X] **530** - Tasks API: `GET /api/v1/todos/{id}` with creator (`user`) and `assignee`; readable 403 messages instead of "Forbidden"; the assignee can save edits as long as `assigned_to` is unchanged or left out (23-10-2026)
 
 - [X] **Support JodTod page and free-for-now note** (14-10-2026)
   Users now see that JodTod is free for now and may add an optional donation or subscription later (feature names are not listed; "some features will always stay free"). New `/support` page (sidebar "Support JodTod") with the note, the UPI QR (Save QR Code), the UPI ID (Copy) and a "Pay with UPI App" deep link on phones. The UPI ID, payee name and QR image are set in Admin > Settings. Same content on the landing page (note only), in Terms section 5 and through `GET /api/v1/support` for the mobile app.

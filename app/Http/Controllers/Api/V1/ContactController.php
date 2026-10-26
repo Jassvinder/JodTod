@@ -58,7 +58,7 @@ class ContactController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'contact_user_id' => 'required|exists:users,id',
+            'contact_user_id' => 'required|exists:users,id,is_guest,0',
         ]);
 
         if ($validated['contact_user_id'] == Auth::id()) {

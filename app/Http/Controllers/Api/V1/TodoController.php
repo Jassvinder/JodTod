@@ -97,7 +97,7 @@ class TodoController extends Controller
             'due_date' => 'nullable|date',
             'reminder_at' => 'nullable|date',
             'todo_category_id' => 'nullable|exists:todo_categories,id',
-            'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id,is_guest,0',
         ]);
 
         $todo = Todo::create([
@@ -111,9 +111,18 @@ class TodoController extends Controller
             $assignee->notify(new TodoAssigned($todo, Auth::user()->name));
         }
 
-        $todo->load(['category', 'assignee:id,name,avatar']);
+        $todo->load(['category', 'assignee:id,name,avatar', 'user:id,name,avatar']);
 
         return $this->created($todo, 'Task added successfully.');
+    }
+
+    public function show(Todo $todo): JsonResponse
+    {
+        $this->authorizeTodoOrAssignee($todo);
+
+        $todo->load(['category', 'assignee:id,name,avatar', 'user:id,name,avatar']);
+
+        return $this->success($todo);
     }
 
     public function update(Request $request, Todo $todo): JsonResponse
@@ -126,12 +135,13 @@ class TodoController extends Controller
             'due_date' => 'nullable|date',
             'reminder_at' => 'nullable|date',
             'todo_category_id' => 'nullable|exists:todo_categories,id',
-            'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id,is_guest,0',
         ]);
 
         // Only the todo owner can change assignment
-        if (array_key_exists('assigned_to', $validated) && $todo->user_id !== Auth::id()) {
-            return $this->forbidden('Only the task owner can change assignment.');
+        if (array_key_exists('assigned_to', $validated) && $todo->user_id !== Auth::id()
+            && (int) $validated['assigned_to'] !== (int) $todo->assigned_to) {
+            return $this->forbidden('Only the person who created this task can change who it is assigned to.');
         }
 
         // Reset reminder_sent if reminder time changed
@@ -148,14 +158,14 @@ class TodoController extends Controller
             $assignee->notify(new TodoAssigned($todo, Auth::user()->name));
         }
 
-        $todo->load(['category', 'assignee:id,name,avatar']);
+        $todo->load(['category', 'assignee:id,name,avatar', 'user:id,name,avatar']);
 
         return $this->success($todo, 'Task updated successfully.');
     }
 
     public function destroy(Todo $todo): JsonResponse
     {
-        $this->authorizeTodoOwner($todo);
+        $this->authorizeTodoOwner($todo, 'This task was assigned to you by someone else, so only they can delete it.');
 
         $todo->delete();
 
@@ -176,12 +186,12 @@ class TodoController extends Controller
         return $this->success($todo, $todo->is_completed ? 'Task completed.' : 'Task marked as pending.');
     }
 
-    private function authorizeTodoOwner(Todo $todo): void
+    private function authorizeTodoOwner(Todo $todo, string $message = 'Only the person who created this task can do this.'): void
     {
         if ($todo->user_id !== Auth::id()) {
             abort(response()->json([
                 'success' => false,
-                'message' => 'Forbidden',
+                'message' => $message,
             ], 403));
         }
     }
@@ -191,7 +201,7 @@ class TodoController extends Controller
         if ($todo->user_id !== Auth::id() && $todo->assigned_to !== Auth::id()) {
             abort(response()->json([
                 'success' => false,
-                'message' => 'Forbidden',
+                'message' => 'You do not have access to this task.',
             ], 403));
         }
     }

@@ -8,10 +8,12 @@
 |--------|------|-------------|-------------|
 | id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
 | name | VARCHAR(100) | NOT NULL | |
-| email | VARCHAR(255) | NOT NULL, UNIQUE | |
+| email | VARCHAR(255) | NULLABLE, UNIQUE | NULL only for guest members |
 | email_verified_at | TIMESTAMP | NULLABLE | |
 | password | VARCHAR(255) | NULLABLE (Google login) | |
 | role | ENUM('admin', 'user') | DEFAULT 'user' | App-level role (admin or regular user) |
+| is_guest | BOOLEAN | DEFAULT false | Group member without the app (name only). Cannot log in, never notified, hidden from search and admin counts (`User::registered()` scope) |
+| guest_created_by | BIGINT UNSIGNED | NULLABLE, FK -> users.id, ON DELETE SET NULL | Group admin who added the guest |
 | avatar | VARCHAR(255) | NULLABLE | Profile photo path |
 | google_id | VARCHAR(255) | NULLABLE, UNIQUE | For Google OAuth |
 | currency | VARCHAR(10) | DEFAULT 'INR' | Preferred currency |
@@ -254,6 +256,121 @@
 
 ---
 
+## Table: ledger_people
+
+Lend & Borrow: people the user gives money to or gets money from.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | Ledger owner |
+| name | VARCHAR(100) | NOT NULL | Person's name |
+| phone | VARCHAR(20) | NULLABLE | Optional phone |
+| note | VARCHAR(255) | NULLABLE | Optional details |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | Touched on every new entry (list is ordered by it) |
+
+**Indexes:** (user_id, name)
+
+---
+
+## Table: ledger_entries
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| ledger_person_id | BIGINT UNSIGNED | FK -> ledger_people.id, ON DELETE CASCADE | Parent person |
+| type | ENUM('gave', 'got') | NOT NULL | gave = user gave money to the person, got = user received money from them |
+| amount | DECIMAL(12,2) | NOT NULL | Always positive |
+| entry_date | DATE | NOT NULL | Cannot be in the future |
+| note | VARCHAR(255) | NULLABLE | Optional details |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** (ledger_person_id, entry_date)
+
+Balance with a person = SUM(gave) - SUM(got). Positive: they owe the user. Negative: the user owes them.
+
+---
+
+## Column: users.app_mode
+
+ENUM('personal', 'team_builder'), NULLABLE, after `is_guest`. Which part of the mobile app the user works in. Null until the user chooses once after login.
+
+---
+
+## Table: teams
+
+Team Builder: one network marketing team of any company.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| owner_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | Creator, top of the tree |
+| name | VARCHAR(100) | NOT NULL | Team name |
+| company_name | VARCHAR(100) | NULLABLE | Network marketing company |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+---
+
+## Table: team_members
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| team_id | BIGINT UNSIGNED | FK -> teams.id, ON DELETE CASCADE | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | |
+| sponsor_id | BIGINT UNSIGNED | FK -> users.id, NULLABLE, ON DELETE SET NULL | Upline (whose code was used). Null for the owner |
+| invite_code | VARCHAR(8) | UNIQUE | This member's own code; joining with it makes them the sponsor |
+| path | VARCHAR(1000) | NOT NULL | User ids from the top down to this member, e.g. `/3/12/45/`. Downline = rows whose path starts with this path |
+| joined_at | TIMESTAMP | | |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** UNIQUE (team_id, user_id), (team_id, sponsor_id)
+
+---
+
+## Table: prospects
+
+People the user shows the business plan to. Uplines may later see names, statuses and follow-up dates of their downline's prospects, but never phone numbers or notes.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | Owner |
+| team_id | BIGINT UNSIGNED | FK -> teams.id, NULLABLE, ON DELETE SET NULL | Which team/company it is for |
+| name | VARCHAR(100) | NOT NULL | |
+| phone | VARCHAR(20) | NULLABLE | |
+| source | VARCHAR(100) | NULLABLE | Where the user met them |
+| status | ENUM('new', 'plan_shown', 'follow_up', 'joined', 'not_interested') | DEFAULT 'new' | |
+| next_follow_up_at | DATETIME | NULLABLE | Cleared when the status is joined or not_interested |
+| joined_at | TIMESTAMP | NULLABLE | Set when the status becomes joined |
+| note | VARCHAR(500) | NULLABLE | |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | Bumped on every logged activity (list order) |
+
+**Indexes:** (user_id, status), (user_id, next_follow_up_at)
+
+---
+
+## Table: prospect_activities
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| prospect_id | BIGINT UNSIGNED | FK -> prospects.id, ON DELETE CASCADE | |
+| type | ENUM('call', 'plan_shown', 'follow_up', 'meeting', 'note') | NOT NULL | |
+| note | VARCHAR(500) | NULLABLE | |
+| done_at | DATETIME | NOT NULL | When it happened |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** (prospect_id, done_at)
+
+---
+
 ## Entity Relationship Diagram (Text)
 
 ```
@@ -273,6 +390,9 @@ users (1) ----< (M) group_members (M) >---- (1) groups
   +----< todos
   +----< incomes
   +----< remember_items ----< remember_entries
+  +----< ledger_people ----< ledger_entries
+  +----< teams (owner) ----< team_members (also user_id, sponsor_id -> users)
+  +----< prospects ----< prospect_activities
 
 categories (1) ----< (M) expenses
 ```

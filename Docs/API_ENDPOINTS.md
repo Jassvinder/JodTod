@@ -233,7 +233,8 @@ Every user has a unique 6-character `friend_code` (3 letters + 3 digits). It tel
 |--------|----------|-------------|------|
 | GET | `/api/v1/todos` | List the authenticated user's own and assigned Todos | Yes |
 | POST | `/api/v1/todos` | Create a Todo | Yes |
-| PUT | `/api/v1/todos/{id}` | Update a Todo | Yes |
+| GET | `/api/v1/todos/{id}` | One Todo with `category`, `assignee` and `user` (creator, i.e. who assigned it). Creator or assignee only | Yes |
+| PUT | `/api/v1/todos/{id}` | Update a Todo. The assignee can edit it but cannot change `assigned_to` (send it unchanged or leave it out) | Yes |
 | PATCH | `/api/v1/todos/{id}/toggle` | Toggle Todo completion | Yes |
 | DELETE | `/api/v1/todos/{id}` | Delete an owned Todo | Yes |
 | GET | `/api/v1/todo-categories` | List own and assigned-task categories; creates Home and Market defaults for the authenticated user | Yes |
@@ -262,6 +263,59 @@ Personal log of recurring things, such as when the gas cylinder was replaced or 
 **Item summary fields:** `entries_count`, `last_done_on` (latest `done_on` or `null`), and `avg_gap_days` (average days between first and last entry, `null` with fewer than two entries). Item, entry create/delete, and update responses return the summary plus `entries`. Items owned by another user return 403.
 
 The dashboard response includes `rememberStats.total`, the number of items the user has saved.
+
+## Lend & Borrow (Mobile API)
+
+Simple personal ledger of money given to and received from people.
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/v1/ledger-people` | `{ people: [summary], totals: { you_will_get, you_will_give, net } }`, most recently active first. Optional `search` (name) | Yes |
+| POST | `/api/v1/ledger-people` | Add a person: `name` (required, max 100), `phone` (optional, max 20), `note` (optional) | Yes |
+| GET | `/api/v1/ledger-people/{id}` | Person summary plus `entries`, newest first | Yes |
+| PUT | `/api/v1/ledger-people/{id}` | Update `name`, `phone`, `note` | Yes |
+| DELETE | `/api/v1/ledger-people/{id}` | Delete the person and all entries | Yes |
+| POST | `/api/v1/ledger-people/{id}/entries` | Add an entry: `type` (`gave`/`got`), `amount` (> 0), `entry_date` (not in the future), `note` (optional) | Yes |
+| PUT | `/api/v1/ledger-people/{id}/entries/{entryId}` | Update an entry (same fields) | Yes |
+| DELETE | `/api/v1/ledger-people/{id}/entries/{entryId}` | Delete an entry | Yes |
+
+**Person summary fields:** `entries_count`, `total_gave`, `total_got`, `balance` (`total_gave - total_got`; positive = they owe the user), `last_entry_on`. Each entry has `balance_after` (running balance after that entry). Entry and person write responses return the full detail. Another user's records return 403.
+
+## Team Builder (Mobile API)
+
+Network marketing teams (upline/downline), prospects and follow-ups. All routes are under `/api/v1/team-builder`. Date-times are sent as local Indian time (`YYYY-MM-DD HH:MM`) and returned as ISO 8601 with offset.
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| PUT | `/api/v1/user/app-mode` | `app_mode`: `personal` or `team_builder`. Returns the user. `users.app_mode` is null until the user chooses | Yes |
+| GET | `/team-builder/dashboard` | `week` (Monday to now: `plans_shown`, `follow_ups`, `calls`, `meetings`, `new_prospects`, `joined`), `follow_ups` (`overdue`, `today` counts), `pipeline` (count per status), `teams` (`id`, `name`, `downline_count`) | Yes |
+| GET | `/team-builder/follow-ups` | Open prospects with a follow-up date: `{ overdue, today, upcoming }` | Yes |
+| GET | `/team-builder/teams` | My teams: team summary list | Yes |
+| POST | `/team-builder/teams` | Create a team: `name` (required, max 100), `company_name` (optional). The creator becomes the top member | Yes |
+| POST | `/team-builder/teams/join` | `invite_code` (8 chars, any member's code). That member becomes the sponsor. 404 for a wrong code, 422 if already in the team | Yes |
+| GET | `/team-builder/teams/{id}` | Team summary plus `direct_members` (`user_id`, `name`, `avatar_url`, `phone`, `joined_at`, `direct_count`, `downline_count`). Members only (403) | Yes |
+| PUT | `/team-builder/teams/{id}` | Rename (`name`, `company_name`). Creator only | Yes |
+| DELETE | `/team-builder/teams/{id}` | Creator only, and only while nobody else is in the team (422) | Yes |
+| POST | `/team-builder/teams/{id}/leave` | Not for the creator, and not while anyone joined under you (422) | Yes |
+| GET | `/team-builder/prospects` | `{ prospects: [summary], status_counts }`, most recently worked first. Optional `status`, `search` (name) | Yes |
+| POST | `/team-builder/prospects` | `name` (required), `phone`, `source`, `team_id` (must be my team), `status` (default `new`), `next_follow_up_at`, `note` (max 500) | Yes |
+| GET | `/team-builder/prospects/{id}` | Prospect plus `activities`, newest first. Owner only (403) | Yes |
+| PUT | `/team-builder/prospects/{id}` | Same fields as create | Yes |
+| DELETE | `/team-builder/prospects/{id}` | Deletes the prospect and its activities | Yes |
+| POST | `/team-builder/prospects/{id}/activities` | `type` (`call`, `plan_shown`, `follow_up`, `meeting`, `note`), `note`, `done_at` (default now, not in the future), optional `status`, and `next_follow_up_at` (sending the key with null clears it). `plan_shown` on a `new` prospect moves it to `plan_shown`. Returns the prospect detail | Yes |
+| DELETE | `/team-builder/prospects/{id}/activities/{activityId}` | Delete an activity. Returns the prospect detail | Yes |
+
+**Team summary fields:** `id`, `name`, `company_name`, `is_owner`, `invite_code` (my own code), `joined_at`, `level` (0 = top), `sponsor` (`id`, `name`, `avatar_url`, `phone`) or null, `direct_count`, `downline_count` (whole downline, any depth).
+
+**Prospect fields:** `id`, `name`, `phone`, `source`, `status` (`new`, `plan_shown`, `follow_up`, `joined`, `not_interested`), `team_id`, `team_name`, `next_follow_up_at`, `joined_at` (set when the status becomes `joined`), `note`, `last_activity_at` (lists only), `created_at`. Moving to `joined` or `not_interested` clears `next_follow_up_at`.
+
+## Guest Group Members (Mobile API)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/v1/groups/{id}/guest-members` | Admin only. Add a member who does not use the app: `name` (required, max 100, unique among the group's members). Creates a `users` row with `is_guest = true` | Yes |
+
+Group members in `GET /api/v1/groups/{id}` include `is_guest`. Guests take part in expenses, splits, balances and settlements like any member; the admin marks their settlements as paid. They never receive notifications and cannot be found in contact search or assigned tasks.
 
 ## Support JodTod
 

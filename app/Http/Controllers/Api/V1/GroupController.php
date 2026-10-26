@@ -87,7 +87,7 @@ class GroupController extends Controller
         }
 
         $group->load(['members' => function ($query) {
-            $query->select('users.id', 'users.name', 'users.email', 'users.phone', 'users.avatar')
+            $query->select('users.id', 'users.name', 'users.email', 'users.phone', 'users.avatar', 'users.is_guest')
                 ->orderByPivot('joined_at');
         }, 'creator:id,name']);
 
@@ -400,6 +400,46 @@ class GroupController extends Controller
         $user->notify(new AddedToGroup($group, $request->user()->name));
 
         return $this->success(null, $user->name . ' has been added to the group.');
+    }
+
+    /**
+     * Add a guest member who does not use the app (name only). Admin only.
+     * The guest is a user row that cannot log in and is never notified.
+     */
+    public function addGuestMember(Request $request, Group $group): JsonResponse
+    {
+        if (!$group->isAdmin($request->user())) {
+            return $this->forbidden('Only group admin can add members.');
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+        ]);
+
+        $name = trim($validated['name']);
+
+        $nameTaken = $group->members()->where('users.name', $name)->exists();
+        if ($nameTaken) {
+            return $this->error('A member with this name is already in the group.', 422);
+        }
+
+        $guest = DB::transaction(function () use ($group, $name, $request) {
+            $guest = User::create([
+                'name' => $name,
+                'is_guest' => true,
+                'guest_created_by' => $request->user()->id,
+            ]);
+
+            GroupMember::create([
+                'group_id' => $group->id,
+                'user_id' => $guest->id,
+                'role' => 'member',
+            ]);
+
+            return $guest;
+        });
+
+        return $this->created($guest->only(['id', 'name', 'is_guest']), $guest->name . ' has been added to the group.');
     }
 
     /**

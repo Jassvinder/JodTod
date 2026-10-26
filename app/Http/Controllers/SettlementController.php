@@ -395,6 +395,11 @@ class SettlementController extends Controller
      */
     private function addSettlementToPersonalExpense(Settlement $settlement, Group $group): void
     {
+        // Guest members have no app, so they keep no personal expenses.
+        if (User::whereKey($settlement->from_user)->where('is_guest', true)->exists()) {
+            return;
+        }
+
         $otherCategory = Category::where('name', 'Other')->first();
 
         $toUser = User::find($settlement->to_user);

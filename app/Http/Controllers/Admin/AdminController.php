@@ -26,13 +26,13 @@ class AdminController extends Controller
         $startOfMonth = $now->copy()->startOfMonth();
 
         // Overall counts
-        $totalUsers = User::count();
+        $totalUsers = User::registered()->count();
         $totalGroups = Group::count();
         $totalExpenses = Expense::count();
         $totalAmountTracked = round((float) Expense::sum('amount'), 2);
 
         // This month stats
-        $newUsersThisMonth = User::where('created_at', '>=', $startOfMonth)->count();
+        $newUsersThisMonth = User::registered()->where('created_at', '>=', $startOfMonth)->count();
         $newGroupsThisMonth = Group::where('created_at', '>=', $startOfMonth)->count();
 
         // Recent 5 users
@@ -58,7 +58,7 @@ class AdminController extends Controller
      */
     public function users(Request $request): Response
     {
-        $query = User::query();
+        $query = User::registered();
 
         // Search filter (name or email)
         if ($search = $request->input('search')) {
@@ -278,7 +278,7 @@ class AdminController extends Controller
                 'expenses' => round((float) Expense::whereYear('expense_date', $month->year)
                     ->whereMonth('expense_date', $month->month)
                     ->sum('amount'), 2),
-                'users' => User::whereYear('created_at', $month->year)
+                'users' => User::registered()->whereYear('created_at', $month->year)
                     ->whereMonth('created_at', $month->month)
                     ->count(),
             ];

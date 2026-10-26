@@ -8,11 +8,14 @@ use App\Http\Controllers\Api\V1\ExpenseController;
 use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\GroupExpenseController;
 use App\Http\Controllers\Api\V1\IncomeController;
+use App\Http\Controllers\Api\V1\LedgerController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OtpController;
 use App\Http\Controllers\Api\V1\RememberItemController;
 use App\Http\Controllers\Api\V1\SettlementController;
 use App\Http\Controllers\Api\V1\SupportController;
+use App\Http\Controllers\Api\V1\TeamBuilder\ProspectController;
+use App\Http\Controllers\Api\V1\TeamBuilder\TeamController;
 use App\Http\Controllers\Api\V1\TodoCategoryController;
 use App\Http\Controllers\Api\V1\TodoController;
 use App\Http\Controllers\DashboardController;
@@ -48,6 +51,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', \App\Http\Middleware\CheckBanned::class])->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
+        Route::put('/user/app-mode', [AuthController::class, 'updateAppMode']);
         Route::post('/email/verification-notification', [AuthController::class, 'resendVerification']);
 
         // Dashboard
@@ -99,6 +103,7 @@ Route::prefix('v1')->group(function () {
         // Todos
         Route::get('/todos', [TodoController::class, 'index']);
         Route::post('/todos', [TodoController::class, 'store']);
+        Route::get('/todos/{todo}', [TodoController::class, 'show']);
         Route::put('/todos/{todo}', [TodoController::class, 'update']);
         Route::delete('/todos/{todo}', [TodoController::class, 'destroy']);
         Route::patch('/todos/{todo}/toggle', [TodoController::class, 'toggle']);
@@ -118,6 +123,38 @@ Route::prefix('v1')->group(function () {
         Route::post('/remember-items/{rememberItem}/entries', [RememberItemController::class, 'storeEntry']);
         Route::delete('/remember-items/{rememberItem}/entries/{rememberEntry}', [RememberItemController::class, 'destroyEntry']);
 
+        // Lend & Borrow (personal ledger)
+        Route::get('/ledger-people', [LedgerController::class, 'index']);
+        Route::post('/ledger-people', [LedgerController::class, 'store']);
+        Route::get('/ledger-people/{ledgerPerson}', [LedgerController::class, 'show']);
+        Route::put('/ledger-people/{ledgerPerson}', [LedgerController::class, 'update']);
+        Route::delete('/ledger-people/{ledgerPerson}', [LedgerController::class, 'destroy']);
+        Route::post('/ledger-people/{ledgerPerson}/entries', [LedgerController::class, 'storeEntry']);
+        Route::put('/ledger-people/{ledgerPerson}/entries/{ledgerEntry}', [LedgerController::class, 'updateEntry']);
+        Route::delete('/ledger-people/{ledgerPerson}/entries/{ledgerEntry}', [LedgerController::class, 'destroyEntry']);
+
+        // Team Builder (network marketing teams, prospects and follow-ups)
+        Route::prefix('team-builder')->group(function () {
+            Route::get('/dashboard', [ProspectController::class, 'dashboard']);
+            Route::get('/follow-ups', [ProspectController::class, 'followUps']);
+
+            Route::get('/teams', [TeamController::class, 'index']);
+            Route::post('/teams', [TeamController::class, 'store']);
+            Route::post('/teams/join', [TeamController::class, 'join']);
+            Route::get('/teams/{team}', [TeamController::class, 'show']);
+            Route::put('/teams/{team}', [TeamController::class, 'update']);
+            Route::delete('/teams/{team}', [TeamController::class, 'destroy']);
+            Route::post('/teams/{team}/leave', [TeamController::class, 'leave']);
+
+            Route::get('/prospects', [ProspectController::class, 'index']);
+            Route::post('/prospects', [ProspectController::class, 'store']);
+            Route::get('/prospects/{prospect}', [ProspectController::class, 'show']);
+            Route::put('/prospects/{prospect}', [ProspectController::class, 'update']);
+            Route::delete('/prospects/{prospect}', [ProspectController::class, 'destroy']);
+            Route::post('/prospects/{prospect}/activities', [ProspectController::class, 'storeActivity']);
+            Route::delete('/prospects/{prospect}/activities/{activity}', [ProspectController::class, 'destroyActivity']);
+        });
+
         // Groups
         Route::get('/groups', [GroupController::class, 'index']);
         Route::post('/groups', [GroupController::class, 'store']);
@@ -127,6 +164,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/groups/join', [GroupController::class, 'join']);
         Route::post('/groups/{group}/leave', [GroupController::class, 'leave']);
         Route::post('/groups/{group}/add-member', [GroupController::class, 'addMember']);
+        Route::post('/groups/{group}/guest-members', [GroupController::class, 'addGuestMember']);
         Route::delete('/groups/{group}/members/{userId}', [GroupController::class, 'removeMember']);
         Route::post('/groups/{group}/members/{userId}/reactivate', [GroupController::class, 'reactivateMember']);
         Route::post('/groups/{group}/members/{userId}/approve', [GroupController::class, 'approveMember']);

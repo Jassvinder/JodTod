@@ -17,7 +17,7 @@ class SendWeeklySummary extends Command
     {
         $weekAgo = now()->subWeek();
 
-        $users = User::where('notification_email', true)
+        $users = User::registered()->where('notification_email', true)
             ->whereNull('banned_at')
             ->cursor();
 
