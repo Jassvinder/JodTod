@@ -11,6 +11,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupExpenseController;
 use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\LedgerController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PhoneVerificationController;
@@ -18,6 +19,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RememberController;
 use App\Http\Controllers\SettlementController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\TeamBuilder\DashboardController as TeamBuilderDashboardController;
+use App\Http\Controllers\TeamBuilder\ProspectController as TeamBuilderProspectController;
+use App\Http\Controllers\TeamBuilder\TeamController as TeamBuilderTeamController;
 use App\Http\Controllers\TodoCategoryController;
 use App\Http\Controllers\TodoController;
 use App\Services\SupportService;
@@ -113,6 +117,43 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/remember/{rememberItem}/entries', [RememberController::class, 'storeEntry'])->name('remember.entries.store');
     Route::delete('/remember/{rememberItem}/entries/{rememberEntry}', [RememberController::class, 'destroyEntry'])->name('remember.entries.destroy');
 
+    // Give & Take (personal ledger)
+    Route::get('/give-take', [LedgerController::class, 'index'])->name('ledger.index');
+    Route::post('/give-take', [LedgerController::class, 'store'])->name('ledger.store');
+    Route::get('/give-take/{ledgerPerson}', [LedgerController::class, 'show'])->name('ledger.show');
+    Route::put('/give-take/{ledgerPerson}', [LedgerController::class, 'update'])->name('ledger.update');
+    Route::delete('/give-take/{ledgerPerson}', [LedgerController::class, 'destroy'])->name('ledger.destroy');
+    Route::post('/give-take/{ledgerPerson}/entries', [LedgerController::class, 'storeEntry'])->name('ledger.entries.store');
+    Route::put('/give-take/{ledgerPerson}/entries/{ledgerEntry}', [LedgerController::class, 'updateEntry'])->name('ledger.entries.update');
+    Route::delete('/give-take/{ledgerPerson}/entries/{ledgerEntry}', [LedgerController::class, 'destroyEntry'])->name('ledger.entries.destroy');
+
+    // Team Builder (network marketing teams, prospects and follow-ups)
+    Route::prefix('team-builder')->name('team-builder.')->group(function () {
+        Route::get('/', [TeamBuilderDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/follow-ups', [TeamBuilderDashboardController::class, 'followUps'])->name('follow-ups');
+        Route::put('/target', [TeamBuilderDashboardController::class, 'updateTarget'])->name('target.update');
+
+        Route::get('/prospects', [TeamBuilderProspectController::class, 'index'])->name('prospects.index');
+        Route::post('/prospects', [TeamBuilderProspectController::class, 'store'])->name('prospects.store');
+        Route::get('/prospects/{prospect}', [TeamBuilderProspectController::class, 'show'])->name('prospects.show');
+        Route::put('/prospects/{prospect}', [TeamBuilderProspectController::class, 'update'])->name('prospects.update');
+        Route::delete('/prospects/{prospect}', [TeamBuilderProspectController::class, 'destroy'])->name('prospects.destroy');
+        Route::post('/prospects/{prospect}/activities', [TeamBuilderProspectController::class, 'storeActivity'])->name('prospects.activities.store');
+        Route::delete('/prospects/{prospect}/activities/{activity}', [TeamBuilderProspectController::class, 'destroyActivity'])->name('prospects.activities.destroy');
+
+        Route::get('/teams', [TeamBuilderTeamController::class, 'index'])->name('teams.index');
+        Route::post('/teams', [TeamBuilderTeamController::class, 'store'])->name('teams.store');
+        Route::post('/teams/join', [TeamBuilderTeamController::class, 'join'])->name('teams.join');
+        Route::get('/teams/{team}', [TeamBuilderTeamController::class, 'show'])->name('teams.show');
+        Route::put('/teams/{team}', [TeamBuilderTeamController::class, 'update'])->name('teams.update');
+        Route::delete('/teams/{team}', [TeamBuilderTeamController::class, 'destroy'])->name('teams.destroy');
+        Route::post('/teams/{team}/leave', [TeamBuilderTeamController::class, 'leave'])->name('teams.leave');
+        Route::get('/teams/{team}/members/{userId}', [TeamBuilderTeamController::class, 'memberShow'])->whereNumber('userId')->name('teams.members.show');
+        Route::put('/teams/{team}/members/{userId}/target', [TeamBuilderTeamController::class, 'updateMemberTarget'])->whereNumber('userId')->name('teams.members.target');
+        Route::post('/teams/{team}/announcements', [TeamBuilderTeamController::class, 'storeAnnouncement'])->name('teams.announcements.store');
+        Route::delete('/announcements/{announcement}', [TeamBuilderTeamController::class, 'destroyAnnouncement'])->name('announcements.destroy');
+    });
+
     // Help & Tips
     Route::get('/help', fn () => Inertia::render('Help'))->name('help');
 
@@ -131,6 +172,7 @@ Route::middleware(['auth', 'verified'/*, 'phone.verified'*/])->group(function ()
     Route::post('/groups/{group}/members/{userId}/approve', [GroupController::class, 'approveMember'])->name('groups.members.approve');
     Route::delete('/groups/{group}/members/{userId}/reject', [GroupController::class, 'rejectMember'])->name('groups.members.reject');
     Route::post('/groups/{group}/add-member', [GroupController::class, 'addMember'])->name('groups.add-member');
+    Route::post('/groups/{group}/guest-members', [GroupController::class, 'addGuestMember'])->name('groups.guest-members.store');
 
     // Group Expenses
     Route::get('/groups/{group}/expenses', [GroupExpenseController::class, 'index'])->name('groups.expenses.index');

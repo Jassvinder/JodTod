@@ -41,6 +41,10 @@ class ExpoPushChannel
             'reactivated_in_group' => 'Welcome Back',
             'join_request_rejected' => 'Join Request Update',
             'contact_request_received' => 'Contact Request',
+            'team_member_joined' => 'New Team Member',
+            'team_announcement' => 'Team Announcement',
+            'team_target_set' => 'Weekly Target',
+            'team_weekly_summary' => 'Team Update',
         ];
 
         $pushTitle = $titleMap[$data['type'] ?? ''] ?? 'JodTod';
@@ -50,6 +54,7 @@ class ExpoPushChannel
             'group_id' => $data['group_id'] ?? null,
             'todo_id' => $data['todo_id'] ?? null,
             'contact_id' => $data['contact_id'] ?? null,
+            'team_id' => $data['team_id'] ?? null,
         ]);
     }
 }

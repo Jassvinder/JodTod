@@ -82,6 +82,16 @@ class TeamMember extends Model
     }
 
     /**
+     * User ids from the top of the tree down to (and including) this member.
+     *
+     * @return int[]
+     */
+    public function pathUserIds(): array
+    {
+        return array_map('intval', explode('/', trim($this->path, '/')));
+    }
+
+    /**
      * Levels below the top of the tree (the owner is level 0).
      */
     public function depth(): int

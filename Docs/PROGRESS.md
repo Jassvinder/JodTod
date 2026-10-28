@@ -1,5 +1,28 @@
 # JodTod - Development Progress
 
+### 2026-10-28 - Web Parity: Give & Take, Guests, Tasks, Team Builder (COMPLETED)
+- **Tasks:** web `TodoController` ignores `assigned_to` from anyone but the creator, rejects guest assignees, and turns the assignee's delete into a flash message. `Todos/Index.vue` shows "Assigned by <name>" instead of the Assign select for the assignee.
+- **Groups:** `POST /groups/{group}/guest-members` (admin, name only) via the new `Group::hasMemberNamed()` / `Group::addGuestMember()` (also used by the API). Show page: guest form in the Add Member modal, "No app" badge. Paid By already defaulted to the current user.
+- **Give & Take:** `/give-take` (`LedgerController`, `Pages/Ledger/Index.vue`): totals, people list with search, selected person with balance, You Gave / You Got, history with running balance, edit/delete entries and person, WhatsApp statement link. Validation and totals moved to `LedgerPerson::RULES`, `LedgerEntry::RULES`, `LedgerPerson::totalsFor()` (API uses them too).
+- **Dashboard:** `ledgerTotals` added to the dashboard data (web and API); To Pay / To Receive cards show the combined amount with Groups and Give & Take rows.
+- **Team Builder web:** `/team-builder` section (sidebar link) with Dashboard, Prospects, Follow-ups, Teams, team page and member page, sharing components in `Components/TeamBuilder` (nav tabs, prospect row, status / flag badges, call + WhatsApp links, target progress + modal, announcement card, team card) and `Utils/teamBuilder.js`. Datetimes use `datetime-local` inputs sent as local time.
+- **Shared logic:** `TeamService`, `ProspectService`, `AnnouncementService` and `TeamStatsService` hold every Team Builder rule; API and web controllers are thin. `TeamBuilderException` renders JSON (status kept: 403/404/422) for the API and a flash error with redirect back on web.
+- New shared frontend pieces: `InitialsAvatar`, `Utils/money.js` (`formatCurrency`), `Utils/phone.js` (WhatsApp / tel links), extra icons in `Icon.vue`.
+- Verified: `npm run build`; PHP lint; the three Team Builder API smoke tests re-run after the refactor (same results); a web smoke test through the HTTP kernel (every new page renders its component, forms redirect with the right flash, access checks). Test rows deleted.
+
+### 2026-10-28 - Team Builder Phase 3 API: Targets, Announcements, Notifications (COMPLETED, API only)
+- Migration `2026_10_28_000000_create_team_targets_and_announcements_tables`: `team_builder_targets` (one per user, `set_by`), `team_announcements`. Models `TeamBuilderTarget` (`RULES`, `toPayload()`) and `TeamAnnouncement` (`visibleTo()` uses the member's path, so a member reads posts by themselves and their upline). `TeamMember::pathUserIds()` added.
+- Member stats moved from `TeamMemberController` into `App\Services\TeamBuilder\TeamStatsService` (also used by the weekly command); member summaries now include `target`.
+- New endpoints: my target, an upline setting a member's target, announcements list/post/delete; the dashboard returns `target` and `latest_announcement`.
+- Notifications (database + Expo push; `ExpoPushChannel` now passes `team_id` and has titles for the new types): `TeamMemberJoined` to the whole upline on join, `TeamAnnouncementPosted` to everyone below the author, `TeamTargetSet` to the member, `TeamWeeklySummary` from the new `team-builder:weekly-summary` command, scheduled Mondays 08:30.
+- Verified locally with three temporary users and a sync queue: own and upline targets (upline-only, validation), announcements (visibility per level, `can_post`, 422 with nobody below, author-only delete), dashboard target and latest announcement, weekly summary for 2 uplines, and the expected notification rows for each user. Test rows deleted.
+
+### 2026-10-26 - Team Builder Phase 2 API: Upline View (COMPLETED, API only)
+- Kept simple on purpose (no tree): `Api\V1\TeamBuilder\TeamMemberController` lists everyone below the user in a team as one flat list, flagged members first, with open prospects, overdue follow-ups, this week's plans / follow-ups / joinings, last active date and a flag. Member detail adds their prospects for that team with names, statuses and dates only (no phone or notes).
+- Flags: `push` (nothing logged for 7 days, counted from the join date for new members), `training` (5+ plans in 30 days, nobody joined). Rules are constants at the top of the controller.
+- Join now makes sponsor and member approved contacts (`Contact::connect()`) and, on the user's first team, moves their team-less prospects into it so the upline sees them. `GET /teams/{id}` no longer returns `direct_members`.
+- No new migrations. Verified locally with temporary users: flags, ordering, upline-only access (404 for an upline), no phone/notes in member prospects, contacts both ways, prospects moved on first join. Test rows deleted.
+
 ### 2026-10-26 - Team Builder Phase 1 API (COMPLETED, API only)
 - New Team Builder mode for network marketers of any company. Migrations `2026_10_26_000000_add_app_mode_to_users_table` (`users.app_mode`) and `2026_10_26_000001_create_team_builder_tables` (`teams`, `team_members`, `prospects`, `prospect_activities`).
 - Tree: every `team_members` row has its own `invite_code` and a materialized `path` of user ids, so joining with someone's code makes them the sponsor and `TeamMember::downlineOf()` finds the whole downline with one `LIKE 'path%'` query.

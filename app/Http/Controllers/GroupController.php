@@ -82,7 +82,7 @@ class GroupController extends Controller
         }
 
         $group->load(['members' => function ($query) {
-            $query->select('users.id', 'users.name', 'users.email', 'users.phone', 'users.avatar')
+            $query->select('users.id', 'users.name', 'users.email', 'users.phone', 'users.avatar', 'users.is_guest')
                 ->orderByPivot('joined_at');
         }, 'creator:id,name']);
 
@@ -495,5 +495,27 @@ class GroupController extends Controller
         $user->notify(new AddedToGroup($group, $request->user()->name));
 
         return back()->with('success', $user->name . ' has been added to the group.');
+    }
+
+    /**
+     * Add someone without the app by name only. Admin only.
+     */
+    public function addGuestMember(Request $request, Group $group): RedirectResponse
+    {
+        if (!$group->isAdmin($request->user())) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+        ]);
+
+        if ($group->hasMemberNamed($validated['name'])) {
+            return back()->withErrors(['name' => 'A member with this name is already in the group.']);
+        }
+
+        $guest = $group->addGuestMember($validated['name'], $request->user()->id);
+
+        return back()->with('success', $guest->name . ' has been added to the group.');
     }
 }

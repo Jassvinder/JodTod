@@ -25,6 +25,15 @@ class Contact extends Model
     }
 
     /**
+     * Make two users approved contacts of each other (both rows), replacing any pending request.
+     */
+    public static function connect(int $userId, int $otherUserId): void
+    {
+        static::updateOrCreate(['user_id' => $userId, 'contact_user_id' => $otherUserId], ['status' => 'approved']);
+        static::updateOrCreate(['user_id' => $otherUserId, 'contact_user_id' => $userId], ['status' => 'approved']);
+    }
+
+    /**
      * Find users to add by name or exact friend code. Approved contacts and the user are hidden;
      * users with a pending request stay visible with its direction in `request_status`
      * (`sent`, `received`, or null).

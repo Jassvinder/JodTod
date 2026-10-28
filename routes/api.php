@@ -15,7 +15,9 @@ use App\Http\Controllers\Api\V1\RememberItemController;
 use App\Http\Controllers\Api\V1\SettlementController;
 use App\Http\Controllers\Api\V1\SupportController;
 use App\Http\Controllers\Api\V1\TeamBuilder\ProspectController;
+use App\Http\Controllers\Api\V1\TeamBuilder\TeamAnnouncementController;
 use App\Http\Controllers\Api\V1\TeamBuilder\TeamController;
+use App\Http\Controllers\Api\V1\TeamBuilder\TeamMemberController;
 use App\Http\Controllers\Api\V1\TodoCategoryController;
 use App\Http\Controllers\Api\V1\TodoController;
 use App\Http\Controllers\DashboardController;
@@ -145,6 +147,13 @@ Route::prefix('v1')->group(function () {
             Route::put('/teams/{team}', [TeamController::class, 'update']);
             Route::delete('/teams/{team}', [TeamController::class, 'destroy']);
             Route::post('/teams/{team}/leave', [TeamController::class, 'leave']);
+            Route::get('/teams/{team}/members', [TeamMemberController::class, 'index']);
+            Route::get('/teams/{team}/members/{userId}', [TeamMemberController::class, 'show'])->whereNumber('userId');
+            Route::put('/teams/{team}/members/{userId}/target', [TeamMemberController::class, 'updateTarget'])->whereNumber('userId');
+            Route::get('/teams/{team}/announcements', [TeamAnnouncementController::class, 'index']);
+            Route::post('/teams/{team}/announcements', [TeamAnnouncementController::class, 'store']);
+            Route::delete('/announcements/{announcement}', [TeamAnnouncementController::class, 'destroy']);
+            Route::put('/target', [ProspectController::class, 'updateMyTarget']);
 
             Route::get('/prospects', [ProspectController::class, 'index']);
             Route::post('/prospects', [ProspectController::class, 'store']);

@@ -1,4 +1,5 @@
 <script setup>
+import { teamBuilderNotificationLink } from '@/Utils/teamBuilder.js';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
@@ -116,8 +117,11 @@ const handleNotificationClick = (notification) => {
 
     // Navigate to relevant page
     const data = notification.data;
+    const teamBuilderLink = teamBuilderNotificationLink(data);
     if (data.type === 'todo_reminder' || data.type === 'todo_assigned') {
         router.visit(route('todos.index'));
+    } else if (teamBuilderLink) {
+        router.visit(teamBuilderLink);
     } else if (data.group_id) {
         if (data.type === 'group_expense_added') {
             router.visit(route('groups.expenses.index', data.group_id));

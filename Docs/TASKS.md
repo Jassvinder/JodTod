@@ -40,19 +40,13 @@
 
 - [ ] **536** - Local database tables are MyISAM, so foreign keys and cascades are not enforced and transactions do not roll back. Check the live database engine; if it is also MyISAM, plan a switch to InnoDB (`ALTER TABLE ... ENGINE=InnoDB`) after a backup. Ledger person delete already removes entries explicitly.
 
-- [ ] **538** - Deploy Team Builder Phase 1 and run migrations on live: check the setup output lists `add_app_mode_to_users_table` and `create_team_builder_tables`. Then test with the mobile app (mobile Task 1537).
+- [ ] **543** - Test the 28-10-2026 web work on the live site after deploy: Todos (assignee sees "Assigned by", no reassign, delete message), group "Add someone without the app" + "No app" badge, Give & Take page (people, You Gave / You Got, edit/delete entries, running balance, WhatsApp statement), Dashboard To Pay / To Receive with Groups and Give & Take rows, Team Builder (dashboard, target, prospects with Log Activity, follow-ups, teams create/join, team page with flags and announcements, member page with target), Team Builder notifications open the right page.
 
-- [ ] **539** - Team Builder Phase 2 API: upline view of the whole downline (tree with each member's weekly numbers, last active date, and their prospects' names, statuses and next follow-up dates; never phone numbers or notes). Flags: "Push needed" when a member logged no plan or follow-up in 7 days; "Training needed" when a member showed many plans but got few joinings. Auto-add the direct sponsor and direct downline as approved contacts on join.
-
-- [ ] **540** - Team Builder Phase 3: weekly targets (set by self or upline) with progress, team announcements / training material, push notifications (follow-up due, someone joined your downline, weekly team summary).
+- [ ] **538** - Deploy Team Builder Phases 1-3 and run migrations on live: check the setup output lists `add_app_mode_to_users_table`, `create_team_builder_tables` and `create_team_targets_and_announcements_tables`. The Monday team summary needs the cron from Task 526. Then test with the mobile app (mobile Task 1537).
 
 ### Web Pending (built in the mobile app first)
 
 Features and fixes shipped in the mobile app that the web app does not have yet. Add every new mobile-only feature here.
-
-- [ ] **533** - Web parity for mobile Tasks 1521–1525: task details view with "Assigned by" before edit and no reassign option for assigned-to-me tasks; hide Delete on assigned-to-me tasks; group expense "Paid By" defaults to the current user; add guest members (no app) to a group; Lend & Borrow page.
-
-- [ ] **541** - Web parity for Team Builder (mobile Task 1536): mode choice, prospects, follow-ups, dashboard, teams (create, join with invite code, direct members).
 
 - [ ] **528** - PWA icons in `public/icons/` (used by `manifest.json`) show an old, different logo, not the current JodTod mark. Regenerate all sizes from `favicon.png` (needs a decision on background/padding for maskable icons).
 
@@ -76,6 +70,14 @@ Features and fixes shipped in the mobile app that the web app does not have yet.
 ## COMPLETED
 
 ## Completed Current Tasks
+
+- [X] **541** - Web Team Builder: pages `TeamBuilder/Dashboard` (weekly numbers, follow-up alerts, target, latest announcement, teams), `Prospects` (list + selected prospect with Log Activity and history), `FollowUps`, `Teams` (create, join), `TeamShow` (team card with invite code copy / WhatsApp, member list with Push / Training filters, announcements), `Member` (numbers, flag, target, prospects). Web controllers in `App\Http\Controllers\TeamBuilder`. Team Builder rules moved into `TeamService`, `ProspectService`, `AnnouncementService` and `TeamStatsService` so the API and web share them; rule errors use `App\Exceptions\TeamBuilderException` (JSON for the API, flash error on web). Sidebar link, notification links (28-10-2026)
+
+- [X] **533** - Web parity for mobile Tasks 1521-1525 and 1528: Todos (assignee cannot reassign, sees "Assigned by", readable delete message, guest users rejected as assignees); groups "Add someone without the app" (`groups.guest-members.store`, shared `Group::addGuestMember()`) and "No app" badge; Give & Take page (`Ledger/Index`, web `LedgerController`, shared `LedgerPerson::RULES`, `LedgerEntry::RULES`, `LedgerPerson::totalsFor()`) with WhatsApp statement; Dashboard To Pay / To Receive add Give & Take (`ledgerTotals` in the dashboard data). Paid By already defaulted to the current user on web (28-10-2026)
+
+- [X] **540** - Team Builder Phase 3 API: weekly targets (self and upline), team announcements with push to everyone below, notifications for a new team member, announcement, target set and a Monday team summary (`team-builder:weekly-summary`); member stats moved to `TeamStatsService` (28-10-2026)
+
+- [X] **539** - Team Builder Phase 2 API (simple upline view, no tree): `TeamMemberController` with the flat member list (flags `push` / `training`, overdue follow-ups, weekly numbers) and member detail with prospect names, statuses and dates only; join adds sponsor and member as contacts and moves team-less prospects into the first team (26-10-2026)
 
 - [X] **537** - Team Builder Phase 1 API: `users.app_mode` + `PUT /api/v1/user/app-mode`; `teams`, `team_members` (per-member invite code, sponsor, materialized path), `prospects`, `prospect_activities`; `Api\V1\TeamBuilder\TeamController` and `ProspectController` with dashboard and follow-ups (26-10-2026)
 

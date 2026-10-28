@@ -117,7 +117,7 @@ class TodoController extends Controller
             'due_date' => 'nullable|date',
             'reminder_at' => 'nullable|date',
             'todo_category_id' => 'nullable|exists:todo_categories,id',
-            'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id,is_guest,0',
         ]);
 
         $todo = Todo::create([
@@ -144,8 +144,13 @@ class TodoController extends Controller
             'due_date' => 'nullable|date',
             'reminder_at' => 'nullable|date',
             'todo_category_id' => 'nullable|exists:todo_categories,id',
-            'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id,is_guest,0',
         ]);
+
+        // Only the creator can reassign a task.
+        if ($todo->user_id !== Auth::id()) {
+            unset($validated['assigned_to']);
+        }
 
         // Reset reminder_sent if reminder time changed
         if (isset($validated['reminder_at']) && $validated['reminder_at'] !== $todo->reminder_at?->toDateTimeString()) {
@@ -178,6 +183,10 @@ class TodoController extends Controller
 
     public function destroy(Todo $todo)
     {
+        if ($todo->assigned_to === Auth::id() && $todo->user_id !== Auth::id()) {
+            return redirect()->back()->with('error', 'This task was assigned to you by someone else, so only they can delete it.');
+        }
+
         $this->authorizeTodo($todo);
 
         $todo->delete();

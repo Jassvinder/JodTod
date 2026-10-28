@@ -416,28 +416,11 @@ class GroupController extends Controller
             'name' => ['required', 'string', 'max:100'],
         ]);
 
-        $name = trim($validated['name']);
-
-        $nameTaken = $group->members()->where('users.name', $name)->exists();
-        if ($nameTaken) {
+        if ($group->hasMemberNamed($validated['name'])) {
             return $this->error('A member with this name is already in the group.', 422);
         }
 
-        $guest = DB::transaction(function () use ($group, $name, $request) {
-            $guest = User::create([
-                'name' => $name,
-                'is_guest' => true,
-                'guest_created_by' => $request->user()->id,
-            ]);
-
-            GroupMember::create([
-                'group_id' => $group->id,
-                'user_id' => $guest->id,
-                'role' => 'member',
-            ]);
-
-            return $guest;
-        });
+        $guest = $group->addGuestMember($validated['name'], $request->user()->id);
 
         return $this->created($guest->only(['id', 'name', 'is_guest']), $guest->name . ' has been added to the group.');
     }

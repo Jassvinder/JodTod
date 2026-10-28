@@ -78,7 +78,13 @@ function startEdit(todo) {
 }
 
 function saveEdit(todo) {
-    editForm.put(route('todos.update', todo.id), {
+    // The assignee cannot reassign, so the field is left out of their update.
+    const isOwner = todo.user_id === authUserId.value;
+    editForm.transform((data) => {
+        if (isOwner) return data;
+        const { assigned_to, ...rest } = data;
+        return rest;
+    }).put(route('todos.update', todo.id), {
         preserveScroll: true,
         onSuccess: () => { editingTodo.value = null; },
     });
@@ -600,7 +606,11 @@ const priorityColors = {
                                     <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                                 </select>
                             </div>
-                            <div v-if="contacts.length > 0" class="flex items-center gap-2">
+                            <!-- Only the creator can reassign; the assignee sees who assigned it instead. -->
+                            <p v-if="todo.user_id !== authUserId" class="text-xs text-gray-500 dark:text-gray-400">
+                                Assigned by {{ todo.user?.name }}
+                            </p>
+                            <div v-else-if="contacts.length > 0" class="flex items-center gap-2">
                                 <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>

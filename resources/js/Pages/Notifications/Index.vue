@@ -1,4 +1,5 @@
 <script setup>
+import { teamBuilderNotificationLink } from '@/Utils/teamBuilder.js';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -24,6 +25,10 @@ const getNotificationLink = (notification) => {
     const data = notification.data || {};
     if (data.type === 'todo_reminder' || data.type === 'todo_assigned') {
         return route('todos.index');
+    }
+    const teamBuilderLink = teamBuilderNotificationLink(data);
+    if (teamBuilderLink) {
+        return teamBuilderLink;
     }
     if (data.group_id) {
         if (data.type === 'group_expense_added') {

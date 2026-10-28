@@ -288,15 +288,22 @@ Network marketing teams (upline/downline), prospects and follow-ups. All routes 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | PUT | `/api/v1/user/app-mode` | `app_mode`: `personal` or `team_builder`. Returns the user. `users.app_mode` is null until the user chooses | Yes |
-| GET | `/team-builder/dashboard` | `week` (Monday to now: `plans_shown`, `follow_ups`, `calls`, `meetings`, `new_prospects`, `joined`), `follow_ups` (`overdue`, `today` counts), `pipeline` (count per status), `teams` (`id`, `name`, `downline_count`) | Yes |
+| GET | `/team-builder/dashboard` | `week` (Monday to now: `plans_shown`, `follow_ups`, `calls`, `meetings`, `new_prospects`, `joined`), `follow_ups` (`overdue`, `today` counts), `pipeline` (count per status), `teams` (`id`, `name`, `downline_count`), `target` (`plans_per_week`, `follow_ups_per_week`, `set_by_name`) or null, `latest_announcement` (newest visible across my teams) or null | Yes |
 | GET | `/team-builder/follow-ups` | Open prospects with a follow-up date: `{ overdue, today, upcoming }` | Yes |
 | GET | `/team-builder/teams` | My teams: team summary list | Yes |
 | POST | `/team-builder/teams` | Create a team: `name` (required, max 100), `company_name` (optional). The creator becomes the top member | Yes |
-| POST | `/team-builder/teams/join` | `invite_code` (8 chars, any member's code). That member becomes the sponsor. 404 for a wrong code, 422 if already in the team | Yes |
-| GET | `/team-builder/teams/{id}` | Team summary plus `direct_members` (`user_id`, `name`, `avatar_url`, `phone`, `joined_at`, `direct_count`, `downline_count`). Members only (403) | Yes |
+| POST | `/team-builder/teams/join` | `invite_code` (8 chars, any member's code). That member becomes the sponsor. Sponsor and new member become approved contacts of each other. On the user's first team, their prospects without a team move into it. 404 for a wrong code, 422 if already in the team | Yes |
+| GET | `/team-builder/teams/{id}` | Team summary. Members only (403) | Yes |
+| GET | `/team-builder/teams/{id}/members` | Everyone below me in the team (any depth) as one flat list, flagged members first: `{ members: [member summary], counts: { total, push, training } }` | Yes |
+| GET | `/team-builder/teams/{id}/members/{userId}` | Member summary plus `prospects` (`id`, `name`, `status`, `next_follow_up_at`, `joined_at`, `last_activity_at`; never phone or note), open ones first. 404 if the user is not below me | Yes |
 | PUT | `/team-builder/teams/{id}` | Rename (`name`, `company_name`). Creator only | Yes |
 | DELETE | `/team-builder/teams/{id}` | Creator only, and only while nobody else is in the team (422) | Yes |
 | POST | `/team-builder/teams/{id}/leave` | Not for the creator, and not while anyone joined under you (422) | Yes |
+| PUT | `/team-builder/target` | My weekly target: `plans_per_week`, `follow_ups_per_week` (0-500, 0 = none). Returns the target | Yes |
+| PUT | `/team-builder/teams/{id}/members/{userId}/target` | An upline sets the weekly target of someone below them (same fields). Notifies the member. Returns the member summary | Yes |
+| GET | `/team-builder/teams/{id}/announcements` | `{ announcements, can_post }`: up to 50 newest posts by me or anyone above me in the team. `can_post` is true when someone is below me | Yes |
+| POST | `/team-builder/teams/{id}/announcements` | `message` (max 1000), `link` (optional URL). Sends a push to everyone below me. 422 when nobody is below me | Yes |
+| DELETE | `/team-builder/announcements/{id}` | Author only | Yes |
 | GET | `/team-builder/prospects` | `{ prospects: [summary], status_counts }`, most recently worked first. Optional `status`, `search` (name) | Yes |
 | POST | `/team-builder/prospects` | `name` (required), `phone`, `source`, `team_id` (must be my team), `status` (default `new`), `next_follow_up_at`, `note` (max 500) | Yes |
 | GET | `/team-builder/prospects/{id}` | Prospect plus `activities`, newest first. Owner only (403) | Yes |
@@ -306,6 +313,10 @@ Network marketing teams (upline/downline), prospects and follow-ups. All routes 
 | DELETE | `/team-builder/prospects/{id}/activities/{activityId}` | Delete an activity. Returns the prospect detail | Yes |
 
 **Team summary fields:** `id`, `name`, `company_name`, `is_owner`, `invite_code` (my own code), `joined_at`, `level` (0 = top), `sponsor` (`id`, `name`, `avatar_url`, `phone`) or null, `direct_count`, `downline_count` (whole downline, any depth).
+
+**Member summary fields:** `user_id`, `name`, `avatar_url`, `phone`, `joined_at`, `is_direct`, `sponsor_name`, `last_active_at`, `open_prospects`, `overdue_follow_ups`, `plans_week`, `follow_ups_week`, `joined_week`, `target` (or null), `flag`. Only prospects saved under this team count. `flag`: `push` when nothing was logged for 7 days (counted from the join date for new members), `training` when 5+ plans were shown in 30 days and nobody joined, otherwise null.
+
+**Team Builder notifications** (database + push, push data includes `team_id`): `team_member_joined` (to the whole upline), `team_announcement` (to everyone below the author), `team_target_set` (to the member), `team_weekly_summary` (Mondays 8:30 AM via `team-builder:weekly-summary`, to anyone with people below them: people count, push / training counts, overdue follow-ups).
 
 **Prospect fields:** `id`, `name`, `phone`, `source`, `status` (`new`, `plan_shown`, `follow_up`, `joined`, `not_interested`), `team_id`, `team_name`, `next_follow_up_at`, `joined_at` (set when the status becomes `joined`), `note`, `last_activity_at` (lists only), `created_at`. Moving to `joined` or `not_interested` clears `next_follow_up_at`.
 

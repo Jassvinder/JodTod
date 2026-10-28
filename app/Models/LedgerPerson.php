@@ -11,6 +11,13 @@ class LedgerPerson extends Model
 {
     protected $table = 'ledger_people';
 
+    // Shared by the API and web controllers.
+    public const RULES = [
+        'name' => 'required|string|max:100',
+        'phone' => 'nullable|string|max:20',
+        'note' => 'nullable|string|max:255',
+    ];
+
     protected $fillable = [
         'user_id',
         'name',
@@ -61,6 +68,26 @@ class LedgerPerson extends Model
                 ? substr((string) $this->entries_max_entry_date, 0, 10)
                 : null,
             'created_at' => $this->created_at,
+        ];
+    }
+
+    /**
+     * Overall totals across all of a user's people: what they will get back and what they owe.
+     */
+    public static function totalsFor(int $userId): array
+    {
+        $balances = static::where('user_id', $userId)
+            ->withLedgerTotals()
+            ->get()
+            ->map(fn (self $person) => $person->toSummary()['balance']);
+
+        $willGet = round($balances->filter(fn ($b) => $b > 0)->sum(), 2);
+        $willGive = round(abs($balances->filter(fn ($b) => $b < 0)->sum()), 2);
+
+        return [
+            'you_will_get' => $willGet,
+            'you_will_give' => $willGive,
+            'net' => round($willGet - $willGive, 2),
         ];
     }
 

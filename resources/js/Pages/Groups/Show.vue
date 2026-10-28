@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import NoContactsNote from '@/Components/Shared/NoContactsNote.vue';
 import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { confirmAction } from '@/Utils/confirm.js';
 
@@ -106,6 +106,18 @@ const addMember = (user) => {
     }, {
         preserveScroll: true,
         onSuccess: () => {
+            showAddMemberModal.value = false;
+        },
+    });
+};
+
+const guestForm = useForm({ name: '' });
+
+const addGuest = () => {
+    guestForm.post(route('groups.guest-members.store', props.group.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            guestForm.reset();
             showAddMemberModal.value = false;
         },
     });
@@ -304,6 +316,13 @@ const memberSharesOpen = ref(true);
 
                         <div class="flex items-center gap-2">
                             <span
+                                v-if="member.is_guest"
+                                class="px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 rounded-full"
+                                title="Added by name; does not use JodTod"
+                            >
+                                No app
+                            </span>
+                            <span
                                 v-if="member.pivot?.role === 'admin'"
                                 class="px-2 py-0.5 text-xs font-medium bg-primary-100 text-primary-700 rounded-full"
                             >
@@ -456,6 +475,24 @@ const memberSharesOpen = ref(true);
         <Modal :show="showAddMemberModal" @close="showAddMemberModal = false" max-width="md">
             <div class="p-6">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add Member from Contacts</h2>
+
+                <!-- Someone without the app: added by name only -->
+                <form class="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20" @submit.prevent="addGuest">
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Add someone without the app</p>
+                    <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Just their name. They are split into expenses like anyone else; you mark their payments.</p>
+                    <div class="mt-3 flex gap-2">
+                        <input
+                            v-model="guestForm.name"
+                            type="text"
+                            maxlength="100"
+                            required
+                            placeholder="e.g. Ramesh"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                        />
+                        <button type="submit" :disabled="guestForm.processing" class="px-3 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 disabled:opacity-60">Add</button>
+                    </div>
+                    <p v-if="guestForm.errors.name" class="mt-1 text-xs text-red-600">{{ guestForm.errors.name }}</p>
+                </form>
 
                 <NoContactsNote v-if="contacts.length === 0" purpose="add more members" />
 

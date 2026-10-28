@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -106,5 +107,32 @@ class Group extends Model
         return $this->groupMembers()
             ->where('user_id', $user->id)
             ->exists();
+    }
+
+    public function hasMemberNamed(string $name): bool
+    {
+        return $this->members()->where('users.name', trim($name))->exists();
+    }
+
+    /**
+     * Add someone without the app: a name-only guest user who is never notified and cannot log in.
+     */
+    public function addGuestMember(string $name, int $createdBy): User
+    {
+        return DB::transaction(function () use ($name, $createdBy) {
+            $guest = User::create([
+                'name' => trim($name),
+                'is_guest' => true,
+                'guest_created_by' => $createdBy,
+            ]);
+
+            GroupMember::create([
+                'group_id' => $this->id,
+                'user_id' => $guest->id,
+                'role' => 'member',
+            ]);
+
+            return $guest;
+        });
     }
 }

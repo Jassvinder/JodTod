@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Expense;
 use App\Models\ExpenseSplit;
 use App\Models\Income;
+use App\Models\LedgerPerson;
 use App\Models\RememberItem;
 use App\Models\Settlement;
 use App\Models\Todo;
@@ -34,6 +35,8 @@ class DashboardController extends Controller
             'rememberStats' => [
                 'total' => RememberItem::where('user_id', $user->id)->count(),
             ],
+            // Give & Take totals, added to the group balances in To Pay / To Receive.
+            'ledgerTotals' => LedgerPerson::totalsFor($user->id),
         ];
 
         if ($this->wantsJson()) {

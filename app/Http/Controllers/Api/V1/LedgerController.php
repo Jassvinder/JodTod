@@ -24,21 +24,9 @@ class LedgerController extends Controller
             ->get()
             ->map(fn (LedgerPerson $person) => $person->toSummary());
 
-        $allBalances = LedgerPerson::where('user_id', Auth::id())
-            ->withLedgerTotals()
-            ->get()
-            ->map(fn (LedgerPerson $person) => $person->toSummary()['balance']);
-
-        $willGet = round($allBalances->filter(fn ($b) => $b > 0)->sum(), 2);
-        $willGive = round(abs($allBalances->filter(fn ($b) => $b < 0)->sum()), 2);
-
         return $this->success([
             'people' => $people,
-            'totals' => [
-                'you_will_get' => $willGet,
-                'you_will_give' => $willGive,
-                'net' => round($willGet - $willGive, 2),
-            ],
+            'totals' => LedgerPerson::totalsFor(Auth::id()),
         ]);
     }
 
@@ -51,11 +39,7 @@ class LedgerController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'phone' => 'nullable|string|max:20',
-            'note' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validate(LedgerPerson::RULES);
 
         $person = LedgerPerson::create([
             ...$validated,
@@ -69,11 +53,7 @@ class LedgerController extends Controller
     {
         $this->authorizePerson($ledgerPerson);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'phone' => 'nullable|string|max:20',
-            'note' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validate(LedgerPerson::RULES);
 
         $ledgerPerson->update($validated);
 
@@ -130,12 +110,7 @@ class LedgerController extends Controller
 
     private function validateEntry(Request $request): array
     {
-        return $request->validate([
-            'type' => 'required|in:gave,got',
-            'amount' => 'required|numeric|min:0.01|max:9999999999.99',
-            'entry_date' => 'required|date|before_or_equal:today',
-            'note' => 'nullable|string|max:255',
-        ]);
+        return $request->validate(LedgerEntry::RULES);
     }
 
     private function ensureEntryBelongs(LedgerPerson $person, LedgerEntry $entry): void

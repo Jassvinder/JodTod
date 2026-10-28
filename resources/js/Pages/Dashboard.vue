@@ -39,6 +39,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    ledgerTotals: {
+        type: Object,
+        default: () => ({ you_will_get: 0, you_will_give: 0, net: 0 }),
+    },
     pendingSettlements: {
         type: Object,
         default: () => ({
@@ -87,6 +91,21 @@ const topCategories = computed(() => {
         percentage: total > 0 ? Math.round((c.total / total) * 100) : 0,
     }));
 });
+
+const balanceCards = computed(() => [
+    {
+        title: 'To Pay', icon: 'arrow-out', tone: 'red', extraClass: '',
+        amountClass: 'text-red-600 dark:text-red-400',
+        groups: Number(props.groupsSummary.total_you_owe) || 0,
+        ledger: Number(props.ledgerTotals.you_will_give) || 0,
+    },
+    {
+        title: 'To Receive', icon: 'arrow-in', tone: 'green', extraClass: 'col-span-2 lg:col-span-1',
+        amountClass: 'text-green-600 dark:text-green-400',
+        groups: Number(props.groupsSummary.total_owed_to_you) || 0,
+        ledger: Number(props.ledgerTotals.you_will_get) || 0,
+    },
+]);
 
 // Format currency in INR
 function formatCurrency(amount) {
@@ -185,14 +204,17 @@ function relativeDate(dateStr) {
                     <p class="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">Income minus expenses</p>
                 </SummaryCard>
 
-                <SummaryCard title="To Pay" icon="arrow-out" tone="red" :href="route('groups.index')">
-                    <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ formatCurrency(groupsSummary.total_you_owe) }}</p>
-                    <p class="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">Across your groups</p>
-                </SummaryCard>
-
-                <SummaryCard title="To Receive" icon="arrow-in" tone="green" :href="route('groups.index')" class="col-span-2 lg:col-span-1">
-                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ formatCurrency(groupsSummary.total_owed_to_you) }}</p>
-                    <p class="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">Across your groups</p>
+                <!-- Group balances plus Give & Take; each source row links to its page. -->
+                <SummaryCard v-for="card in balanceCards" :key="card.title" :title="card.title" :icon="card.icon" :tone="card.tone" :class="card.extraClass">
+                    <p class="text-2xl font-bold" :class="card.amountClass">{{ formatCurrency(card.groups + card.ledger) }}</p>
+                    <Link :href="route('groups.index')" class="mt-1.5 flex items-center justify-between text-[11px] text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <span>Groups</span>
+                        <span class="font-semibold">{{ formatCurrency(card.groups) }} &rsaquo;</span>
+                    </Link>
+                    <Link :href="route('ledger.index')" class="mt-0.5 flex items-center justify-between text-[11px] text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <span>Give &amp; Take</span>
+                        <span class="font-semibold">{{ formatCurrency(card.ledger) }} &rsaquo;</span>
+                    </Link>
                 </SummaryCard>
             </div>
 

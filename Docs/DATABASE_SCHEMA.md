@@ -332,6 +332,36 @@ Team Builder: one network marketing team of any company.
 
 ---
 
+## Table: team_builder_targets
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, UNIQUE, ON DELETE CASCADE | One weekly target per user |
+| set_by | BIGINT UNSIGNED | FK -> users.id, NULLABLE, ON DELETE SET NULL | The user or an upline; the latest save wins |
+| plans_per_week | SMALLINT UNSIGNED | DEFAULT 0 | 0 = no target |
+| follow_ups_per_week | SMALLINT UNSIGNED | DEFAULT 0 | 0 = no target |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+---
+
+## Table: team_announcements
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | BIGINT UNSIGNED | PK, AUTO_INCREMENT | |
+| team_id | BIGINT UNSIGNED | FK -> teams.id, ON DELETE CASCADE | |
+| user_id | BIGINT UNSIGNED | FK -> users.id, ON DELETE CASCADE | Author; readers are everyone below them (path-based) |
+| message | VARCHAR(1000) | NOT NULL | |
+| link | VARCHAR(500) | NULLABLE | Training video, meeting or document |
+| created_at | TIMESTAMP | | |
+| updated_at | TIMESTAMP | | |
+
+**Indexes:** (team_id, created_at)
+
+---
+
 ## Table: prospects
 
 People the user shows the business plan to. Uplines may later see names, statuses and follow-up dates of their downline's prospects, but never phone numbers or notes.
@@ -393,6 +423,8 @@ users (1) ----< (M) group_members (M) >---- (1) groups
   +----< ledger_people ----< ledger_entries
   +----< teams (owner) ----< team_members (also user_id, sponsor_id -> users)
   +----< prospects ----< prospect_activities
+  +----< team_builder_targets (user_id, set_by)
+  +----< team_announcements (author) >---- teams
 
 categories (1) ----< (M) expenses
 ```
